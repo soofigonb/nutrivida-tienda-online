@@ -443,3 +443,71 @@ if (formNutricionista) {
         window.location.href = "admin-nutricionistas.html";
     });
 }
+
+// Sofía - Formulario nuevo / editar paciente (admin)
+
+
+const formPaciente = document.getElementById("form-paciente");
+
+if (formPaciente) {
+
+    const parametros = new URLSearchParams(window.location.search);
+    const idEditar = parametros.get("id") ? Number(parametros.get("id")) : null;
+
+    let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
+
+    const tituloForm = document.getElementById("titulo-form-paciente");
+    const campoNombre = document.getElementById("paciente-nombre");
+    const campoApellidos = document.getElementById("paciente-apellidos");
+    const campoCorreo = document.getElementById("paciente-correo");
+    const campoTipo = document.getElementById("paciente-tipo");
+    const mensajeForm = document.getElementById("mensaje-form-paciente");
+
+    // Si viene un id en la URL, precargamos los datos para editar
+    if (idEditar !== null) {
+        const pacienteExistente = pacientes.find(function (p) {
+            return p.id === idEditar;
+        });
+
+        if (pacienteExistente) {
+            tituloForm.textContent = "Editar paciente";
+            campoNombre.value = pacienteExistente.nombre;
+            campoApellidos.value = pacienteExistente.apellidos;
+            campoCorreo.value = pacienteExistente.correo;
+            campoTipo.value = pacienteExistente.tipo;
+        }
+    }
+
+    formPaciente.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const nombre = campoNombre.value.trim();
+        const apellidos = campoApellidos.value.trim();
+        const correo = campoCorreo.value.trim();
+        const tipo = campoTipo.value;
+
+        // Validación básica. Reemplazar por las funciones de validación de Jonathan (en este mismo app.js)
+        if (nombre === "" || apellidos === "" || correo === "" || tipo === "") {
+            mensajeForm.textContent = "Debe completar todos los campos";
+            mensajeForm.className = "alert alert-danger mt-3";
+            return;
+        }
+
+        if (idEditar !== null) {
+            pacientes = pacientes.map(function (p) {
+                if (p.id === idEditar) {
+                    return { id: p.id, nombre, apellidos, correo, tipo };
+                }
+                return p;
+            });
+        } else {
+            const nuevoId = pacientes.length > 0
+                ? Math.max.apply(null, pacientes.map(function (p) { return p.id; })) + 1
+                : 1;
+            pacientes.push({ id: nuevoId, nombre, apellidos, correo, tipo });
+        }
+
+        localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
+        window.location.href = "admin-pacientes.html";
+    });
+}
