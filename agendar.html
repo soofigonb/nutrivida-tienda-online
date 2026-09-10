@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NutriVida</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oleo+Script:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">NutriVida</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#nosotros">Nosotros</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="agendar.html">Agendar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#contacto">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="registro.html">Registrarse</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <section class="container py-5">
+            <div class="row justify-content-center mb-4">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <p class="text-center text-muted mb-2">Conoce cómo es tu primera consulta</p>
+                    <div class="ratio ratio-16x9">
+                        <iframe src="https://www.youtube.com/embed/9Pf9gUxJgGU"
+                            title="Consejos para una alimentación saludable"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-center mb-4" id="titulo-agendar">Agenda tu cita</h2>
+
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+
+                    <form id="formulario-agenda" class="border rounded p-4 shadow bg-white" novalidate>
+
+                        <div class="mb-3">
+                            <label for="nutricionista" class="form-label">Nutricionista</label>
+                            <select id="nutricionista" class="form-select">
+                                <option value="">Seleccione un nutricionista</option>
+                                <option value="Dra. Camila Torres">Dra. Camila Torres - Nutrición clínica</option>
+                                <option value="Lic. Mateo Silva">Lic. Mateo Silva - Nutrición deportiva</option>
+                                <option value="Dra. Valeria Rojas">Dra. Valeria Rojas - Enfermedades metabólicas
+                                </option>
+                                <option value="Lic. Gabriel Morales">Lic. Gabriel Morales - Alimentación vegetariana
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="motivo" class="form-label">Motivo de consulta</label>
+                            <input type="text" id="motivo" class="form-control" placeholder="Ej: Control de peso">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fecha-cita" class="form-label">Fecha</label>
+                            <input type="date" id="fecha-cita" class="form-control">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="hora-cita" class="form-label">Horario</label>
+                            <select id="hora-cita" class="form-select">
+                                <option value="">Seleccione horario</option>
+                                <option value="09:00">09:00 horas</option>
+                                <option value="11:00">11:00 horas</option>
+                                <option value="15:00">15:00 horas</option>
+                                <option value="17:00">17:00 horas</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Agendar cita</button>
+                    </form>
+
+                    <div id="mensaje-agenda" class="mt-4"></div>
+                </div>
+            </div>
+
+            <h3 class="mt-5 mb-3" id="titulo-citas">Mis citas agendadas</h3>
+            <div id="lista-citas" class="row g-3">
+                <!-- Se cargan dinámicamente desde js/app.js -->
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <footer>
+        <p>Clínica Nutricional NutriVida - Calle Manuel Montt 850, Temuco, Región de La Araucanía</p>
+        <p>Contacto: contacto@nutrividaclinica.cl | Teléfono: +56 45 299 8800</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="js/app.js" defer></script>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 console.log("Hola soy JavaScript");
 
-// promociones
+// Nitsi  - Promociones
 const botonPromocion = document.getElementById("boton-promocion");
 const promocion = document.getElementById("promocion");
 
@@ -16,7 +16,7 @@ if (botonPromocion && promocion) {
     });
 }
 
-// arreglo de los 4 nutricionistas
+// Nitsi - Arreglo de los 4 nutricionistas
 const nutricionistas = [
     {
         id: 1,
@@ -100,4 +100,100 @@ if (contenedor) {
             }
         });
     });
+}
+
+// Sofía - Agendamiento de citas
+
+
+const formularioAgenda = document.getElementById("formulario-agenda");
+const campoNutricionista = document.getElementById("nutricionista");
+const campoMotivo = document.getElementById("motivo");
+const campoFechaCita = document.getElementById("fecha-cita");
+const campoHoraCita = document.getElementById("hora-cita");
+const mensajeAgenda = document.getElementById("mensaje-agenda");
+const listaCitas = document.getElementById("lista-citas");
+
+if (formularioAgenda) {
+
+    // Cargar citas guardadas o crear arreglo vacío
+    let citas = JSON.parse(localStorage.getItem("citasNutriVida")) || [];
+
+    function guardarCitas() {
+        localStorage.setItem("citasNutriVida", JSON.stringify(citas));
+    }
+
+    function renderCitas() {
+        listaCitas.innerHTML = "";
+
+        if (citas.length === 0) {
+            listaCitas.innerHTML = "<p class='text-muted'>No tienes citas agendadas.</p>";
+            return;
+        }
+
+        citas.forEach(function (cita, indice) {
+            const columna = document.createElement("div");
+            columna.className = "col-12 col-md-6";
+
+            columna.innerHTML = `
+                <div class="card p-3">
+                    <p class="mb-1">${cita.nutricionista}</p>
+                    <p class="mb-1">${cita.motivo}</p>
+                    <p class="mb-1">${cita.fecha} - ${cita.hora}</p>
+                    <button class="btn btn-sm btn-outline-danger boton-cancelar" data-indice="${indice}">
+                        Cancelar cita
+                    </button>
+                </div>
+            `;
+
+            listaCitas.appendChild(columna);
+        });
+
+        const botonesCancelar = document.querySelectorAll(".boton-cancelar");
+
+        botonesCancelar.forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                const indice = Number(boton.dataset.indice);
+                citas.splice(indice, 1);
+                guardarCitas();
+                renderCitas();
+
+                mensajeAgenda.textContent = "Cita cancelada correctamente";
+                mensajeAgenda.className = "alert alert-warning mt-4";
+            });
+        });
+    }
+
+    formularioAgenda.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const nutricionista = campoNutricionista.value;
+        const motivo = campoMotivo.value.trim();
+        const fecha = campoFechaCita.value;
+        const hora = campoHoraCita.value;
+
+        if (nutricionista === "" || motivo === "" || fecha === "" || hora === "") {
+            mensajeAgenda.textContent = "Debe completar todos los campos";
+            mensajeAgenda.className = "alert alert-danger mt-4";
+            return;
+        }
+
+        const hoy = new Date().toISOString().split("T")[0];
+
+        if (fecha < hoy) {
+            mensajeAgenda.textContent = "No puede agendar una cita en una fecha pasada";
+            mensajeAgenda.className = "alert alert-danger mt-4";
+            return;
+        }
+
+        citas.push({ nutricionista, motivo, fecha, hora });
+        guardarCitas();
+        renderCitas();
+
+        mensajeAgenda.textContent = "Cita agendada correctamente para " + nutricionista + " el " + fecha + " a las " + hora;
+        mensajeAgenda.className = "alert alert-success mt-4";
+
+        formularioAgenda.reset();
+    });
+
+    renderCitas();
 }

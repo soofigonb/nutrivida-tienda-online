@@ -138,6 +138,64 @@ article img {
     text-decoration: none;
 }
 
+/* ------------------------------------------------------------------ */
+
+/* Sofía - AGENDAR */
+
+#titulo-agendar, #titulo-citas{
+    font-family: "Source Code Pro", monospace;
+    font-weight: 500;
+} 
+#formulario-agenda .form-label {
+    font-family: "Roboto", sans-serif;
+    letter-spacing: 1px; 
+    font-weight: bold;
+    color: #2f241f;
+}
+
+#formulario-agenda .btn-primary {
+    background-color: #047857;
+    border-color: #047857;
+    font-family: "Roboto", sans-serif;
+}
+
+#formulario-agenda .btn-primary:hover {
+    background-color: #036548;
+    border-color: #036548;
+}
+
+#lista-citas .card {
+    border: 1px solid #d8c4b8;
+    border-radius: 10px;
+    transition: border-color 0.2s ease;
+}
+
+#lista-citas .card:hover {
+    border-color: #047857;
+}
+
+#lista-citas .card p:first-child {
+    color: #047857;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#lista-citas .boton-cancelar {
+    margin-top: 8px;
+}
+
+#lista-citas p.text-muted {
+    font-family: "Roboto", sans-serif;
+    font-style: italic;
+    font-size: 15px;
+}
+
+#mensaje-agenda {
+    font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ */
+
 /* Nitsi - Responsivo */
 @media (max-width: 700px) {
     header {
