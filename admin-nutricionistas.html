@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NutriVida - Nutricionistas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oleo+Script:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <aside class="admin-sidebar">
+            <div class="admin-sidebar-brand">
+                <a href="admin-home.html">NutriVida</a>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="admin-home.html" class="admin-nav-link">
+                    <i class="bi bi-house"></i> Dashboard
+                </a>
+                <a href="admin-pacientes.html" class="admin-nav-link">
+                    <i class="bi bi-people"></i> Pacientes
+                </a>
+                <a href="admin-nutricionistas.html" class="admin-nav-link active">
+                    <i class="bi bi-person-badge"></i> Nutricionistas
+                </a>
+            </nav>
+
+            <div class="admin-sidebar-footer">
+                <div class="admin-user">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Administrador</span>
+                </div>
+                <a href="index.html" class="admin-nav-link">
+                    <i class="bi bi-box-arrow-left"></i> Volver al sitio
+                </a>
+            </div>
+        </aside>
+
+        <main class="admin-content">
+            <header class="admin-topbar admin-topbar-flex">
+                <h1>Nutricionistas</h1>
+                <a href="admin-form-nutricionista.html" class="btn btn-primary admin-btn-nuevo">
+                    <i class="bi bi-plus-lg"></i> Nuevo nutricionista
+                </a>
+            </header>
+
+            <section class="admin-panel">
+                <div class="table-responsive">
+                    <table class="table admin-table align-middle">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Especialidad</th>
+                                <th>Modalidad</th>
+                                <th class="text-end">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-nutricionistas">
+                            <!-- Se carga dinámicamente desde js/app.js -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="sin-nutricionistas" class="text-muted d-none">No hay nutricionistas registrados.</p>
+            </section>
+        </main>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="js/app.js" defer></script>
+</body>
+
+</html>
