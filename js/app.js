@@ -225,3 +225,78 @@ if (statNutricionistas) {
     const nutricionistasGuardados = JSON.parse(localStorage.getItem("nutricionistasNutriVida")) || [];
     statNutricionistas.textContent = nutricionistasGuardados.length;
 }
+
+// Sofía - Listado de pacientes (admin)
+
+
+const tablaPacientes = document.getElementById("tabla-pacientes");
+const sinPacientes = document.getElementById("sin-pacientes");
+
+if (tablaPacientes) {
+
+    const pacientesPorDefecto = [
+        { id: 1, nombre: "Ana Muñoz", apellidos: "Fuentes", correo: "ana.munoz@gmail.com", tipo: "Cliente" },
+        { id: 2, nombre: "Diego Paredes", apellidos: "Reyes", correo: "diego.paredes@duoc.cl", tipo: "Cliente" },
+        { id: 3, nombre: "Francisca Vidal", apellidos: "Concha", correo: "francisca.vidal@gmail.com", tipo: "Vendedor" }
+    ];
+
+    let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || pacientesPorDefecto;
+
+    function guardarPacientes() {
+        localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
+    }
+
+    function renderPacientes() {
+        tablaPacientes.innerHTML = "";
+
+        if (pacientes.length === 0) {
+            sinPacientes.classList.remove("d-none");
+            return;
+        }
+
+        sinPacientes.classList.add("d-none");
+
+        pacientes.forEach(function (paciente) {
+            const fila = document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>${paciente.nombre} ${paciente.apellidos}</td>
+                <td>${paciente.correo}</td>
+                <td><span class="badge admin-badge-tipo">${paciente.tipo}</span></td>
+                <td class="text-end">
+                    <a href="admin-form-paciente.html?id=${paciente.id}" class="btn btn-sm btn-outline-secondary me-1">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <button class="btn btn-sm btn-outline-danger boton-eliminar-paciente" data-id="${paciente.id}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            `;
+
+            tablaPacientes.appendChild(fila);
+        });
+
+        const botonesEliminar = document.querySelectorAll(".boton-eliminar-paciente");
+
+        botonesEliminar.forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                const id = Number(boton.dataset.id);
+
+                const confirmar = confirm("¿Seguro que deseas eliminar este paciente?");
+                if (!confirmar) {
+                    return;
+                }
+
+                pacientes = pacientes.filter(function (p) {
+                    return p.id !== id;
+                });
+
+                guardarPacientes();
+                renderPacientes();
+            });
+        });
+    }
+
+    guardarPacientes();
+    renderPacientes();
+}
