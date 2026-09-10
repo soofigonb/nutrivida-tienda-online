@@ -379,3 +379,67 @@ if (tablaNutricionistasAdmin) {
     guardarNutricionistasAdmin();
     renderNutricionistasAdmin();
 }
+
+// Sofía - Formulario nuevo / editar nutricionista (admin)
+
+
+const formNutricionista = document.getElementById("form-nutricionista");
+
+if (formNutricionista) {
+
+    const parametros = new URLSearchParams(window.location.search);
+    const idEditar = parametros.get("id") ? Number(parametros.get("id")) : null;
+
+    let nutricionistasForm = JSON.parse(localStorage.getItem("nutricionistasNutriVida")) || [];
+
+    const tituloForm = document.getElementById("titulo-form-nutricionista");
+    const campoNombre = document.getElementById("nutri-nombre");
+    const campoEspecialidad = document.getElementById("nutri-especialidad");
+    const campoModalidad = document.getElementById("nutri-modalidad");
+    const mensajeForm = document.getElementById("mensaje-form-nutricionista");
+
+    if (idEditar !== null) {
+        const nutriExistente = nutricionistasForm.find(function (n) {
+            return n.id === idEditar;
+        });
+
+        if (nutriExistente) {
+            tituloForm.textContent = "Editar nutricionista";
+            campoNombre.value = nutriExistente.nombre;
+            campoEspecialidad.value = nutriExistente.especialidad;
+            campoModalidad.value = nutriExistente.modalidad;
+        }
+    }
+
+    formNutricionista.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const nombre = campoNombre.value.trim();
+        const especialidad = campoEspecialidad.value.trim();
+        const modalidad = campoModalidad.value;
+
+        // Validación básica. Reemplazar por las funciones de validación de Jonathan (en este mismo app.js)
+        if (nombre === "" || especialidad === "" || modalidad === "") {
+            mensajeForm.textContent = "Debe completar todos los campos";
+            mensajeForm.className = "alert alert-danger mt-3";
+            return;
+        }
+
+        if (idEditar !== null) {
+            nutricionistasForm = nutricionistasForm.map(function (n) {
+                if (n.id === idEditar) {
+                    return { id: n.id, nombre, especialidad, modalidad };
+                }
+                return n;
+            });
+        } else {
+            const nuevoId = nutricionistasForm.length > 0
+                ? Math.max.apply(null, nutricionistasForm.map(function (n) { return n.id; })) + 1
+                : 1;
+            nutricionistasForm.push({ id: nuevoId, nombre, especialidad, modalidad });
+        }
+
+        localStorage.setItem("nutricionistasNutriVida", JSON.stringify(nutricionistasForm));
+        window.location.href = "admin-nutricionistas.html";
+    });
+}

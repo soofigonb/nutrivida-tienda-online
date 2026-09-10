@@ -8,7 +8,7 @@ body {
     background-color: #fffaf4;
 }
 
-/* Nitsi - NAVBAR */
+/* Nitsi - Navbar */
 
 header {
     padding: 20px;
@@ -140,7 +140,7 @@ article img {
 
 /* ------------------------------------------------------------------ */
 
-/* Sofía - AGENDAR */
+/* Sofía - Agendar */
 
 #titulo-agendar, #titulo-citas{
     font-family: "Source Code Pro", monospace;
@@ -196,7 +196,7 @@ article img {
 
 /* ------------------------------------------------------------------ */
 
-/* Sofía - PANEL ADMINISTRADOR   */
+/* Sofía - Panel administrador   */
 
 .admin-layout {
     display: flex;
@@ -317,6 +317,7 @@ article img {
     margin: 4px 0 0;
 }
 
+/* ------------------------------------------------------------------ */
 
 /* Sofía - Panel Pacientes - Nutricionistas*/
 
@@ -370,6 +371,44 @@ article img {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+/* ------------------------------------------------------------------ */
+
+
+/* Sofía - Formularios admin (nuevo / editar) */
+
+.admin-form-card {
+    background-color: white;
+    border: 1px solid #d8c4b8;
+    border-radius: 10px;
+    padding: 24px;
+    font-family: "Roboto", sans-serif;
+}
+
+.admin-form-card .form-label {
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #2f241f;
+}
+
+.admin-form-card .form-text {
+    display: block;
+    min-height: 1rem;
+    color: #b91c1c;
+}
+
+.admin-form-card .is-invalid {
+    border-color: #b91c1c;
+}
+
+.admin-form-card .is-valid {
+    border-color: #047857;
+}
+
+.admin-btn-volver {
+    font-family: "Roboto", sans-serif;
+    white-space: nowrap;
 }
 
 
