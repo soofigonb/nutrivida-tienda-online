@@ -138,6 +138,190 @@ article img {
     text-decoration: none;
 }
 
+/* ------------------------------------------------------------------ */
+
+/* Sofía - AGENDAR */
+
+#titulo-agendar, #titulo-citas{
+    font-family: "Source Code Pro", monospace;
+    font-weight: 500;
+} 
+#formulario-agenda .form-label {
+    font-family: "Roboto", sans-serif;
+    letter-spacing: 1px; 
+    font-weight: bold;
+    color: #2f241f;
+}
+
+#formulario-agenda .btn-primary {
+    background-color: #047857;
+    border-color: #047857;
+    font-family: "Roboto", sans-serif;
+}
+
+#formulario-agenda .btn-primary:hover {
+    background-color: #036548;
+    border-color: #036548;
+}
+
+#lista-citas .card {
+    border: 1px solid #d8c4b8;
+    border-radius: 10px;
+    transition: border-color 0.2s ease;
+}
+
+#lista-citas .card:hover {
+    border-color: #047857;
+}
+
+#lista-citas .card p:first-child {
+    color: #047857;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+#lista-citas .boton-cancelar {
+    margin-top: 8px;
+}
+
+#lista-citas p.text-muted {
+    font-family: "Roboto", sans-serif;
+    font-style: italic;
+    font-size: 15px;
+}
+
+#mensaje-agenda {
+    font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ */
+
+/* Sofía - PANEL ADMINISTRADOR   */
+
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background-color: #1f2937;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0;
+}
+
+.admin-sidebar-brand {
+    padding: 0 20px 20px;
+    font-family: "Fraunces", serif;
+    letter-spacing: 3px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    margin-bottom: 16px;
+}
+
+.admin-sidebar-brand a {
+    color: white;
+    text-decoration: none;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.admin-nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Roboto", sans-serif;
+    transition: background-color 0.2s ease;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link.active {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.admin-sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    padding-top: 12px;
+    margin-top: 12px;
+}
+
+.admin-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 20px 16px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: "Roboto", sans-serif;
+    font-size: 0.9rem;
+}
+
+.admin-user i {
+    font-size: 1.2rem;
+}
+
+.admin-content {
+    flex-grow: 1;
+    padding: 32px 40px;
+    background-color: #fffaf4;
+}
+
+.admin-topbar {
+    margin-bottom: 24px;
+    background-color: transparent;
+}
+
+.admin-topbar h1 {
+    font-family: "Fraunces", serif;
+    font-size: 2rem;
+    font-weight: 500;
+    color: #1f2937;
+    letter-spacing: 0.3px;
+    border-bottom: 2px solid #e5e0d8;
+    padding-bottom: 16px;
+}
+
+.admin-panel {
+    background-color: transparent;
+}
+
+.admin-stat-card {
+    background-color: white;
+    border: 1px solid #d8c4b8;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+}
+
+.admin-stat-number {
+    font-family: "Fraunces", serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: #0f766e;
+    margin: 0;
+}
+
+.admin-stat-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin: 4px 0 0;
+}
+
+
+
+
+/*-------------------------------------------------------------------*/
+
 /* Nitsi - Responsivo */
 @media (max-width: 700px) {
     header {
@@ -160,5 +344,25 @@ article img {
 
     .productos {
         flex-direction: column;
+    }
+}
+
+/* Sofía - Responsivo admin */
+@media (max-width: 768px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+    }
+
+    .admin-content {
+        padding: 20px;
+    }
+
+    .admin-btn-volver {
+        padding: 4px 10px;
+        font-size: 0.85rem;
     }
 }
