@@ -102,8 +102,9 @@ if (contenedor) {
     });
 }
 
-// Sofía - Agendamiento de citas
 
+
+// Sofía - Agendamiento de citas
 
 const formularioAgenda = document.getElementById("formulario-agenda");
 const campoNutricionista = document.getElementById("nutricionista");
@@ -196,4 +197,31 @@ if (formularioAgenda) {
     });
 
     renderCitas();
+}
+
+
+// Sofía - Dashboard admin 
+
+const statCitasHoy = document.getElementById("stat-citas-hoy");
+const statPacientes = document.getElementById("stat-pacientes");
+const statNutricionistas = document.getElementById("stat-nutricionistas");
+
+if (statCitasHoy) {
+    const citasGuardadas = JSON.parse(localStorage.getItem("citasNutriVida")) || [];
+    const hoy = new Date().toISOString().split("T")[0];
+    const citasDeHoy = citasGuardadas.filter(function (cita) {
+        return cita.fecha === hoy;
+    });
+
+    statCitasHoy.textContent = citasDeHoy.length;
+}
+
+if (statPacientes) {
+    const pacientesGuardados = JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
+    statPacientes.textContent = pacientesGuardados.length;
+}
+
+if (statNutricionistas) {
+    const nutricionistasGuardados = JSON.parse(localStorage.getItem("nutricionistasNutriVida")) || [];
+    statNutricionistas.textContent = nutricionistasGuardados.length;
 }
