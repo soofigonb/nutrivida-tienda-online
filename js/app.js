@@ -300,3 +300,82 @@ if (tablaPacientes) {
     guardarPacientes();
     renderPacientes();
 }
+
+
+// Sofía - Listado de nutricionistas (admin)
+
+
+const tablaNutricionistasAdmin = document.getElementById("tabla-nutricionistas");
+const sinNutricionistas = document.getElementById("sin-nutricionistas");
+
+if (tablaNutricionistasAdmin) {
+
+    const nutricionistasPorDefecto = [
+        { id: 1, nombre: "Dra. Camila Torres", especialidad: "Nutrición clínica y pérdida de peso", modalidad: "Presencial y online" },
+        { id: 2, nombre: "Lic. Mateo Silva", especialidad: "Nutrición deportiva y alto rendimiento", modalidad: "Presencial" },
+        { id: 3, nombre: "Dra. Valeria Rojas", especialidad: "Control de enfermedades metabólicas", modalidad: "Presencial y online" },
+        { id: 4, nombre: "Lic. Gabriel Morales", especialidad: "Alimentación vegetariana y vegana", modalidad: "Online" }
+    ];
+
+    let nutricionistasAdmin = JSON.parse(localStorage.getItem("nutricionistasNutriVida")) || nutricionistasPorDefecto;
+
+    function guardarNutricionistasAdmin() {
+        localStorage.setItem("nutricionistasNutriVida", JSON.stringify(nutricionistasAdmin));
+    }
+
+    function renderNutricionistasAdmin() {
+        tablaNutricionistasAdmin.innerHTML = "";
+
+        if (nutricionistasAdmin.length === 0) {
+            sinNutricionistas.classList.remove("d-none");
+            return;
+        }
+
+        sinNutricionistas.classList.add("d-none");
+
+        nutricionistasAdmin.forEach(function (nutri) {
+            const fila = document.createElement("tr");
+
+            fila.innerHTML = `
+                <td>${nutri.nombre}</td>
+                <td>${nutri.especialidad}</td>
+                <td><span class="badge admin-badge-tipo">${nutri.modalidad}</span></td>
+                <td class="text-end">
+                    <div class="d-flex justify-content-end gap-1">
+                        <a href="admin-form-nutricionista.html?id=${nutri.id}" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <button class="btn btn-sm btn-outline-danger boton-eliminar-nutricionista" data-id="${nutri.id}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            tablaNutricionistasAdmin.appendChild(fila);
+        });
+
+        const botonesEliminarNutri = document.querySelectorAll(".boton-eliminar-nutricionista");
+
+        botonesEliminarNutri.forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                const id = Number(boton.dataset.id);
+
+                const confirmar = confirm("¿Seguro que deseas eliminar este nutricionista?");
+                if (!confirmar) {
+                    return;
+                }
+
+                nutricionistasAdmin = nutricionistasAdmin.filter(function (n) {
+                    return n.id !== id;
+                });
+
+                guardarNutricionistasAdmin();
+                renderNutricionistasAdmin();
+            });
+        });
+    }
+
+    guardarNutricionistasAdmin();
+    renderNutricionistasAdmin();
+}
