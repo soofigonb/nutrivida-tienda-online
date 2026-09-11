@@ -89,14 +89,22 @@ if (contenedor) {
 
             if (encontrado && detalleModal) {
                 detalleModal.innerHTML = `
-                    <div class="alert alert-success mt-3" role="alert">
-                        <h4 class="alert-heading">${encontrado.nombre}</h4>
+                    <div class="alert alert-success mt-3 position-relative" role="alert">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" id="cerrar-detalle-nutri" aria-label="Cerrar detalle"></button>
+                        <h4 class="alert-heading pe-4">${encontrado.nombre}</h4>
                         <p><strong>Especialidad:</strong> ${encontrado.especialidad}</p>
                         <p><strong>Modalidad:</strong> ${encontrado.modalidad}</p>
                         <hr>
                         <p class="mb-0">${encontrado.experiencia}</p>
                     </div>
                 `;
+
+                const btnCerrar = document.getElementById("cerrar-detalle-nutri");
+                if (btnCerrar) {
+                    btnCerrar.addEventListener("click", function(){
+                        detalleModal.innerHTML = "";
+                    });
+                }
             }
         });
     });
