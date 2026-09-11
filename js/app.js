@@ -487,27 +487,112 @@ if (formPaciente) {
         const tipo = campoTipo.value;
 
         // Validación básica. Reemplazar por las funciones de validación de Jonathan (en este mismo app.js)
-        if (nombre === "" || apellidos === "" || correo === "" || tipo === "") {
-            mensajeForm.textContent = "Debe completar todos los campos";
-            mensajeForm.className = "alert alert-danger mt-3";
-            return;
-        }
+        document.addEventListener("DOMContentLoaded", function () {
+    const formPaciente = document.getElementById("formPaciente");
 
-        if (idEditar !== null) {
-            pacientes = pacientes.map(function (p) {
-                if (p.id === idEditar) {
-                    return { id: p.id, nombre, apellidos, correo, tipo };
-                }
-                return p;
-            });
-        } else {
-            const nuevoId = pacientes.length > 0
-                ? Math.max.apply(null, pacientes.map(function (p) { return p.id; })) + 1
-                : 1;
-            pacientes.push({ id: nuevoId, nombre, apellidos, correo, tipo });
-        }
+    const idEditar = localStorage.getItem("idPacienteEditar") //paciente existente
+        ? parseInt(localStorage.getItem("idPacienteEditar")) 
+        : null;
 
-        localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
-        window.location.href = "admin-pacientes.html";
-    });
-}
+    if (formPaciente) {
+        formPaciente.addEventListener("submit", function (e) {
+            e.preventDefault(); // Evitar el recargue de la página
+
+            const nombreInput = document.getElementById("nombre");
+            const apellidosInput = document.getElementById("apellidos");
+            const correoInput = document.getElementById("correo");
+            const telefonoInput = document.getElementById("telefono");
+            const passwordInput = document.getElementById("password");
+            const confirmarPasswordInput = document.getElementById("confirmarPassword");
+            const regionInput = document.getElementById("region");
+            const comunaInput = document.getElementById("comuna");
+            const mensajeForm = document.getElementById("mensajeForm");
+
+            //obtener valores
+            const nombre = nombreInput.value.trim();
+            const apellidos = apellidosInput.value.trim();
+            const correo = correoInput.value.trim();
+            const telefono = telefonoInput.value.trim();
+            const password = passwordInput.value.trim();
+            const confirmarPassword = confirmarPasswordInput.value.trim();
+            const region = regionInput.value;
+            const comuna = comunaInput.value;
+
+            function mostrarError(mensaje) {
+                mensajeForm.textContent = mensaje;
+                mensajeForm.className = "alert alert-danger mt-2 py-2 small";
+            }
+
+            
+            if (!nombre || !apellidos || !correo || !telefono || !password || !confirmarPassword || !region || !comuna) {
+                mostrarError("Debe completar todos los campos del formulario.");
+                return;
+            }
+            
+            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!regexEmail.test(correo)) {
+                mostrarError("Por favor, ingrese un correo electrónico válido.");
+                correoInput.focus();
+                return;
+            }
+
+            const regexTelefono = /^[0-9]{8,12}$/;
+            if (!regexTelefono.test(telefono)) {
+                mostrarError("El teléfono debe contener solo números (mínimo 8 dígitos).");
+                telefonoInput.focus();
+                return;
+            }
+
+            if (password.length < 6) {
+                mostrarError("La contraseña debe tener al menos 6 caracteres.");
+                passwordInput.focus();
+                return;
+            }
+
+            if (password !== confirmarPassword) {
+                mostrarError("Las contraseñas no coinciden. Por favor, verifíquelas.");
+                confirmarPasswordInput.focus();
+                return;
+            }
+
+            // Si todas las validaciones pasan, se limpia el mensaje de error
+            mensajeForm.textContent = "";
+            mensajeForm.className = "";
+
+            let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
+
+            if (idEditar !== null) {
+                pacientes = pacientes.map(function (p) {
+                    if (p.id === idEditar) {
+                        return { id: p.id, nombre, apellidos, correo, telefono, password, region, comuna };
+                    }
+                    return p;
+                });
+                localStorage.removeItem("idPacienteEditar");
+            } else {
+                const nuevoId = pacientes.length > 0
+                    ? Math.max.apply(null, pacientes.map(function (p) { return p.id; })) + 1
+                    : 1;
+
+                pacientes.push({
+                    id: nuevoId,
+                    nombre,
+                    apellidos,
+                    correo,
+                    telefono,
+                    password,
+                    region,
+                    comuna
+                });
+            }
+
+            // Guardar cambios y redirigir
+            localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
+            
+            mensajeForm.textContent = "¡Paciente registrado exitosamente!";
+            mensajeForm.className = "alert alert-success mt-2 py-2 small";
+
+            setTimeout(function () {
+                window.location.href = "admin-pacientes.html";
+            }, 1000);
+        });

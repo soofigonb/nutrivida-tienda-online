@@ -28,7 +28,6 @@
                             <a class="nav-link" href="index.html#nosotros">Nosotros</a>
                         </li>
                         <li class="nav-item">
-                            <li class="nav-item">
                             <a class="nav-link" href="agendar.html">Agendar</a>
                         </li>
                         <li class="nav-item">
@@ -44,8 +43,8 @@
                 </div>
             </div>
         </nav>
-    </header>     <a class="nav-link" href="index.html#blogs">Blogs</a>
-                        </li>
+    </header>
+
     <div class="container my-4">
         
         <div class="mx-auto" style="max-width: 900px;">
@@ -68,31 +67,31 @@
                             <div class="row g-2">
                                 <div class="col-6 mb-1">
                                     <label class="form-label small mb-1">Nombre</label>
-                                    <input type="text" class="form-control form-control-sm" required>
+                                    <input type="text" id="nombre" class="form-control form-control-sm" required>
                                 </div>
                                 <div class="col-6 mb-1">
                                     <label class="form-label small mb-1">Apellidos</label>
-                                    <input type="text" class="form-control form-control-sm" required>
+                                    <input type="text" id="apellidos" class="form-control form-control-sm" required>
                                 </div>
                                 <div class="col-12 mb-1">
                                     <label class="form-label small mb-1">Correo electrónico</label>
-                                    <input type="email" class="form-control form-control-sm" required>
+                                    <input type="email" id="correo" class="form-control form-control-sm" required>
                                 </div>
                                 <div class="col-12 mb-1">
                                     <label class="form-label small mb-1">Teléfono</label>
-                                    <input type="tel" class="form-control form-control-sm" required>
+                                    <input type="tel" id="telefono" class="form-control form-control-sm" required>
                                 </div>
                                 <div class="col-6 mb-1">
                                     <label class="form-label small mb-1">Contraseña</label>
-                                    <input type="password" class="form-control form-control-sm" required>
+                                    <input type="password" id="password" class="form-control form-control-sm" required>
                                 </div>
                                 <div class="col-6 mb-1">
                                     <label class="form-label small mb-1">Confirmar contraseña</label>
-                                    <input type="password" class="form-control form-control-sm" required>
+                                    <input type="password" id="confirmarPassword" class="form-control form-control-sm" required>
                                 </div>
                                 <div class="col-6 mb-2">
                                     <label class="form-label small mb-1">Región</label>
-                                    <select class="form-select form-select-sm" required>
+                                    <select id="region" class="form-select form-select-sm" required>
                                         <option value="">Seleccione región</option>
                                         <option value="region1">Región de los Ríos</option>
                                         <option value="region2">Región de los Lagos</option>
@@ -101,13 +100,16 @@
                                 </div>
                                 <div class="col-6 mb-2">
                                     <label class="form-label small mb-1">Comuna</label>
-                                    <select class="form-select form-select-sm" required>
+                                    <select id="comuna" class="form-select form-select-sm" required>
                                         <option value="">Seleccione comuna</option>
                                         <option value="comuna1">Valdivia</option>
                                         <option value="comuna2">Puerto Montt</option>
                                         <option value="comuna3">Temuco</option>
                                     </select>
                                 </div>
+
+                                <div id="mensajeForm" class="col-12"></div>
+
                                 <div class="col-12 mt-3">
                                     <button type="submit" class="btn btn-info text-white w-100">Registrar paciente</button>
                                 </div>
@@ -119,6 +121,8 @@
             </div>
         </div>
     </div>
+
+    <script src="js/app.js"></script>
 </body>
 
 </html>
