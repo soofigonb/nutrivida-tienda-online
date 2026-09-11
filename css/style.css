@@ -63,6 +63,22 @@ footer {
     font-size: 1rem;
 }
 
+footer a {
+    color: white;
+    margin: 0 10px;
+    font-size: 1.5rem;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    display: inline-block;
+    text-decoration: none;
+}
+
+footer a:hover {
+    color: #e2e8f0;
+    opacity: 0.8;
+    transform: translateY(-2px);
+}
+
+
 .productos {
     display: flex;
     gap: 20px;
