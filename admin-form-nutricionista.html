@@ -4,15 +4,22 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>NutriVida - Nutricionista</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
+
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link
-        href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oleo+Script:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -20,51 +27,90 @@
 
     <div class="admin-layout">
 
+        <!-- Menú lateral -->
         <aside class="admin-sidebar">
+
             <div class="admin-sidebar-brand">
-                <a href="admin-home.html">NutriVida</a>
+
+                <a href="admin-home.html">
+                    <i class="bi bi-heart-pulse"></i>
+                    NutriVida
+                </a>
+
+                <span>Panel administrador</span>
+
             </div>
 
-            <nav class="admin-nav">
+            <nav class="admin-nav" aria-label="Navegación administrativa">
+
                 <a href="admin-home.html" class="admin-nav-link">
-                    <i class="bi bi-house"></i> Dashboard
+
+                    <i class="bi bi-grid"></i>
+                    Dashboard
                 </a>
+
                 <a href="admin-pacientes.html" class="admin-nav-link">
-                    <i class="bi bi-people"></i> Pacientes
+
+                    <i class="bi bi-people"></i>
+                    Pacientes
                 </a>
-                <a href="admin-nutricionistas.html" class="admin-nav-link active">
-                    <i class="bi bi-person-badge"></i> Nutricionistas
+
+                <a href="admin-nutricionistas.html" class="admin-nav-link active" aria-current="page">
+
+                    <i class="bi bi-person-badge"></i>
+                    Nutricionistas
                 </a>
+
             </nav>
 
             <div class="admin-sidebar-footer">
+
                 <div class="admin-user">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Administrador</span>
+
+                    <div class="admin-user-icono">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+
+                    <div>
+                        <strong>Administrador</strong>
+                        <span>Sesión activa</span>
+                    </div>
+
                 </div>
+
                 <a href="index.html" class="admin-nav-link">
-                    <i class="bi bi-box-arrow-left"></i> Volver al sitio
+
+                    <i class="bi bi-box-arrow-left"></i>
+                    Volver al sitio
                 </a>
+
             </div>
+
         </aside>
 
+        <!-- Contenido principal -->
         <main class="admin-content">
 
             <header class="admin-topbar admin-topbar-listado">
 
                 <div>
-                    <p class="admin-bienvenida">Gestión de pacientes</p>
 
-                    <h1 id="titulo-form-paciente">
-                        Nuevo paciente
+                    <p class="admin-bienvenida">
+                        Gestión de profesionales
+                    </p>
+
+                    <h1 id="titulo-form-nutricionista">
+                        Nuevo nutricionista
                     </h1>
 
                     <p class="admin-descripcion">
-                        Completa los datos personales y de contacto del paciente.
+                        Registra los datos profesionales y la modalidad
+                        de atención.
                     </p>
+
                 </div>
 
-                <a href="admin-pacientes.html" class="admin-btn-volver">
+                <a href="admin-nutricionistas.html" class="admin-btn-volver">
 
                     <i class="bi bi-arrow-left"></i>
                     Volver al listado
@@ -79,147 +125,88 @@
                     <div class="admin-form-encabezado">
 
                         <div class="admin-form-icono">
-                            <i class="bi bi-person-plus"></i>
+                            <i class="bi bi-person-badge"></i>
                         </div>
 
                         <div>
-                            <h2>Información del paciente</h2>
+
+                            <h2>
+                                Información profesional
+                            </h2>
 
                             <p>
-                                Los campos señalados son obligatorios.
+                                Completa todos los datos del nutricionista.
                             </p>
+
                         </div>
 
                     </div>
 
-                    <form id="form-paciente" class="admin-form-card" novalidate>
+                    <form id="form-nutricionista" class="admin-form-card" novalidate>
 
                         <div class="row g-4">
 
                             <!-- Nombre -->
-                            <div class="col-12 col-md-6">
+                            <div class="col-12">
 
-                                <label for="paciente-nombre" class="form-label">
-                                    Nombre
+                                <label for="nutri-nombre" class="form-label">
+                                    Nombre completo
                                 </label>
 
-                                <input type="text" id="paciente-nombre" class="form-control" minlength="2"
-                                    maxlength="50" autocomplete="given-name" required>
+                                <input type="text" id="nutri-nombre" name="nombre" class="form-control"
+                                    placeholder="Ej: Dra. Camila Torres" minlength="3" maxlength="80"
+                                    autocomplete="name" aria-describedby="error-nutri-nombre" required>
 
-                                <small class="form-text" id="error-paciente-nombre">
+                                <small id="error-nutri-nombre" class="form-text" aria-live="polite">
                                 </small>
 
                             </div>
 
-                            <!-- Apellidos -->
-                            <div class="col-12 col-md-6">
+                            <!-- Especialidad -->
+                            <div class="col-12 col-md-7">
 
-                                <label for="paciente-apellidos" class="form-label">
-                                    Apellidos
+                                <label for="nutri-especialidad" class="form-label">
+                                    Especialidad
                                 </label>
 
-                                <input type="text" id="paciente-apellidos" class="form-control" minlength="2"
-                                    maxlength="80" autocomplete="family-name" required>
+                                <input type="text" id="nutri-especialidad" name="especialidad" class="form-control"
+                                    placeholder="Ej: Nutrición deportiva" minlength="4" maxlength="100"
+                                    autocomplete="off" aria-describedby="error-nutri-especialidad" required>
 
-                                <small class="form-text" id="error-paciente-apellidos">
+                                <small id="error-nutri-especialidad" class="form-text" aria-live="polite">
                                 </small>
 
                             </div>
 
-                            <!-- RUN -->
-                            <div class="col-12 col-md-6">
+                            <!-- Modalidad -->
+                            <div class="col-12 col-md-5">
 
-                                <label for="paciente-run" class="form-label">
-                                    RUN
+                                <label for="nutri-modalidad" class="form-label">
+                                    Modalidad
                                 </label>
 
-                                <input type="text" id="paciente-run" class="form-control" placeholder="Ej: 18.345.678-5"
-                                    maxlength="12" autocomplete="off" required>
+                                <select id="nutri-modalidad" name="modalidad" class="form-select"
+                                    aria-describedby="error-nutri-modalidad" required>
 
-                                <small class="form-text" id="error-paciente-run">
-                                </small>
+                                    <option value="">
+                                        Seleccione una modalidad
+                                    </option>
 
-                            </div>
+                                    <option value="Presencial">
+                                        Presencial
+                                    </option>
 
-                            <!-- Correo -->
-                            <div class="col-12 col-md-6">
+                                    <option value="Online">
+                                        Online
+                                    </option>
 
-                                <label for="paciente-correo" class="form-label">
-                                    Correo electrónico
-                                </label>
+                                    <option value="Presencial y online">
+                                        Presencial y online
+                                    </option>
 
-                                <input type="email" id="paciente-correo" class="form-control"
-                                    placeholder="nombre@correo.cl" autocomplete="email" required>
-
-                                <small class="form-text" id="error-paciente-correo">
-                                </small>
-
-                            </div>
-
-                            <!-- Fecha de nacimiento -->
-                            <div class="col-12 col-md-6">
-
-                                <label for="paciente-fecha-nacimiento" class="form-label">
-                                    Fecha de nacimiento
-                                </label>
-
-                                <input type="date" id="paciente-fecha-nacimiento" class="form-control"
-                                    autocomplete="bday">
-
-                                <small class="form-text" id="error-paciente-fecha-nacimiento">
-                                </small>
-
-                            </div>
-
-                            <!-- Región -->
-                            <div class="col-12 col-md-6">
-
-                                <label for="paciente-region" class="form-label">
-                                    Región
-                                </label>
-
-                                <select id="paciente-region" class="form-select" required>
-
-                                    <option value="">Seleccione una región</option>
-                                    <option value="Valparaíso">Valparaíso</option>
-                                    <option value="Metropolitana">Metropolitana</option>
-                                    <option value="La Araucanía">La Araucanía</option>
                                 </select>
 
-                                <small class="form-text" id="error-paciente-region">
-                                </small>
-
-                            </div>
-
-                            <!-- Comuna -->
-                            <div class="col-12 col-md-6">
-
-                                <label for="paciente-comuna" class="form-label">
-                                    Comuna
-                                </label>
-
-                                <select id="paciente-comuna" class="form-select" disabled required>
-
-                                    <option value="">Seleccione una comuna</option>
-                                </select>
-
-                                <small class="form-text" id="error-paciente-comuna">
-                                </small>
-
-                            </div>
-
-                            <!-- Dirección -->
-                            <div class="col-12 col-md-6">
-
-                                <label for="paciente-direccion" class="form-label">
-                                    Dirección
-                                </label>
-
-                                <input type="text" id="paciente-direccion" class="form-control"
-                                    placeholder="Ej: Avenida Alemania 450" maxlength="120" autocomplete="street-address"
-                                    required>
-
-                                <small class="form-text" id="error-paciente-direccion">
+                                <small id="error-nutri-modalidad" class="form-text" aria-live="polite">
                                 </small>
 
                             </div>
@@ -228,19 +215,19 @@
 
                         <div class="admin-form-acciones">
 
-                            <a href="admin-pacientes.html" class="admin-btn-cancelar">
+                            <a href="admin-nutricionistas.html" class="admin-btn-cancelar">
                                 Cancelar
                             </a>
 
                             <button type="submit" class="admin-btn-guardar">
 
                                 <i class="bi bi-check-lg"></i>
-                                Guardar paciente
+                                Guardar nutricionista
                             </button>
 
                         </div>
 
-                        <div id="mensaje-form-paciente" class="admin-form-mensaje" role="alert" aria-live="polite">
+                        <div id="mensaje-form-nutricionista" class="admin-form-mensaje" role="alert" aria-live="polite">
                         </div>
 
                     </form>
@@ -250,12 +237,15 @@
             </section>
 
         </main>
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-        crossorigin="anonymous"></script>
-    <script src="js/app.js" defer></script>
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous">
+        </script>
+
+    <script src="js/app.js"></script>
+
 </body>
 
 </html>
