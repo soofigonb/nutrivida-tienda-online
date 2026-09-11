@@ -36,24 +36,514 @@ header {
     color: black;
 }
 
-/* --------------------------------------------------------------- */
+/* ------------------------------------------------------------------ */
 
-main {
-    max-width: 1100px;
-    margin: 0 auto;
+/* Nitsi - Página principal */
+
+.inicio-main {
+    width: 100%;
+}
+
+/* Estilos compartidos de los encabezados */
+
+.seccion-encabezado {
+    max-width: 680px;
+    margin: 0 auto 40px;
+    text-align: center;
+}
+
+.seccion-etiqueta,
+.inicio-etiqueta {
+    margin-bottom: 8px;
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.seccion-titulo {
+    margin-bottom: 12px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 2.3rem;
+    font-weight: 600;
+}
+
+.seccion-descripcion {
+    margin-bottom: 0;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.7;
+}
+
+/* Hero */
+
+.inicio-hero {
+    padding: 72px 24px;
+    background-color: #d1fae5;
+}
+
+.inicio-hero-contenido {
+    max-width: 580px;
+}
+
+.inicio-titulo {
+    margin-bottom: 20px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 3.2rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.inicio-descripcion {
+    margin-bottom: 0;
+    color: #4b5563;
+    font-family: "Roboto", sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.inicio-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.inicio-boton-principal,
+.inicio-boton-secundario {
+    display: inline-block;
+    padding: 12px 20px;
+    border: 2px solid #047857;
+    border-radius: 8px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.inicio-boton-principal {
+    color: white;
+    background-color: #047857;
+}
+
+.inicio-boton-secundario {
+    color: #047857;
+    background-color: transparent;
+}
+
+.inicio-boton-principal:hover,
+.inicio-boton-secundario:hover {
+    color: white;
+    background-color: #036548;
+    transform: translateY(-2px);
+}
+
+.inicio-hero-imagen img {
+    display: block;
+    width: 100%;
+    height: 420px;
+    border-radius: 20px;
+    object-fit: cover;
+    box-shadow: 0 16px 35px rgba(47, 36, 31, 0.15);
+}
+
+/* Nosotros */
+
+.nosotros-seccion {
+    padding: 80px 24px;
+    background-color: #fffaf4;
+}
+
+.nosotros-tarjeta {
+    height: 100%;
+    padding: 28px;
+    border: 1px solid #d8c4b8;
+    border-radius: 14px;
+    background-color: white;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.nosotros-tarjeta:hover {
+    border-color: #047857;
+    transform: translateY(-3px);
+}
+
+.nosotros-icono {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 18px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #047857;
+    background-color: #d1fae5;
+    font-size: 1.3rem;
+}
+
+.nosotros-tarjeta h3 {
+    margin-bottom: 12px;
+    font-family: "Fraunces", serif;
+    font-size: 1.4rem;
+}
+
+.nosotros-tarjeta p,
+.nosotros-lista {
+    margin-bottom: 0;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.7;
+}
+
+.nosotros-lista {
+    padding-left: 20px;
+}
+
+/* Nutricionistas */
+
+.nutricionistas-seccion {
+    padding: 80px 24px;
+    background-color: white;
+}
+
+.nutricionistas-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.nutricionistas-grid .tarjeta {
+    min-width: 0;
+    padding: 24px;
+    border: 1px solid #d8c4b8;
+    border-radius: 14px;
+    background-color: #fffaf4;
+    text-align: center;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.nutricionistas-grid .tarjeta:hover {
+    border-color: #047857;
+    transform: translateY(-3px);
+}
+
+.nutricionistas-grid .tarjeta img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 340px;
+    margin: 0 0 18px;
+    border-radius: 10px;
+    object-fit: contain;
+    object-position: center;
+}
+
+.nutricionistas-grid .tarjeta h3 {
+    font-family: "Fraunces", serif;
+    font-size: 1.4rem;
+}
+
+.nutricionistas-grid .etiqueta {
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+}
+
+.nutricionistas-grid .precio {
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+}
+
+.nutricionista-detalle {
+    margin-top: 24px;
+}
+
+/* Servicios */
+
+.servicios-seccion {
+    padding: 80px 24px;
+    background-color: #f0fdf4;
+}
+
+.servicios-encabezado {
+    display: flex;
+    margin-bottom: 32px;
+    align-items: end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.promocion-boton {
+    padding: 10px 18px;
+    border: 1px solid #d97706;
+    border-radius: 8px;
+    color: #7c2d12;
+    background-color: #fef3c7;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+}
+
+.promocion-boton:hover {
+    color: white;
+    background-color: #d97706;
+}
+
+.promocion-mensaje {
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    border: 1px solid #6ee7b7;
+    border-radius: 10px;
+    color: #065f46;
+    background-color: #d1fae5;
+    font-family: "Roboto", sans-serif;
+}
+
+.servicios-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.servicio-tarjeta {
+    overflow: hidden;
+    border: 1px solid #d8c4b8;
+    border-radius: 14px;
+    background-color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.servicio-tarjeta:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(47, 36, 31, 0.1);
+}
+
+.servicio-imagen {
+    display: block;
+    width: 100%;
+    height: 210px;
+    object-fit: cover;
+}
+
+.servicio-contenido {
     padding: 24px;
 }
 
-section {
-    margin-bottom: 48px;
+.servicio-etiqueta,
+.blog-etiqueta {
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
 }
 
-article {
-    margin-bottom: 16px;
-    padding: 20px;
+.servicio-contenido h3 {
+    margin: 10px 0 12px;
+    font-family: "Fraunces", serif;
+    font-size: 1.4rem;
+}
+
+.servicio-contenido p {
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.6;
+}
+
+.servicio-contenido .servicio-precio {
+    color: #047857;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.servicio-boton {
+    display: inline-block;
+    padding: 10px 18px;
+    border-radius: 8px;
+    color: white;
+    background-color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.servicio-boton:hover {
+    color: white;
+    background-color: #036548;
+}
+
+/* Blogs */
+
+.blogs-seccion {
+    padding: 80px 24px;
+    background-color: #fffaf4;
+}
+
+.blogs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.blog-tarjeta {
+    display: grid;
+    overflow: hidden;
+    grid-template-columns: 210px 1fr;
     border: 1px solid #d8c4b8;
-    border-radius: 10px;
+    border-radius: 14px;
     background-color: white;
+}
+
+.blog-imagen {
+    width: 100%;
+    height: 100%;
+    min-height: 270px;
+    object-fit: cover;
+}
+
+.blog-contenido {
+    padding: 24px;
+}
+
+.blog-contenido h3 {
+    margin: 10px 0 12px;
+    font-family: "Fraunces", serif;
+    font-size: 1.4rem;
+}
+
+.blog-contenido p {
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.6;
+}
+
+.blog-enlace {
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.blog-enlace:hover {
+    color: #036548;
+    text-decoration: underline;
+}
+
+/* Contacto */
+
+.contacto-seccion {
+    padding: 80px 24px;
+    background-color: white;
+}
+
+.contacto-informacion {
+    padding-right: 32px;
+}
+
+.contacto-titulo {
+    margin-bottom: 16px;
+    font-family: "Fraunces", serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+}
+
+.contacto-descripcion {
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.7;
+}
+
+.contacto-lista {
+    padding: 0;
+    margin: 28px 0 0;
+    list-style: none;
+}
+
+.contacto-lista li {
+    display: flex;
+    margin-bottom: 14px;
+    align-items: center;
+    gap: 12px;
+    color: #4b5563;
+    font-family: "Roboto", sans-serif;
+}
+
+.contacto-lista i {
+    color: #047857;
+    font-size: 1.2rem;
+}
+
+.contacto-formulario {
+    padding: 32px;
+    border: 1px solid #d8c4b8;
+    border-radius: 14px;
+    background-color: #fffaf4;
+}
+
+.contacto-campo {
+    margin-bottom: 20px;
+}
+
+.contacto-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2f241f;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+}
+
+.contacto-control {
+    border-color: #cfc4ba;
+    border-radius: 8px;
+}
+
+.contacto-control:focus {
+    border-color: #047857;
+    box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.15);
+}
+
+.contacto-control.is-invalid {
+    border-color: #b91c1c;
+}
+
+.contacto-control.is-valid {
+    border-color: #047857;
+}
+
+.contacto-error {
+    display: block;
+    min-height: 18px;
+    margin-top: 5px;
+    color: #b91c1c;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.8rem;
+}
+
+.contacto-boton {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid #047857;
+    border-radius: 8px;
+    color: white;
+    background-color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+}
+
+.contacto-boton:hover {
+    color: white;
+    background-color: #036548;
+}
+
+.contacto-resultado {
+    min-height: 20px;
+    margin-top: 18px;
 }
 
 footer {
@@ -81,138 +571,446 @@ footer a:hover {
     transform: translateY(-2px);
 }
 
+/* ------------------------------------------------------------------ */
+/* Nitsi - Detalle del blog */
 
-.productos {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
+.blog-detalle-main {
+    padding: 56px 24px 80px;
+    background-color: #fffaf4;
 }
 
-article img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    max-height: 380px;
-    margin: 20px auto;
-    border-radius: 8px;
-    object-fit: cover;
-    object-position: center;
+/* Navegación */
+
+.blog-detalle-navegacion {
+    max-width: 900px;
+    margin: 0 auto 24px;
 }
 
-.tarjeta {
-    flex: 1 1 calc(50% - 20px);
-    min-width: 260px;
-    margin: 0;
+.blog-volver {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.blog-volver:hover {
+    color: #036548;
+    text-decoration: underline;
+}
+
+/* Artículo */
+
+.blog-detalle-articulo {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px;
+    border: 1px solid #d8c4b8;
+    border-radius: 16px;
+    background-color: white;
+    box-shadow: 0 10px 30px rgba(47, 36, 31, 0.08);
+}
+
+/* Encabezado */
+
+.blog-detalle-encabezado {
+    margin-bottom: 32px;
+    padding: 0;
+    background-color: transparent;
     text-align: center;
 }
 
-.tarjeta img {
+.blog-detalle-etiqueta {
+    display: inline-block;
+    margin-bottom: 14px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    color: #047857;
+    background-color: #d1fae5;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.blog-detalle-titulo {
+    max-width: 750px;
+    margin: 0 auto 20px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 2.7rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.blog-detalle-informacion {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.9rem;
+}
+
+.blog-detalle-informacion span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.blog-detalle-informacion i {
+    color: #047857;
+}
+
+/* Imagen */
+
+.blog-detalle-figura {
+    margin: 0 0 32px;
+}
+
+.blog-detalle-imagen {
     display: block;
     width: 100%;
-    max-width: 320px;
-    height: 220px;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
+    border-radius: 12px;
+    object-fit: contain;
+}
+
+.blog-detalle-pie-imagen {
+    margin-top: 10px;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+/* Introducción */
+
+.blog-detalle-introduccion {
+    margin-bottom: 32px;
+    padding-left: 20px;
+    border-left: 4px solid #047857;
+    color: #4b5563;
+    font-family: "Roboto", sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* Contenido */
+
+.blog-detalle-seccion {
+    margin-bottom: 32px;
+}
+
+.blog-detalle-seccion h2 {
+    margin-bottom: 14px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.blog-detalle-seccion p {
+    margin-bottom: 0;
+    color: #4b5563;
+    font-family: "Roboto", sans-serif;
+    font-size: 1rem;
+    line-height: 1.8;
+}
+
+/* Lista */
+
+.blog-detalle-lista {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.blog-detalle-lista li {
+    position: relative;
+    margin-bottom: 12px;
+    padding: 14px 16px 14px 44px;
     border-radius: 8px;
-    margin: 0 auto 14px auto;
+    color: #4b5563;
+    background-color: #f0fdf4;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.6;
 }
 
-.tarjeta:hover {
-    border-color: #047857;
-}
-
-.precio {
+.blog-detalle-lista li::before {
+    content: "✓";
+    position: absolute;
+    top: 14px;
+    left: 17px;
     color: #047857;
-    font-size: 18px;
     font-weight: bold;
 }
 
-.hero {
-    min-height: 380px;
+/* Consejo */
+
+.blog-detalle-consejo {
     display: flex;
+    margin-top: 36px;
+    padding: 24px;
+    border: 1px solid #6ee7b7;
+    border-radius: 12px;
+    gap: 18px;
+    background-color: #ecfdf5;
+}
+
+.blog-consejo-icono {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
     align-items: center;
-    padding: 48px;
-    border-radius: 16px;
-    background-color: #d1fae5;
+    justify-content: center;
+    border-radius: 50%;
+    color: white;
+    background-color: #047857;
+    font-size: 1.3rem;
 }
 
-.hero h2 {
-    max-width: 600px;
-    margin: 8px 0 16px;
-    font-size: 44px;
+.blog-detalle-consejo h2 {
+    margin-bottom: 8px;
+    color: #065f46;
+    font-family: "Fraunces", serif;
+    font-size: 1.35rem;
 }
 
-.etiqueta {
-    color: #047857;
-    font-weight: bold;
+.blog-detalle-consejo p {
+    margin-bottom: 0;
+    color: #4b5563;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.6;
 }
 
-.boton {
+/* Acción final */
+
+.blog-detalle-accion {
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 1px solid #d8c4b8;
+    text-align: center;
+}
+
+.blog-detalle-accion p {
+    margin-bottom: 16px;
+    color: #4b5563;
+    font-family: "Roboto", sans-serif;
+}
+
+.blog-agendar-boton {
     display: inline-block;
-    margin-top: 12px;
-    padding: 12px 20px;
+    padding: 12px 22px;
+    border: 1px solid #047857;
     border-radius: 8px;
     color: white;
     background-color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
     text-decoration: none;
+}
+
+.blog-agendar-boton:hover {
+    color: white;
+    background-color: #036548;
 }
 
 /* ------------------------------------------------------------------ */
 
-/* Sofía - Agendar */
 
-#titulo-agendar,
-#titulo-citas {
-    font-family: "Source Code Pro", monospace;
+/* Sofía - Agendamiento */
+
+.agendar-main {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+/* Encabezado */
+
+.agendar-encabezado {
+    max-width: 650px;
+    margin: 0 auto 32px;
+    text-align: center;
+}
+
+.agendar-subtitulo {
+    margin-bottom: 8px;
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.agendar-titulo {
+    margin-bottom: 12px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+.agendar-descripcion {
+    margin-bottom: 0;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.6;
+}
+
+/* Formulario */
+
+.agendar-formulario {
+    padding: 32px;
+    border: 1px solid #d8c4b8;
+    border-radius: 14px;
+    background-color: white;
+    box-shadow: 0 8px 24px rgba(47, 36, 31, 0.08);
+    font-family: "Roboto", sans-serif;
+}
+
+.agendar-campo {
+    margin-bottom: 20px;
+}
+
+.agendar-label {
+    margin-bottom: 8px;
+    color: #2f241f;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+.agendar-control {
+    min-height: 46px;
+    border: 1px solid #cfc4ba;
+    border-radius: 8px;
+    color: #2f241f;
+    background-color: #ffffff;
+}
+
+.agendar-control:focus {
+    border-color: #047857;
+    box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.15);
+}
+
+/* Estados para las validaciones de app.js */
+
+.agendar-control.is-invalid {
+    border-color: #b91c1c;
+    background-image: none;
+}
+
+.agendar-control.is-valid {
+    border-color: #047857;
+    background-image: none;
+}
+
+.agendar-error {
+    display: block;
+    min-height: 18px;
+    margin-top: 5px;
+    color: #b91c1c;
+    font-size: 0.8rem;
+}
+
+/* Botón */
+
+.agendar-boton {
+    min-height: 46px;
+    border: 1px solid #047857;
+    border-radius: 8px;
+    color: white;
+    background-color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: 600;
+    transition: background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.agendar-boton:hover {
+    border-color: #036548;
+    color: white;
+    background-color: #036548;
+    transform: translateY(-1px);
+}
+
+.agendar-boton:focus {
+    color: white;
+    background-color: #036548;
+    box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.2);
+}
+
+/* Mensaje general */
+
+.agendar-mensaje {
+    min-height: 20px;
+    margin-top: 24px;
+    font-family: "Roboto", sans-serif;
     font-weight: 500;
 }
 
-#formulario-agenda .form-label {
-    font-family: "Roboto", sans-serif;
-    letter-spacing: 1px;
-    font-weight: bold;
+/* Sección de citas */
+
+.citas-seccion {
+    margin-top: 56px;
+}
+
+.citas-encabezado {
+    margin-bottom: 24px;
+}
+
+.citas-titulo {
+    margin-bottom: 8px;
     color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 2rem;
+    font-weight: 600;
 }
 
-#formulario-agenda .btn-primary {
-    background-color: #047857;
-    border-color: #047857;
+.citas-descripcion {
+    margin-bottom: 0;
+    color: #6b7280;
     font-family: "Roboto", sans-serif;
 }
 
-#formulario-agenda .btn-primary:hover {
-    background-color: #036548;
-    border-color: #036548;
-}
-
-#lista-citas .card {
+.citas-lista .card {
+    height: 100%;
+    padding: 20px;
     border: 1px solid #d8c4b8;
     border-radius: 10px;
-    transition: border-color 0.2s ease;
+    background-color: white;
+    transition: border-color 0.2s ease,
+        transform 0.2s ease;
 }
 
-#lista-citas .card:hover {
+.citas-lista .card:hover {
     border-color: #047857;
+    transform: translateY(-2px);
 }
 
-#lista-citas .card p:first-child {
+.citas-lista .card p:first-child {
     color: #047857;
+    font-size: 1rem;
     font-weight: bold;
-    font-size: 16px;
 }
 
-#lista-citas .boton-cancelar {
+.citas-lista .boton-cancelar {
     margin-top: 8px;
 }
 
-#lista-citas p.text-muted {
+.citas-lista p.text-muted {
     font-family: "Roboto", sans-serif;
+    font-size: 0.95rem;
     font-style: italic;
-    font-size: 15px;
-}
-
-#mensaje-agenda {
-    font-weight: 500;
 }
 
 /* ------------------------------------------------------------------ */
@@ -437,7 +1235,7 @@ article img {
 
 /* RESPONSIVO / MEDIA QUERIES (360px, 768px, 1280px) */
 
-/* 📱 Móvil Pequeño (hasta 360px) */
+/* Móvil Pequeño (hasta 360px) */
 @media (max-width: 360px) {
     header {
         padding: 12px 10px;
@@ -449,31 +1247,54 @@ article img {
         letter-spacing: 1px;
     }
 
-    main {
-        padding: 12px;
+    .inicio-hero {
+        padding: 36px 12px;
     }
 
-    .hero {
+    .inicio-titulo {
+        font-size: 2rem;
+    }
+
+    .inicio-descripcion {
+        font-size: 1rem;
+    }
+
+    .inicio-acciones {
+        flex-direction: column;
+    }
+
+    .inicio-boton-principal,
+    .inicio-boton-secundario {
+        width: 100%;
+        text-align: center;
+    }
+
+    .inicio-hero-imagen img {
+        height: 240px;
+    }
+
+    .seccion-titulo,
+    .contacto-titulo {
+        font-size: 1.8rem;
+    }
+
+    .nosotros-seccion,
+    .nutricionistas-seccion,
+    .servicios-seccion,
+    .blogs-seccion,
+    .contacto-seccion {
+        padding: 44px 12px;
+    }
+
+    .nosotros-tarjeta,
+    .nutricionistas-grid .tarjeta,
+    .servicio-contenido,
+    .blog-contenido,
+    .contacto-formulario {
         padding: 18px;
-        min-height: auto;
     }
 
-    .hero h2 {
-        font-size: 24px;
-    }
 
-    .tarjeta {
-        min-width: 100%;
-        padding: 12px;
-    }
-
-    .tarjeta img {
-        height: 160px;
-    }
-
-    article {
-        padding: 12px;
-    }
 
     footer {
         padding: 16px 10px;
@@ -485,12 +1306,63 @@ article img {
         margin: 0 6px;
     }
 
+    .blog-detalle-main {
+        padding: 32px 12px 44px;
+    }
+
+    .blog-detalle-articulo {
+        padding: 24px 16px;
+    }
+
+    .blog-detalle-titulo {
+        font-size: 1.8rem;
+    }
+
+    .blog-detalle-introduccion {
+        padding-left: 14px;
+        font-size: 1rem;
+    }
+
+    .blog-detalle-lista li {
+        padding: 12px 12px 12px 38px;
+    }
+
+    .blog-detalle-lista li::before {
+        top: 12px;
+        left: 14px;
+    }
+
+    .blog-detalle-consejo {
+        padding: 18px;
+        flex-direction: column;
+    }
+
+    .blog-agendar-boton {
+        width: 100%;
+    }
+
     .admin-content {
         padding: 12px;
     }
+
+    .agendar-main {
+        padding: 32px 12px;
+    }
+
+    .agendar-formulario {
+        padding: 20px 16px;
+    }
+
+    .agendar-titulo {
+        font-size: 2rem;
+    }
+
+    .citas-titulo {
+        font-size: 1.6rem;
+    }
 }
 
-/* 📱/💻 Tableta (hasta 768px) */
+/* Tableta (hasta 768px) */
 @media (max-width: 768px) {
     header {
         text-align: center;
@@ -501,21 +1373,80 @@ article img {
         margin: 10px 0;
     }
 
-    .hero {
-        min-width: 320px;
-        padding: 28px;
+    .inicio-hero {
+        padding: 48px 16px;
     }
 
-    .hero h2 {
-        font-size: 32px;
+    .inicio-titulo {
+        font-size: 2.4rem;
     }
 
-    .productos {
+    .inicio-hero-imagen img {
+        height: 320px;
+    }
+
+    .nosotros-seccion,
+    .nutricionistas-seccion,
+    .servicios-seccion,
+    .blogs-seccion,
+    .contacto-seccion {
+        padding: 56px 16px;
+    }
+
+    .nutricionistas-grid,
+    .servicios-grid,
+    .blogs-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nutricionistas-grid .tarjeta img {
+        height: auto;
+        max-height: 420px;
+        object-fit: contain;
+    }
+
+    .blog-tarjeta {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-imagen {
+        height: 220px;
+        min-height: 0;
+    }
+
+    .servicios-encabezado {
+        align-items: flex-start;
         flex-direction: column;
     }
 
-    .tarjeta {
-        width: 100%;
+    .contacto-informacion {
+        padding-right: 0;
+    }
+
+    .contacto-formulario {
+        padding: 24px 20px;
+    }
+
+    .blog-detalle-main {
+        padding: 40px 16px 56px;
+    }
+
+    .blog-detalle-articulo {
+        padding: 32px 24px;
+    }
+
+    .blog-detalle-titulo {
+        font-size: 2.1rem;
+    }
+
+    .blog-detalle-informacion {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .blog-detalle-seccion h2 {
+        font-size: 1.4rem;
     }
 
     .admin-layout {
@@ -534,29 +1465,143 @@ article img {
         padding: 4px 10px;
         font-size: 0.85rem;
     }
+
+    .agendar-main {
+        padding: 40px 16px;
+    }
+
+    .agendar-formulario {
+        padding: 24px 20px;
+    }
 }
 
-/* 💻 Escritorio / Pantallas Grandes (desde 1280px) */
+/* Tabletas grandes y computadores pequeños */
+
+@media (min-width: 769px) and (max-width: 1199px) {
+
+    /* Hero */
+
+    .inicio-hero {
+        padding: 56px 24px;
+    }
+
+    .inicio-titulo {
+        font-size: 2.7rem;
+    }
+
+    .inicio-hero-imagen img {
+        height: 360px;
+    }
+
+    /* Servicios: dos tarjetas por fila */
+
+    .servicios-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Blogs: una tarjeta por fila */
+
+    .blogs-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-tarjeta {
+        grid-template-columns: 280px minmax(0, 1fr);
+    }
+
+    .blog-imagen {
+        width: 100%;
+        height: 100%;
+        min-height: 280px;
+    }
+}
+
+/* Escritorio / Pantallas grandes (desde 1280px) */
+
 @media (min-width: 1280px) {
-    main {
+
+    /* Hero */
+
+    .inicio-hero {
+        padding: 88px 32px;
+    }
+
+    .inicio-hero .container {
         max-width: 1240px;
-        padding: 36px 24px;
     }
 
-    .hero {
-        min-height: 420px;
-        padding: 64px;
+    .inicio-titulo {
+        font-size: 3.5rem;
     }
 
-    .hero h2 {
-        font-size: 52px;
+    .inicio-hero-imagen img {
+        height: 460px;
     }
 
-    .productos {
+    /* Encabezados */
+
+    .seccion-encabezado {
+        max-width: 720px;
+    }
+
+    .seccion-titulo {
+        font-size: 2.6rem;
+    }
+
+    /* Secciones */
+
+    .nosotros-seccion,
+    .nutricionistas-seccion,
+    .servicios-seccion,
+    .blogs-seccion,
+    .contacto-seccion {
+        padding: 96px 32px;
+    }
+
+    /* Nutricionistas */
+
+    .nutricionistas-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         gap: 28px;
     }
 
-    .tarjeta {
-        flex: 1 1 calc(33.333% - 28px);
+    .nutricionistas-grid .tarjeta {
+        padding: 24px;
+    }
+
+    .nutricionistas-grid .tarjeta img {
+        display: block;
+        width: 100%;
+        height: 300px;
+        margin: 0 0 18px;
+        border-radius: 10px;
+        object-fit: contain;
+        object-position: center;
+        background-color: #f8faf8;
+    }
+
+
+    /* Servicios */
+
+    .servicios-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 28px;
+    }
+
+    /* Blogs */
+
+    .blogs-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 28px;
+    }
+
+    /* Contacto */
+
+    .contacto-seccion .container {
+        max-width: 1100px;
+    }
+
+    .contacto-formulario {
+        padding: 40px;
     }
 }
