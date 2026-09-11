@@ -496,7 +496,7 @@ if (formPaciente) {
 
     if (formPaciente) {
         formPaciente.addEventListener("submit", function (e) {
-            e.preventDefault(); // Evitar el recargue de la página
+            e.preventDefault(); // Evita que el formulario se envíe automáticamente
 
             const nombreInput = document.getElementById("nombre");
             const apellidosInput = document.getElementById("apellidos");
@@ -586,7 +586,6 @@ if (formPaciente) {
                 });
             }
 
-            // Guardar cambios y redirigir
             localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
             
             mensajeForm.textContent = "¡Paciente registrado exitosamente!";
@@ -596,3 +595,5 @@ if (formPaciente) {
                 window.location.href = "admin-pacientes.html";
             }, 1000);
         });
+    }
+}

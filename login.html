@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Nutrivida</title>}
+    <title>Login - Nutrivida</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
@@ -12,7 +12,8 @@
 </head>
 
 <body class="bg-light">
-     <header>
+
+    <header>
         <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 <a class="navbar-brand" href="index.html">NutriVida</a>
@@ -29,7 +30,12 @@
                             <a class="nav-link" href="index.html#nosotros">Nosotros</a>
                         </li>
                         <li class="nav-item">
-                            <li class="nav-item">
+                            <a class="nav-link" href="index.html#servicios">Servicios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="agendar.html">Agendar</a>
                         </li>
                         <li class="nav-item">
@@ -41,50 +47,180 @@
                         <li class="nav-item">
                             <a class="nav-link" href="registro.html">Registrarse</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.html">
+                                <i class="bi bi-cart3"></i>
+                                Carrito
+
+                                <span id="contador-carrito" class="badge rounded-pill bg-warning text-dark">
+                                    0
+                                </span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
-    </header>     <a class="nav-link" href="index.html#blogs">Blogs</a>
-                        </li>
-    <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
-        <div style="width: 100%; max-width: 500px;">
+    </header>
+        <main class="container flex-grow-1 py-5">
 
-            <div class="text-center mb-4">
-                <h2 class="text-muted">Iniciar sesión</h2>
-            </div>
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <form id="loginForm">
-                        <div class="mb-3">
-                            <label class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" placeholder="correo@ejemplo.com" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" placeholder="Contraseña" required>
-                        </div>
+        <section class="row justify-content-center">
 
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="Recordarme">
-                                <label class="form-check-label" for="Recordarme">Recordarme</label>
-                            </div>
-                            <a href="#" class="text-decoration-none small">¿Olvidaste tu contraseña?</a>
-                        </div>
-                        <button type="submit" class="btn btn-info text-white w-100">Iniciar sesión</button>
-                    </form>
-                    <div class="text-center mt-4">
-                        <small class="text-muted">¿No tienes una cuenta? <a href="registro.html" class="text-decoration-none">Regístrate aquí</a></small>
-                    </div>
+            <div class="col-12 col-md-8 col-lg-5">
+
+                <div class="text-center mb-4">
+
+                    <i class="bi bi-person-circle fs-1 text-secondary"></i>
+
+                    <h1 class="h2 text-muted mt-2">
+                        Iniciar sesión
+                    </h1>
+
+
                 </div>
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body p-4">
+
+                        <form id="formulario-login"
+                            novalidate>
+
+                            <!-- Correo -->
+                            <div class="mb-3">
+
+                                <label for="correo-login"
+                                    class="form-label">
+                                    Correo electrónico
+                                </label>
+
+                                <input type="email"
+                                    id="correo-login"
+                                    name="correo"
+                                    class="form-control"
+                                    placeholder="correo@ejemplo.com"
+                                    autocomplete="email"
+                                    aria-describedby="error-correo-login"
+                                    required>
+
+                                <small id="error-correo-login"
+                                    class="text-danger">
+                                </small>
+
+                            </div>
+
+                            <!-- Contraseña -->
+                            <div class="mb-3">
+
+                                <label for="contrasena-login"
+                                    class="form-label">
+                                    Contraseña
+                                </label>
+
+                                <input type="password"
+                                    id="contrasena-login"
+                                    name="contrasena"
+                                    class="form-control"
+                                    placeholder="Contraseña"
+                                    minlength="6"
+                                    autocomplete="current-password"
+                                    aria-describedby="error-contrasena-login"
+                                    required>
+
+                                <small id="error-contrasena-login"
+                                    class="text-danger">
+                                </small>
+
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                                <div class="form-check">
+
+                                    <input class="form-check-input"
+                                        type="checkbox"
+                                        id="recordarme">
+
+                                    <label class="form-check-label"
+                                        for="recordarme">
+                                        Recordarme
+                                    </label>
+
+                                </div>
+
+                                <a href="#"
+                                    class="text-decoration-none small">
+                                    ¿Olvidaste tu contraseña?
+                                </a>
+
+                            </div>
+
+                            <button type="submit"
+                                class="btn btn-info text-white w-100">
+
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                Iniciar sesión
+                            </button>
+
+                            <div id="mensaje-login"
+                                class="mt-3"
+                                role="alert"
+                                aria-live="polite">
+                            </div>
+
+                        </form>
+
+                        <div class="text-center mt-4">
+
+                            <small class="text-muted">
+                                ¿No tienes una cuenta?
+
+                                <a href="registro.html"
+                                    class="text-decoration-none">
+                                    Regístrate aquí
+                                </a>
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="text-center mt-3 mb-4">
+
+                    <a href="admin-home.html"
+                        class="btn btn-outline-secondary btn-sm">
+
+                        <i class="bi bi-shield-lock"></i>
+                        Acceder como administrador
+                    </a>
+
+                </div>
+
             </div>
 
-            <div class="text-center mt-3">
-                <a href="admin-home.html" class="btn btn-outline-secondary btn-sm">Acceder como administrador</a>
+        </section>
+
+    </main>
+
+    <footer class="footer-contacto py-4 text-center mt-auto">
+        <div class="container">
+            <div class="mb-2">
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i
+                        class="bi bi-instagram"></i></a>
+                <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i
+                        class="bi bi-whatsapp"></i></a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
+                        class="bi bi-facebook"></i></a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i
+                        class="bi bi-youtube"></i></a>
             </div>
+            <p class="mb-1">Clínica Nutricional NutriVida. Todos los derechos reservados.</p>
+            <p class="mb-0 small">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo:
+                contacto@nutrividaclinica.cl</p>
         </div>
-    </div>
+    </footer>
 
 </body>
 
