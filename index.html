@@ -143,10 +143,32 @@
         </section>
 
     </main>
-
-    <footer id="contacto">
-        <p>Clínica Nutricional NutriVida - Calle Manuel Montt 850, Temuco, Región de La Araucanía</p>
-        <p>Contacto: contacto@nutrividaclinica.cl | Teléfono: +56 45 299 8800</p>
+    <section id="contacto" class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <h3 class="text-center mb-4">Contáctanos</h3>
+                    <form class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingresa tu nombre.
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Mensaje</label>
+                                <textarea class="form-control" id="mensaje" rows="4" required minlength="10"></textarea>
+                                <div class="invalid-feedback">Mínimo 10 caracteres para el mensaje.</div>
+                                <button type="submit" class="btn btn-nutri w-100">Enviar mensaje</button>
+                            </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <footer class="footer-contacto py-4 text-center">
+        <p class="mb-1">Clínica Nutricional NutriVida. Todos los derechos reservados.</p>
+        <p class="mb-0">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo: contacto@nutrividaclínica.cl</p>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
