@@ -5,7 +5,7 @@ const botonPromocion = document.getElementById("boton-promocion");
 const promocion = document.getElementById("promocion");
 
 if (botonPromocion && promocion) {
-    botonPromocion.addEventListener("click", function(){
+    botonPromocion.addEventListener("click", function () {
         promocion.classList.toggle("d-none");
 
         if (promocion.classList.contains("d-none")) {
@@ -58,7 +58,7 @@ const detalleModal = document.getElementById("detalle-nutricionista-info");
 if (contenedor) {
     contenedor.innerHTML = "";
 
-    nutricionistas.forEach(function(nutri){
+    nutricionistas.forEach(function (nutri) {
         const article = document.createElement("article");
         article.className = "tarjeta";
 
@@ -82,8 +82,8 @@ if (contenedor) {
 
     const botonesAgregar = document.querySelectorAll(".boton-agregar");
 
-    botonesAgregar.forEach(function(boton){
-        boton.addEventListener("click", function(){
+    botonesAgregar.forEach(function (boton) {
+        boton.addEventListener("click", function () {
             const idNutri = Number(boton.dataset.id);
             const encontrado = nutricionistas.find(n => n.id === idNutri);
 
@@ -101,7 +101,7 @@ if (contenedor) {
 
                 const btnCerrar = document.getElementById("cerrar-detalle-nutri");
                 if (btnCerrar) {
-                    btnCerrar.addEventListener("click", function(){
+                    btnCerrar.addEventListener("click", function () {
                         detalleModal.innerHTML = "";
                     });
                 }
@@ -421,9 +421,39 @@ const sinPacientes = document.getElementById("sin-pacientes");
 if (tablaPacientes) {
 
     const pacientesPorDefecto = [
-        { id: 1, nombre: "Ana Muñoz", apellidos: "Fuentes", correo: "ana.munoz@gmail.com", tipo: "Cliente" },
-        { id: 2, nombre: "Diego Paredes", apellidos: "Reyes", correo: "diego.paredes@duoc.cl", tipo: "Cliente" },
-        { id: 3, nombre: "Francisca Vidal", apellidos: "Concha", correo: "francisca.vidal@gmail.com", tipo: "Vendedor" }
+        {
+            id: 1,
+            nombre: "Ana",
+            apellidos: "Muñoz Fuentes",
+            run: "18.345.678-5",
+            correo: "ana.munoz@gmail.com",
+            fechaNacimiento: "1998-05-14",
+            region: "La Araucanía",
+            comuna: "Temuco",
+            direccion: "Avenida Alemania 450"
+        },
+        {
+            id: 2,
+            nombre: "Diego",
+            apellidos: "Paredes Reyes",
+            run: "19.234.567-8",
+            correo: "diego.paredes@duoc.cl",
+            fechaNacimiento: "2000-09-22",
+            region: "La Araucanía",
+            comuna: "Padre Las Casas",
+            direccion: "Villa Los Robles 235"
+        },
+        {
+            id: 3,
+            nombre: "Francisca",
+            apellidos: "Vidal Concha",
+            run: "17.456.789-2",
+            correo: "francisca.vidal@gmail.com",
+            fechaNacimiento: "1996-12-03",
+            region: "La Araucanía",
+            comuna: "Villarrica",
+            direccion: "Calle Pedro de Valdivia 765"
+        }
     ];
 
     let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || pacientesPorDefecto;
@@ -446,16 +476,45 @@ if (tablaPacientes) {
             const fila = document.createElement("tr");
 
             fila.innerHTML = `
-                <td>${paciente.nombre} ${paciente.apellidos}</td>
+                <td>
+                    <strong>
+                        ${paciente.nombre} ${paciente.apellidos}
+                    </strong>
+                </td>
+
+                <td>${paciente.run}</td>
+
                 <td>${paciente.correo}</td>
-                <td><span class="badge admin-badge-tipo">${paciente.tipo}</span></td>
+
+                <td>${paciente.fechaNacimiento}</td>
+
+                <td>${paciente.region}</td>
+
+                <td>
+                    <span class="admin-badge-tipo">
+                        ${paciente.comuna}
+                    </span>
+                </td>
+
+                <td>${paciente.direccion}</td>
+
                 <td class="text-end">
-                    <a href="admin-form-paciente.html?id=${paciente.id}" class="btn btn-sm btn-outline-secondary me-1">
+
+                    <a href="admin-form-paciente.html?id=${paciente.id}"
+                        class="btn btn-sm btn-outline-secondary me-1"
+                        aria-label="Editar a ${paciente.nombre}">
+
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <button class="btn btn-sm btn-outline-danger boton-eliminar-paciente" data-id="${paciente.id}">
+
+                    <button type="button"
+                        class="btn btn-sm btn-outline-danger boton-eliminar-paciente"
+                        data-id="${paciente.id}"
+                        aria-label="Eliminar a ${paciente.nombre}">
+
                         <i class="bi bi-trash"></i>
                     </button>
+
                 </td>
             `;
 
@@ -632,35 +691,133 @@ if (formNutricionista) {
 
 // Sofía - Formulario nuevo / editar paciente (admin)
 
-
 const formPaciente = document.getElementById("form-paciente");
 
 if (formPaciente) {
 
-    const parametros = new URLSearchParams(window.location.search);
-    const idEditar = parametros.get("id") ? Number(parametros.get("id")) : null;
+    const parametros =
+        new URLSearchParams(window.location.search);
 
-    let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
+    const idEditar = parametros.get("id")
+        ? Number(parametros.get("id"))
+        : null;
 
-    const tituloForm = document.getElementById("titulo-form-paciente");
-    const campoNombre = document.getElementById("paciente-nombre");
-    const campoApellidos = document.getElementById("paciente-apellidos");
-    const campoCorreo = document.getElementById("paciente-correo");
-    const campoTipo = document.getElementById("paciente-tipo");
-    const mensajeForm = document.getElementById("mensaje-form-paciente");
+    let pacientes =
+        JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
 
-    // Si viene un id en la URL, precargamos los datos para editar
+    const tituloForm =
+        document.getElementById("titulo-form-paciente");
+
+    const campoNombre =
+        document.getElementById("paciente-nombre");
+
+    const campoApellidos =
+        document.getElementById("paciente-apellidos");
+
+    const campoRun =
+        document.getElementById("paciente-run");
+
+    const campoCorreo =
+        document.getElementById("paciente-correo");
+
+    const campoFechaNacimiento =
+        document.getElementById("paciente-fecha-nacimiento");
+
+    const campoRegion =
+        document.getElementById("paciente-region");
+
+    const campoComuna =
+        document.getElementById("paciente-comuna");
+
+    const campoDireccion =
+        document.getElementById("paciente-direccion");
+
+    const mensajeForm =
+        document.getElementById("mensaje-form-paciente");
+
+    const comunasPorRegion = {
+        "Valparaíso": [
+            "Valparaíso",
+            "Viña del Mar",
+            "Quilpué",
+            "Villa Alemana"
+        ],
+        "Metropolitana": [
+            "Santiago",
+            "Providencia",
+            "Ñuñoa",
+            "Maipú"
+        ],
+        "La Araucanía": [
+            "Temuco",
+            "Padre Las Casas",
+            "Villarrica",
+            "Pucón"
+        ]
+    };
+
+    function cargarComunas(region, comunaSeleccionada) {
+        campoComuna.innerHTML =
+            '<option value="">Seleccione una comuna</option>';
+
+        if (!region || !comunasPorRegion[region]) {
+            campoComuna.disabled = true;
+            return;
+        }
+
+        campoComuna.disabled = false;
+
+        comunasPorRegion[region].forEach(function (comuna) {
+            const opcion = document.createElement("option");
+
+            opcion.value = comuna;
+            opcion.textContent = comuna;
+
+            if (comuna === comunaSeleccionada) {
+                opcion.selected = true;
+            }
+
+            campoComuna.appendChild(opcion);
+        });
+    }
+
+    campoRegion.addEventListener("change", function () {
+        cargarComunas(campoRegion.value, "");
+    });
+
     if (idEditar !== null) {
-        const pacienteExistente = pacientes.find(function (p) {
-            return p.id === idEditar;
+        const pacienteExistente = pacientes.find(function (paciente) {
+            return paciente.id === idEditar;
         });
 
         if (pacienteExistente) {
             tituloForm.textContent = "Editar paciente";
-            campoNombre.value = pacienteExistente.nombre;
-            campoApellidos.value = pacienteExistente.apellidos;
-            campoCorreo.value = pacienteExistente.correo;
-            campoTipo.value = pacienteExistente.tipo;
+
+            campoNombre.value =
+                pacienteExistente.nombre || "";
+
+            campoApellidos.value =
+                pacienteExistente.apellidos || "";
+
+            campoRun.value =
+                pacienteExistente.run || "";
+
+            campoCorreo.value =
+                pacienteExistente.correo || "";
+
+            campoFechaNacimiento.value =
+                pacienteExistente.fechaNacimiento || "";
+
+            campoRegion.value =
+                pacienteExistente.region || "";
+
+            cargarComunas(
+                pacienteExistente.region,
+                pacienteExistente.comuna
+            );
+
+            campoDireccion.value =
+                pacienteExistente.direccion || "";
         }
     }
 
@@ -669,31 +826,90 @@ if (formPaciente) {
 
         const nombre = campoNombre.value.trim();
         const apellidos = campoApellidos.value.trim();
+        const run = campoRun.value.trim();
         const correo = campoCorreo.value.trim();
-        const tipo = campoTipo.value;
+        const fechaNacimiento = campoFechaNacimiento.value;
+        const region = campoRegion.value;
+        const comuna = campoComuna.value;
+        const direccion = campoDireccion.value.trim();
 
-        // Validación básica. Reemplazar por las funciones de validación de Jonathan (en este mismo app.js)
-        if (nombre === "" || apellidos === "" || correo === "" || tipo === "") {
-            mensajeForm.textContent = "Debe completar todos los campos";
-            mensajeForm.className = "alert alert-danger mt-3";
+        if (
+            nombre === "" ||
+            apellidos === "" ||
+            run === "" ||
+            correo === "" ||
+            region === "" ||
+            comuna === "" ||
+            direccion === ""
+        ) {
+            mensajeForm.textContent =
+                "Debe completar todos los campos obligatorios";
+
+            mensajeForm.className =
+                "alert alert-danger admin-form-mensaje";
+
             return;
         }
 
-        if (idEditar !== null) {
-            pacientes = pacientes.map(function (p) {
-                if (p.id === idEditar) {
-                    return { id: p.id, nombre, apellidos, correo, tipo };
-                }
-                return p;
-            });
-        } else {
-            const nuevoId = pacientes.length > 0
-                ? Math.max.apply(null, pacientes.map(function (p) { return p.id; })) + 1
-                : 1;
-            pacientes.push({ id: nuevoId, nombre, apellidos, correo, tipo });
+        const correoValido =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
+
+        if (!correoValido) {
+            mensajeForm.textContent =
+                "Debe ingresar un correo electrónico válido";
+
+            mensajeForm.className =
+                "alert alert-danger admin-form-mensaje";
+
+            return;
         }
 
-        localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
+        const datosPaciente = {
+            nombre: nombre,
+            apellidos: apellidos,
+            run: run,
+            correo: correo,
+            fechaNacimiento: fechaNacimiento,
+            region: region,
+            comuna: comuna,
+            direccion: direccion
+        };
+
+        if (idEditar !== null) {
+
+            pacientes = pacientes.map(function (paciente) {
+                if (paciente.id === idEditar) {
+                    return {
+                        id: paciente.id,
+                        ...datosPaciente
+                    };
+                }
+
+                return paciente;
+            });
+
+        } else {
+
+            const nuevoId = pacientes.length > 0
+                ? Math.max.apply(
+                    null,
+                    pacientes.map(function (paciente) {
+                        return paciente.id;
+                    })
+                ) + 1
+                : 1;
+
+            pacientes.push({
+                id: nuevoId,
+                ...datosPaciente
+            });
+        }
+
+        localStorage.setItem(
+            "pacientesNutriVida",
+            JSON.stringify(pacientes)
+        );
+
         window.location.href = "admin-pacientes.html";
     });
 }
