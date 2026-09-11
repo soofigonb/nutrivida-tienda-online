@@ -41,6 +41,9 @@
                             <a class="nav-link" href="index.html#nosotros">Nosotros</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="index.html#servicios">Servicios</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="index.html#blogs">Blogs</a>
                         </li>
                         <li class="nav-item">
@@ -73,18 +76,6 @@
                 <div class="mt-3">
                     <a class="boton" href="#nutricionistas">Ver nutricionistas</a>
                 </div>
-            </div>
-        </section>
-
-        <!-- Promoción -->
-        <section class="container py-4">
-            <button id="boton-promocion" class="btn btn-warning">
-                Mostrar promoción
-            </button>
-
-            <div id="promocion" class="alert alert-success mt-3 d-none">
-                ✨ <strong>Evaluación inicial:</strong> Durante este mes, agendando tu primera consulta online incluye
-                medición de composición corporal sin costo adicional.
             </div>
         </section>
 
@@ -127,6 +118,50 @@
             </div>
 
             <div id="detalle-nutricionista-info" class="mt-4"></div>
+        </section>
+
+        <!-- Sección Servicios y Planes (Vitrina) -->
+        <section id="servicios">
+            <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+                <h2 class="m-0">Nuestros planes y servicios</h2>
+                <button id="boton-promocion" class="btn btn-warning fw-bold btn-sm">
+                    Mostrar promoción
+                </button>
+            </div>
+            <div id="promocion" class="alert alert-success mb-4 d-none">
+                <strong>Evaluación inicial con descuento:</strong> Durante este mes, agendando tu primera consulta online incluye medición de composición corporal sin costo adicional.
+            </div>
+
+            <div class="productos">
+
+                <article class="tarjeta">
+                    <img src="img/blog1.png" alt="Consulta Nutricional Inicial">
+                    <span class="etiqueta">Consulta Presencial / Online</span>
+                    <h3 class="mt-2">Evaluación y Consulta Inicial</h3>
+                    <p>Evaluación antropométrica completa, diagnóstico nutricional y entrega de pauta de alimentación personalizada.</p>
+                    <p class="precio">$35.000 CLP</p>
+                    <a href="agendar.html" class="boton mt-2">Agendar servicio</a>
+                </article>
+
+                <article class="tarjeta">
+                    <img src="img/blog2.png" alt="Plan Nutricional Mensual">
+                    <span class="etiqueta">Plan Mensual</span>
+                    <h3 class="mt-2">Plan Nutricional Integral</h3>
+                    <p>Incluye 2 controles mensuales, ajuste de minuta semanal, seguimiento continuo y guía de compras.</p>
+                    <p class="precio">$60.000 CLP</p>
+                    <a href="agendar.html" class="boton mt-2">Agendar servicio</a>
+                </article>
+
+                <article class="tarjeta">
+                    <img src="img/registro1.jpg" alt="Plan Alto Rendimiento Deportivo">
+                    <span class="etiqueta">Deporte y Rendimiento</span>
+                    <h3 class="mt-2">Plan Nutrición Deportiva</h3>
+                    <p>Estrategias de carga de carbohidratos, pauta de suplementación personalizada y análisis de rendimiento.</p>
+                    <p class="precio">$50.000 CLP</p>
+                    <a href="agendar.html" class="boton mt-2">Agendar servicio</a>
+                </article>
+
+            </div>
         </section>
 
         <!-- Sección Blogs -->
