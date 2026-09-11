@@ -55,71 +55,125 @@
         </nav>
     </header>
 
-    <main>
+    <main class="agendar-main">
 
-        <section class="container py-5">
-            <div class="row justify-content-center mb-4">
-                <div class="col-12 col-md-8 col-lg-6">
-                    <p class="text-center text-muted mb-2">Conoce cómo es tu primera consulta</p>
-                    <div class="ratio ratio-16x9">
-                        <iframe src="https://www.youtube.com/embed/9Pf9gUxJgGU"
-                            title="Consejos para una alimentación saludable"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen></iframe>
-                    </div>
-                </div>
+        <!-- Sección del formulario de agendamiento -->
+        <section class="agendar-seccion">
+
+            <div class="agendar-encabezado">
+                <p class="agendar-subtitulo">Reserva tu atención nutricional</p>
+                <h1 class="agendar-titulo" id="titulo-agendar">Agenda tu cita</h1>
+                <p class="agendar-descripcion">
+                    Selecciona un nutricionista, el motivo de la consulta y el horario
+                    que más te acomode.
+                </p>
             </div>
-
-            <h2 class="text-center mb-4" id="titulo-agendar">Agenda tu cita</h2>
 
             <div class="row justify-content-center">
                 <div class="col-12 col-md-8 col-lg-6">
 
-                    <form id="formulario-agenda" class="border rounded p-4 shadow bg-white" novalidate>
+                    <form id="formulario-agenda" name="formularioAgenda" class="agendar-formulario" novalidate>
 
-                        <div class="mb-3">
-                            <label for="nutricionista" class="form-label">Nutricionista</label>
-                            <select id="nutricionista" class="form-select">
+                        <!-- Nutricionista -->
+                        <div class="agendar-campo">
+                            <label for="nutricionista" class="form-label agendar-label">
+                                Nutricionista
+                            </label>
+
+                            <select id="nutricionista" name="nutricionista" class="form-select agendar-control"
+                                aria-describedby="error-nutricionista" required>
                                 <option value="">Seleccione un nutricionista</option>
-                                <option value="Dra. Camila Torres">Dra. Camila Torres - Nutrición clínica</option>
-                                <option value="Lic. Mateo Silva">Lic. Mateo Silva - Nutrición deportiva</option>
-                                <option value="Dra. Valeria Rojas">Dra. Valeria Rojas - Enfermedades metabólicas
+
+                                <option value="Dra. Camila Torres">
+                                    Dra. Camila Torres - Nutrición clínica
                                 </option>
-                                <option value="Lic. Gabriel Morales">Lic. Gabriel Morales - Alimentación vegetariana
+
+                                <option value="Lic. Mateo Silva">
+                                    Lic. Mateo Silva - Nutrición deportiva
+                                </option>
+
+                                <option value="Dra. Valeria Rojas">
+                                    Dra. Valeria Rojas - Enfermedades metabólicas
+                                </option>
+
+                                <option value="Lic. Gabriel Morales">
+                                    Lic. Gabriel Morales - Alimentación vegetariana
                                 </option>
                             </select>
+
+                            <small id="error-nutricionista" class="agendar-error" aria-live="polite"></small>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="motivo" class="form-label">Motivo de consulta</label>
-                            <input type="text" id="motivo" class="form-control" placeholder="Ej: Control de peso">
+                        <!-- Motivo -->
+                        <div class="agendar-campo">
+                            <label for="motivo" class="form-label agendar-label">
+                                Motivo de consulta
+                            </label>
+
+                            <input type="text" id="motivo" name="motivo" class="form-control agendar-control"
+                                placeholder="Ej: Control de peso" minlength="5" maxlength="100" autocomplete="off"
+                                aria-describedby="error-motivo" required>
+
+                            <small id="error-motivo" class="agendar-error" aria-live="polite"></small>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="fecha-cita" class="form-label">Fecha</label>
-                            <input type="date" id="fecha-cita" class="form-control">
+                        <!-- Fecha -->
+                        <div class="agendar-campo">
+                            <label for="fecha-cita" class="form-label agendar-label">
+                                Fecha
+                            </label>
+
+                            <input type="date" id="fecha-cita" name="fechaCita" class="form-control agendar-control"
+                                aria-describedby="error-fecha-cita" required>
+
+                            <small id="error-fecha-cita" class="agendar-error" aria-live="polite"></small>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="hora-cita" class="form-label">Horario</label>
-                            <select id="hora-cita" class="form-select">
+                        <!-- Hora -->
+                        <div class="agendar-campo">
+                            <label for="hora-cita" class="form-label agendar-label">
+                                Horario
+                            </label>
+
+                            <select id="hora-cita" name="horaCita" class="form-select agendar-control"
+                                aria-describedby="error-hora-cita" required>
                                 <option value="">Seleccione horario</option>
                                 <option value="09:00">09:00 horas</option>
                                 <option value="11:00">11:00 horas</option>
                                 <option value="15:00">15:00 horas</option>
                                 <option value="17:00">17:00 horas</option>
                             </select>
+
+                            <small id="error-hora-cita" class="agendar-error" aria-live="polite"></small>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Agendar cita</button>
+                        <button type="submit" id="boton-agendar" class="btn agendar-boton w-100">
+                            Agendar cita
+                        </button>
+
                     </form>
 
-                    <div id="mensaje-agenda" class="mt-4"></div>
+                    <div id="mensaje-agenda" class="agendar-mensaje" role="alert" aria-live="polite"></div>
+
                 </div>
             </div>
 
-            <h3 class="mt-5 mb-3" id="titulo-citas">Mis citas agendadas</h3>
-            <div id="lista-citas" class="row g-3">
+        </section>
+
+        <!-- Sección de citas guardadas -->
+        <section class="citas-seccion" aria-labelledby="titulo-citas">
+
+            <div class="citas-encabezado">
+                <h2 class="citas-titulo" id="titulo-citas">
+                    Mis citas agendadas
+                </h2>
+
+                <p class="citas-descripcion">
+                    Aquí podrás revisar o cancelar tus citas.
+                </p>
+            </div>
+
+            <div id="lista-citas" class="citas-lista row g-3">
                 <!-- Se cargan dinámicamente desde js/app.js -->
             </div>
 
@@ -129,16 +183,23 @@
 
 
 
+
+
     <footer class="footer-contacto py-4 text-center">
         <div class="container">
             <div class="mb-2">
-                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-                <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
-                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i
+                        class="bi bi-instagram"></i></a>
+                <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i
+                        class="bi bi-whatsapp"></i></a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
+                        class="bi bi-facebook"></i></a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i
+                        class="bi bi-youtube"></i></a>
             </div>
             <p class="mb-1">Clínica Nutricional NutriVida. Todos los derechos reservados.</p>
-            <p class="mb-0 small">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo: contacto@nutrividaclinica.cl</p>
+            <p class="mb-0 small">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo:
+                contacto@nutrividaclinica.cl</p>
         </div>
     </footer>
 
