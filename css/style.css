@@ -15,8 +15,8 @@ header {
     background-color: #0f766e;
 }
 
-.navbar-brand{
-    letter-spacing: 3px; 
+.navbar-brand {
+    letter-spacing: 3px;
     font-family: "Fraunces", serif;
     font-weight: 600;
     font-size: 1.5rem;
@@ -24,12 +24,15 @@ header {
 
 }
 
-.nav-link , .nav-link.active  {
+.nav-link,
+.nav-link.active {
     color: white;
     letter-spacing: 1px;
 }
 
-.navbar-brand:hover,.nav-link:hover, .nav-link.active:hover{
+.navbar-brand:hover,
+.nav-link:hover,
+.nav-link.active:hover {
     color: black;
 }
 
@@ -158,13 +161,15 @@ article img {
 
 /* Sofía - Agendar */
 
-#titulo-agendar, #titulo-citas{
+#titulo-agendar,
+#titulo-citas {
     font-family: "Source Code Pro", monospace;
     font-weight: 500;
-} 
+}
+
 #formulario-agenda .form-label {
     font-family: "Roboto", sans-serif;
-    letter-spacing: 1px; 
+    letter-spacing: 1px;
     font-weight: bold;
     color: #2f241f;
 }
@@ -430,8 +435,63 @@ article img {
 
 /*-------------------------------------------------------------------*/
 
-/* Nitsi - Responsivo */
-@media (max-width: 700px) {
+/* RESPONSIVO / MEDIA QUERIES (360px, 768px, 1280px) */
+
+/* 📱 Móvil Pequeño (hasta 360px) */
+@media (max-width: 360px) {
+    header {
+        padding: 12px 10px;
+        text-align: center;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+
+    main {
+        padding: 12px;
+    }
+
+    .hero {
+        padding: 18px;
+        min-height: auto;
+    }
+
+    .hero h2 {
+        font-size: 24px;
+    }
+
+    .tarjeta {
+        min-width: 100%;
+        padding: 12px;
+    }
+
+    .tarjeta img {
+        height: 160px;
+    }
+
+    article {
+        padding: 12px;
+    }
+
+    footer {
+        padding: 16px 10px;
+        font-size: 0.85rem;
+    }
+
+    footer a {
+        font-size: 1.25rem;
+        margin: 0 6px;
+    }
+
+    .admin-content {
+        padding: 12px;
+    }
+}
+
+/* 📱/💻 Tableta (hasta 768px) */
+@media (max-width: 768px) {
     header {
         text-align: center;
     }
@@ -453,10 +513,11 @@ article img {
     .productos {
         flex-direction: column;
     }
-}
 
-/* Sofía - Responsivo admin */
-@media (max-width: 768px) {
+    .tarjeta {
+        width: 100%;
+    }
+
     .admin-layout {
         flex-direction: column;
     }
@@ -472,5 +533,30 @@ article img {
     .admin-btn-volver {
         padding: 4px 10px;
         font-size: 0.85rem;
+    }
+}
+
+/* 💻 Escritorio / Pantallas Grandes (desde 1280px) */
+@media (min-width: 1280px) {
+    main {
+        max-width: 1240px;
+        padding: 36px 24px;
+    }
+
+    .hero {
+        min-height: 420px;
+        padding: 64px;
+    }
+
+    .hero h2 {
+        font-size: 52px;
+    }
+
+    .productos {
+        gap: 28px;
+    }
+
+    .tarjeta {
+        flex: 1 1 calc(33.333% - 28px);
     }
 }
