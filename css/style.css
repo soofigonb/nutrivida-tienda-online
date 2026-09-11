@@ -1196,170 +1196,485 @@ footer a:hover {
 
 /* ------------------------------------------------------------------ */
 
-/* Sofía - Panel administrador   */
+/* Sofía - Panel administrador */
 
 .admin-layout {
     display: flex;
     min-height: 100vh;
+    background-color: #f8f5ef;
 }
 
+/* Menú lateral */
+
 .admin-sidebar {
-    width: 240px;
-    flex-shrink: 0;
-    background-color: #1f2937;
-    color: white;
     display: flex;
+    width: 260px;
+    min-height: 100vh;
     flex-direction: column;
-    padding: 20px 0;
+    flex-shrink: 0;
+    padding: 24px 0;
+    color: white;
+    background-color: #115e59;
 }
 
 .admin-sidebar-brand {
-    padding: 0 20px 20px;
-    font-family: "Fraunces", serif;
-    letter-spacing: 3px;
-    font-size: 1.5rem;
-    font-weight: 600;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    margin-bottom: 16px;
+    padding: 0 24px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .admin-sidebar-brand a {
-    color: white;
-    text-decoration: none;
-}
-
-.admin-nav {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-}
-
-.admin-nav-link {
-    color: white;
-    text-decoration: none;
-    padding: 12px 20px;
     display: flex;
     align-items: center;
     gap: 10px;
+    color: white;
+    font-family: "Fraunces", serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-decoration: none;
+}
+
+.admin-sidebar-brand a:hover {
+    color: #d1fae5;
+}
+
+.admin-sidebar-brand span {
+    display: block;
+    margin-top: 6px;
+    color: rgba(255, 255, 255, 0.7);
     font-family: "Roboto", sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+
+/* Navegación */
+
+.admin-nav {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    gap: 6px;
+    padding: 24px 14px;
+}
+
+.admin-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.82);
+    font-family: "Roboto", sans-serif;
+    text-decoration: none;
     transition: background-color 0.2s ease;
+}
+
+.admin-nav-link i {
+    font-size: 1.1rem;
 }
 
 .admin-nav-link:hover,
 .admin-nav-link.active {
-    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    background-color: rgba(255, 255, 255, 0.14);
 }
 
+.admin-nav-link.active {
+    font-weight: bold;
+}
+
+/* Usuario */
+
 .admin-sidebar-footer {
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-    padding-top: 12px;
-    margin-top: 12px;
+    margin: 0 14px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .admin-user {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 20px 16px;
-    color: rgba(255, 255, 255, 0.7);
+    gap: 12px;
+    padding: 8px 16px 18px;
     font-family: "Roboto", sans-serif;
+}
+
+.admin-user-icono {
+    font-size: 1.8rem;
+}
+
+.admin-user strong,
+.admin-user span {
+    display: block;
+}
+
+.admin-user strong {
+    color: white;
     font-size: 0.9rem;
 }
 
-.admin-user i {
-    font-size: 1.2rem;
+.admin-user span {
+    margin-top: 2px;
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 0.75rem;
 }
+
+/* Contenido */
 
 .admin-content {
-    flex-grow: 1;
-    padding: 32px 40px;
-    background-color: #fffaf4;
+    width: 100%;
+    min-width: 0;
+    padding: 40px;
+    background-color: #f8f5ef;
 }
 
+/* Encabezado */
+
 .admin-topbar {
-    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 0 0 24px;
+    border-bottom: 1px solid #dfd5cb;
     background-color: transparent;
 }
 
-.admin-topbar h1 {
-    font-family: "Fraunces", serif;
-    font-size: 2rem;
-    font-weight: 500;
-    color: #1f2937;
-    letter-spacing: 0.3px;
-    border-bottom: 2px solid #e5e0d8;
-    padding-bottom: 16px;
+.admin-bienvenida {
+    margin: 0 0 6px;
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
+
+.admin-topbar h1 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 2.4rem;
+    font-weight: 600;
+}
+
+.admin-descripcion {
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+}
+
+.admin-fecha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border: 1px solid #d8c4b8;
+    border-radius: 20px;
+    color: #047857;
+    background-color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+}
+
+/* Tarjetas de estadísticas */
 
 .admin-panel {
     background-color: transparent;
 }
 
 .admin-stat-card {
-    background-color: white;
-    border: 1px solid #d8c4b8;
-    border-radius: 10px;
-    padding: 20px;
-    text-align: center;
-}
-
-.admin-stat-number {
-    font-family: "Fraunces", serif;
-    font-size: 2rem;
-    font-weight: 600;
-    color: #0f766e;
-    margin: 0;
-}
-
-.admin-stat-label {
-    color: #6b7280;
-    font-size: 0.9rem;
-    margin: 4px 0 0;
-}
-
-/* ------------------------------------------------------------------ */
-
-/* Sofía - Panel Pacientes - Nutricionistas*/
-
-.admin-topbar-flex {
     display: flex;
+    height: 100%;
     align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px 16px;
+    gap: 18px;
+    padding: 24px;
+    border: 1px solid #e1d5ca;
+    border-radius: 14px;
+    background-color: white;
+    box-shadow: 0 6px 18px rgba(47, 36, 31, 0.06);
+    transition: transform 0.2s ease;
 }
 
-.admin-topbar-flex h1 {
-    flex: 1 1 auto;
+.admin-stat-card:hover {
+    transform: translateY(-3px);
+}
+
+.admin-stat-icono {
+    display: flex;
+    width: 58px;
+    height: 58px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 12px;
+    font-size: 1.6rem;
+}
+
+.admin-icono-pacientes {
+    color: #047857;
+    background-color: #d1fae5;
+}
+
+.admin-icono-nutricionistas {
+    color: #9a3412;
+    background-color: #ffedd5;
+}
+
+.admin-icono-citas {
+    color: #1d4ed8;
+    background-color: #dbeafe;
+}
+
+.admin-stat-contenido {
     min-width: 0;
 }
 
-.admin-btn-nuevo {
-    background-color: #047857;
-    border-color: #047857;
+.admin-stat-label {
+    margin: 0 0 5px;
+    color: #6b7280;
     font-family: "Roboto", sans-serif;
+    font-size: 0.9rem;
+}
+
+.admin-stat-number {
+    margin: 0;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 2.1rem;
+    font-weight: 700;
+}
+
+/* Accesos rápidos */
+
+.admin-accesos {
+    margin-top: 36px;
+    padding: 28px;
+    border: 1px solid #e1d5ca;
+    border-radius: 14px;
+    background-color: white;
+}
+
+.admin-seccion-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.admin-seccion-encabezado>i {
+    color: #047857;
+    font-size: 1.6rem;
+}
+
+.admin-seccion-etiqueta {
+    margin: 0 0 4px;
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.admin-seccion-encabezado h2 {
+    margin: 0;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 1.7rem;
+}
+
+.admin-acceso-card {
+    display: flex;
+    height: 100%;
+    gap: 18px;
+    padding: 22px;
+    border: 1px solid #e1d5ca;
+    border-radius: 12px;
+    background-color: #fffaf4;
+}
+
+.admin-acceso-icono {
+    display: flex;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 10px;
+    color: white;
+    background-color: #047857;
+    font-size: 1.3rem;
+}
+
+.admin-acceso-contenido h3 {
+    margin: 0 0 8px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 1.25rem;
+}
+
+.admin-acceso-contenido p {
+    margin: 0 0 14px;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    line-height: 1.6;
+}
+
+.admin-acceso-boton {
+    color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.admin-acceso-boton:hover {
+    color: #036548;
+    text-decoration: underline;
+}
+
+/* Aviso inferior */
+
+.admin-aviso {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 16px 20px;
+    border: 1px solid #a7f3d0;
+    border-radius: 10px;
+    color: #065f46;
+    background-color: #ecfdf5;
+    font-family: "Roboto", sans-serif;
+}
+
+.admin-aviso i {
+    flex-shrink: 0;
+    font-size: 1.2rem;
+}
+
+.admin-aviso p {
+    margin: 0;
+}
+
+
+
+/* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/* Sofía - Listados de pacientes y nutricionistas */
+
+.admin-topbar-listado {
+    align-items: flex-end;
+}
+
+.admin-btn-nuevo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 12px 20px;
+    border: 1px solid #047857;
+    border-radius: 8px;
+    color: white;
+    background-color: #047857;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
 }
 
 .admin-btn-nuevo:hover {
-    background-color: #036548;
     border-color: #036548;
+    color: white;
+    background-color: #036548;
 }
 
-.admin-table {
-    background-color: white;
-    border: 1px solid #d8c4b8;
-    border-radius: 10px;
+.admin-listado-card {
     overflow: hidden;
+    border: 1px solid #e1d5ca;
+    border-radius: 14px;
+    background-color: white;
+    box-shadow: 0 6px 18px rgba(47, 36, 31, 0.06);
+}
+
+.admin-listado-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 24px 28px;
+    border-bottom: 1px solid #e1d5ca;
+}
+
+.admin-listado-encabezado h2 {
+    margin: 0 0 6px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.admin-listado-encabezado p {
+    margin: 0;
+    color: #6b7280;
     font-family: "Roboto", sans-serif;
 }
 
-.admin-table thead {
-    background-color: #f5efe6;
+.admin-listado-icono {
+    display: flex;
+    width: 48px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 10px;
+    color: #047857;
+    background-color: #d1fae5;
+    font-size: 1.4rem;
 }
 
-.admin-badge-tipo {
-    background-color: #d1fae5;
-    color: #047857;
+/* Tabla */
+
+.admin-table {
+    width: 100%;
+    margin: 0;
+    font-family: "Roboto", sans-serif;
+}
+
+.admin-table thead th {
+    padding: 16px 20px;
+    border-bottom: 1px solid #d8c4b8;
+    color: #2f241f;
+    background-color: #f5efe6;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.admin-table tbody td {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee8e1;
+    color: #4b5563;
+    vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tbody tr:hover td {
+    background-color: #faf8f4;
+}
+
+.admin-table td:first-child {
+    color: #2f241f;
     font-weight: 500;
 }
 
@@ -1367,35 +1682,189 @@ footer a:hover {
     white-space: nowrap;
 }
 
+/* Tipo y modalidad */
+
+.admin-badge-tipo {
+    display: inline-block;
+    padding: 7px 11px;
+    border-radius: 20px;
+    color: #047857;
+    background-color: #d1fae5;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Botones generados desde app.js */
+
 .admin-table .btn-sm {
     display: inline-flex;
+    width: 34px;
+    height: 34px;
     align-items: center;
     justify-content: center;
+    padding: 0;
+    border-radius: 7px;
+}
+
+.admin-table .btn-outline-secondary {
+    border-color: #9ca3af;
+    color: #4b5563;
+}
+
+.admin-table .btn-outline-secondary:hover {
+    border-color: #4b5563;
+    color: white;
+    background-color: #4b5563;
+}
+
+.admin-table .btn-outline-danger {
+    border-color: #dc3545;
+    color: #dc3545;
+}
+
+.admin-table .btn-outline-danger:hover {
+    color: white;
+    background-color: #dc3545;
+}
+
+/* Sin registros */
+
+.admin-sin-registros {
+    padding: 48px 20px;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+    text-align: center;
+}
+
+.admin-sin-registros i {
+    display: block;
+    margin-bottom: 12px;
+    color: #9ca3af;
+    font-size: 2.5rem;
+}
+
+.admin-sin-registros p {
+    margin: 0 0 10px;
+}
+
+.admin-sin-registros a {
+    color: #047857;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.admin-sin-registros a:hover {
+    text-decoration: underline;
 }
 
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* Sofía - Formularios administrativos */
 
-/* Sofía - Formularios admin (nuevo / editar) */
+.admin-btn-volver {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 11px 18px;
+    border: 1px solid #9ca3af;
+    border-radius: 8px;
+    color: #4b5563;
+    background-color: white;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.admin-btn-volver:hover {
+    border-color: #4b5563;
+    color: white;
+    background-color: #4b5563;
+}
+
+.admin-form-contenedor {
+    overflow: hidden;
+    max-width: 950px;
+    border: 1px solid #e1d5ca;
+    border-radius: 14px;
+    background-color: white;
+    box-shadow: 0 6px 18px rgba(47, 36, 31, 0.06);
+}
+
+.admin-form-encabezado {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 28px;
+    border-bottom: 1px solid #e1d5ca;
+    background-color: #fffaf4;
+}
+
+.admin-form-icono {
+    display: flex;
+    width: 50px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 10px;
+    color: #047857;
+    background-color: #d1fae5;
+    font-size: 1.4rem;
+}
+
+.admin-form-encabezado h2 {
+    margin: 0 0 5px;
+    color: #2f241f;
+    font-family: "Fraunces", serif;
+    font-size: 1.5rem;
+}
+
+.admin-form-encabezado p {
+    margin: 0;
+    color: #6b7280;
+    font-family: "Roboto", sans-serif;
+}
 
 .admin-form-card {
-    background-color: white;
-    border: 1px solid #d8c4b8;
-    border-radius: 10px;
-    padding: 24px;
+    padding: 28px;
     font-family: "Roboto", sans-serif;
 }
 
 .admin-form-card .form-label {
-    font-weight: bold;
-    letter-spacing: 1px;
+    margin-bottom: 7px;
     color: #2f241f;
+    font-weight: bold;
+}
+
+.admin-form-card .form-control,
+.admin-form-card .form-select {
+    min-height: 46px;
+    border: 1px solid #cfc5bb;
+    border-radius: 8px;
+    color: #2f241f;
+    background-color: white;
+}
+
+.admin-form-card .form-control:focus,
+.admin-form-card .form-select:focus {
+    border-color: #047857;
+    box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+}
+
+.admin-form-card .form-select:disabled {
+    color: #9ca3af;
+    background-color: #f3f4f6;
 }
 
 .admin-form-card .form-text {
     display: block;
-    min-height: 1rem;
+    min-height: 20px;
+    margin-top: 5px;
     color: #b91c1c;
+    font-size: 0.8rem;
 }
 
 .admin-form-card .is-invalid {
@@ -1406,11 +1875,57 @@ footer a:hover {
     border-color: #047857;
 }
 
-.admin-btn-volver {
-    font-family: "Roboto", sans-serif;
-    white-space: nowrap;
+.admin-form-acciones {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+    padding-top: 22px;
+    border-top: 1px solid #e1d5ca;
 }
 
+.admin-btn-cancelar,
+.admin-btn-guardar {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: "Roboto", sans-serif;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.admin-btn-cancelar {
+    border: 1px solid #9ca3af;
+    color: #4b5563;
+    background-color: white;
+}
+
+.admin-btn-cancelar:hover {
+    border-color: #4b5563;
+    color: white;
+    background-color: #4b5563;
+}
+
+.admin-btn-guardar {
+    border: 1px solid #047857;
+    color: white;
+    background-color: #047857;
+}
+
+.admin-btn-guardar:hover {
+    border-color: #036548;
+    background-color: #036548;
+}
+
+.admin-form-mensaje {
+    margin-top: 18px;
+}
 
 /*-------------------------------------------------------------------*/
 
@@ -1538,7 +2053,7 @@ footer a:hover {
         font-size: 2rem;
     }
 
-        .carrito-main {
+    .carrito-main {
         padding: 28px 12px;
     }
 
@@ -1578,6 +2093,50 @@ footer a:hover {
     .carrito-seguir-comprando,
     .carrito-confirmar {
         width: 100%;
+    }
+
+    .admin-content {
+        padding: 20px 12px;
+    }
+
+    .admin-topbar h1 {
+        font-size: 1.7rem;
+    }
+
+    .admin-stat-card {
+        padding: 16px;
+    }
+
+    .admin-stat-icono {
+        width: 48px;
+        height: 48px;
+    }
+
+    .admin-accesos {
+        padding: 16px;
+    }
+
+    .admin-nav {
+        flex-direction: column;
+    }
+
+    .admin-nav-link {
+        flex: none;
+        width: 100%;
+    }
+
+    .admin-listado-encabezado {
+        align-items: flex-start;
+        padding: 18px 16px;
+    }
+
+    .admin-listado-icono {
+        width: 42px;
+        height: 42px;
+    }
+
+    .admin-listado-encabezado h2 {
+        font-size: 1.3rem;
     }
 }
 
@@ -1700,6 +2259,98 @@ footer a:hover {
     .carrito-encabezado {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+
+    .admin-sidebar-brand {
+        padding-bottom: 18px;
+    }
+
+    .admin-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 16px;
+    }
+
+    .admin-nav-link {
+        flex: 1 1 150px;
+    }
+
+    .admin-sidebar-footer {
+        margin: 0 16px;
+    }
+
+    .admin-content {
+        padding: 24px 18px;
+    }
+
+    .admin-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-topbar h1 {
+        font-size: 2rem;
+    }
+
+    .admin-fecha {
+        align-self: flex-start;
+    }
+
+    .admin-stat-card {
+        padding: 20px;
+    }
+
+    .admin-accesos {
+        padding: 20px;
+    }
+
+    .admin-acceso-card {
+        flex-direction: column;
+    }
+
+    .admin-topbar-listado {
+        align-items: stretch;
+    }
+
+    .admin-btn-nuevo {
+        width: 100%;
+    }
+
+    .admin-listado-encabezado {
+        padding: 20px;
+    }
+
+    .admin-table {
+        min-width: 700px;
+    }
+
+    .admin-form-contenedor {
+        max-width: 100%;
+    }
+
+    .admin-form-encabezado,
+    .admin-form-card {
+        padding: 20px;
+    }
+
+    .admin-form-acciones {
+        align-items: stretch;
+        flex-direction: column-reverse;
+    }
+
+    .admin-btn-cancelar,
+    .admin-btn-guardar,
+    .admin-btn-volver {
+        width: 100%;
     }
 }
 

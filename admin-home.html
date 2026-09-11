@@ -4,15 +4,21 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NutriVida - Admin</title>
+
+    <title>Panel administrador - NutriVida</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link
-        href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oleo+Script:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap"
         rel="stylesheet">
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -20,63 +26,238 @@
 
     <div class="admin-layout">
 
+        <!-- Menú lateral -->
         <aside class="admin-sidebar">
+
             <div class="admin-sidebar-brand">
-                <a href="admin-home.html">NutriVida</a>
+                <a href="admin-home.html">
+                    <i class="bi bi-heart-pulse"></i>
+                    NutriVida
+                </a>
+
+                <span>Panel administrador</span>
             </div>
 
-            <nav class="admin-nav">
-                <a href="admin-home.html" class="admin-nav-link active">
-                    <i class="bi bi-house"></i> Dashboard
+            <nav class="admin-nav" aria-label="Navegación administrativa">
+
+                <a href="admin-home.html" class="admin-nav-link active" aria-current="page">
+
+                    <i class="bi bi-grid"></i>
+                    Dashboard
                 </a>
+
                 <a href="admin-pacientes.html" class="admin-nav-link">
-                    <i class="bi bi-people"></i> Pacientes
+
+                    <i class="bi bi-people"></i>
+                    Pacientes
                 </a>
+
                 <a href="admin-nutricionistas.html" class="admin-nav-link">
-                    <i class="bi bi-person-badge"></i> Nutricionistas
+
+                    <i class="bi bi-person-badge"></i>
+                    Nutricionistas
                 </a>
+
             </nav>
 
             <div class="admin-sidebar-footer">
+
                 <div class="admin-user">
-                    <i class="bi bi-person-circle"></i>
-                    <span>Administrador</span>
+                    <div class="admin-user-icono">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+
+                    <div>
+                        <strong>Administrador</strong>
+                        <span>Sesión activa</span>
+                    </div>
                 </div>
+
                 <a href="index.html" class="admin-nav-link">
-                    <i class="bi bi-box-arrow-left"></i> Volver al sitio
+                    <i class="bi bi-box-arrow-left"></i>
+                    Volver al sitio
                 </a>
+
             </div>
+
         </aside>
 
+        <!-- Contenido principal -->
         <main class="admin-content">
+
+            <!-- Encabezado -->
             <header class="admin-topbar">
-                <h1>¡Hola Administrador!</h1>
+
+                <div>
+                    <p class="admin-bienvenida">Panel de administración</p>
+
+                    <h1>¡Hola, Administrador!</h1>
+
+                    <p class="admin-descripcion">
+                        Revisa el resumen general y gestiona la información
+                        de NutriVida.
+                    </p>
+                </div>
+
+                <div class="admin-fecha">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="admin-fecha-actual">Resumen general</span>
+                </div>
+
             </header>
 
             <section class="admin-panel">
-                <div class="row g-3">
+
+                <!-- Tarjetas de estadísticas -->
+                <div class="row g-4">
+
                     <div class="col-12 col-md-4">
-                        <div class="admin-stat-card">
-                            <p class="admin-stat-number" id="stat-pacientes"></p>
-                            <p class="admin-stat-label">Pacientes registrados</p>
-                        </div>
+                        <article class="admin-stat-card">
+
+                            <div class="admin-stat-icono admin-icono-pacientes">
+                                <i class="bi bi-people"></i>
+                            </div>
+
+                            <div class="admin-stat-contenido">
+                                <p class="admin-stat-label">
+                                    Pacientes registrados
+                                </p>
+
+                                <p class="admin-stat-number" id="stat-pacientes">
+                                    0
+                                </p>
+                            </div>
+
+                        </article>
                     </div>
+
                     <div class="col-12 col-md-4">
-                        <div class="admin-stat-card">
-                            <p class="admin-stat-number" id="stat-nutricionistas"></p>
-                            <p class="admin-stat-label">Nutricionistas activos</p>
-                        </div>
+                        <article class="admin-stat-card">
+
+                            <div class="admin-stat-icono admin-icono-nutricionistas">
+                                <i class="bi bi-person-badge"></i>
+                            </div>
+
+                            <div class="admin-stat-contenido">
+                                <p class="admin-stat-label">
+                                    Nutricionistas activos
+                                </p>
+
+                                <p class="admin-stat-number" id="stat-nutricionistas">
+                                    0
+                                </p>
+                            </div>
+
+                        </article>
                     </div>
+
                     <div class="col-12 col-md-4">
-                        <div class="admin-stat-card">
-                            <p class="admin-stat-number" id="stat-citas-hoy"></p>
-                            <p class="admin-stat-label">Citas agendadas hoy</p>
-                        </div>
+                        <article class="admin-stat-card">
+
+                            <div class="admin-stat-icono admin-icono-citas">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+
+                            <div class="admin-stat-contenido">
+                                <p class="admin-stat-label">
+                                    Citas agendadas hoy
+                                </p>
+
+                                <p class="admin-stat-number" id="stat-citas-hoy">
+                                    0
+                                </p>
+                            </div>
+
+                        </article>
                     </div>
+
                 </div>
 
-                <p class="text-muted mt-4">Selecciona una opción del menú para gestionar pacientes o nutricionistas.</p>
+                <!-- Accesos rápidos -->
+                <section class="admin-accesos">
+
+                    <div class="admin-seccion-encabezado">
+                        <div>
+                            <p class="admin-seccion-etiqueta">
+                                Gestión
+                            </p>
+
+                            <h2>Accesos rápidos</h2>
+                        </div>
+
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+
+                    <div class="row g-4">
+
+                        <div class="col-12 col-lg-6">
+                            <article class="admin-acceso-card">
+
+                                <div class="admin-acceso-icono">
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+
+                                <div class="admin-acceso-contenido">
+                                    <h3>Gestionar pacientes</h3>
+
+                                    <p>
+                                        Revisa el listado, registra nuevos
+                                        pacientes o modifica sus datos.
+                                    </p>
+
+                                    <a href="admin-pacientes.html" class="admin-acceso-boton">
+
+                                        Ver pacientes
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                            </article>
+                        </div>
+
+                        <div class="col-12 col-lg-6">
+                            <article class="admin-acceso-card">
+
+                                <div class="admin-acceso-icono">
+                                    <i class="bi bi-person-vcard"></i>
+                                </div>
+
+                                <div class="admin-acceso-contenido">
+                                    <h3>Gestionar nutricionistas</h3>
+
+                                    <p>
+                                        Consulta el equipo profesional,
+                                        agrega nutricionistas o edita sus datos.
+                                    </p>
+
+                                    <a href="admin-nutricionistas.html" class="admin-acceso-boton">
+
+                                        Ver nutricionistas
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+
+                            </article>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- Mensaje inferior -->
+                <div class="admin-aviso">
+
+                    <i class="bi bi-info-circle"></i>
+
+                    <p>
+                        Los registros y citas de esta versión se almacenan
+                        localmente en el navegador mediante localStorage.
+                    </p>
+
+                </div>
+
             </section>
+
         </main>
 
     </div>
@@ -84,7 +265,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
-    <script src="js/app.js" defer></script>
+
+    <script src="js/app.js"></script>
+
 </body>
 
 </html>

@@ -49,58 +49,207 @@
         </aside>
 
         <main class="admin-content">
-            <header class="admin-topbar admin-topbar-flex">
-                <h1 id="titulo-form-paciente">Nuevo paciente</h1>
-                <a href="admin-pacientes.html" class="btn btn-outline-secondary admin-btn-volver">
-                    <i class="bi bi-arrow-left"></i> Volver al listado
+
+            <header class="admin-topbar admin-topbar-listado">
+
+                <div>
+                    <p class="admin-bienvenida">Gestión de pacientes</p>
+
+                    <h1 id="titulo-form-paciente">
+                        Nuevo paciente
+                    </h1>
+
+                    <p class="admin-descripcion">
+                        Completa los datos personales y de contacto del paciente.
+                    </p>
+                </div>
+
+                <a href="admin-pacientes.html" class="admin-btn-volver">
+
+                    <i class="bi bi-arrow-left"></i>
+                    Volver al listado
                 </a>
+
             </header>
 
             <section class="admin-panel">
-                <div class="row">
-                    <div class="col-12 col-lg-8">
 
-                        <form id="form-paciente" class="admin-form-card" novalidate>
+                <div class="admin-form-contenedor">
 
-                            <div class="mb-3">
-                                <label for="paciente-nombre" class="form-label">Nombre</label>
-                                <input type="text" id="paciente-nombre" class="form-control" autocomplete="given-name">
-                                <small class="form-text" id="error-paciente-nombre"></small>
-                            </div>
+                    <div class="admin-form-encabezado">
 
-                            <div class="mb-3">
-                                <label for="paciente-apellidos" class="form-label">Apellidos</label>
-                                <input type="text" id="paciente-apellidos" class="form-control" autocomplete="family-name">
-                                <small class="form-text" id="error-paciente-apellidos"></small>
-                            </div>
+                        <div class="admin-form-icono">
+                            <i class="bi bi-person-plus"></i>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="paciente-correo" class="form-label">Correo</label>
-                                <input type="email" id="paciente-correo" class="form-control" autocomplete="email">
-                                <small class="form-text" id="error-paciente-correo"></small>
-                            </div>
+                        <div>
+                            <h2>Información del paciente</h2>
 
-                            <div class="mb-3">
-                                <label for="paciente-tipo" class="form-label">Tipo de usuario</label>
-                                <select id="paciente-tipo" class="form-select">
-                                    <option value="">Seleccione un tipo</option>
-                                    <option value="Cliente">Cliente</option>
-                                    <option value="Vendedor">Vendedor</option>
-                                    <option value="Administrador">Administrador</option>
-                                </select>
-                                <small class="form-text" id="error-paciente-tipo"></small>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary admin-btn-nuevo">Guardar</button>
-
-                            <div id="mensaje-form-paciente" class="mt-3"></div>
-                        </form>
+                            <p>
+                                Los campos señalados son obligatorios.
+                            </p>
+                        </div>
 
                     </div>
-                </div>
-            </section>
-        </main>
 
+                    <form id="form-paciente" class="admin-form-card" novalidate>
+
+                        <div class="row g-4">
+
+                            <!-- Nombre -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-nombre" class="form-label">
+                                    Nombre
+                                </label>
+
+                                <input type="text" id="paciente-nombre" class="form-control" minlength="2"
+                                    maxlength="50" autocomplete="given-name" required>
+
+                                <small class="form-text" id="error-paciente-nombre">
+                                </small>
+
+                            </div>
+
+                            <!-- Apellidos -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-apellidos" class="form-label">
+                                    Apellidos
+                                </label>
+
+                                <input type="text" id="paciente-apellidos" class="form-control" minlength="2"
+                                    maxlength="80" autocomplete="family-name" required>
+
+                                <small class="form-text" id="error-paciente-apellidos">
+                                </small>
+
+                            </div>
+
+                            <!-- RUN -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-run" class="form-label">
+                                    RUN
+                                </label>
+
+                                <input type="text" id="paciente-run" class="form-control" placeholder="Ej: 18.345.678-5"
+                                    maxlength="12" autocomplete="off" required>
+
+                                <small class="form-text" id="error-paciente-run">
+                                </small>
+
+                            </div>
+
+                            <!-- Correo -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-correo" class="form-label">
+                                    Correo electrónico
+                                </label>
+
+                                <input type="email" id="paciente-correo" class="form-control"
+                                    placeholder="nombre@correo.cl" autocomplete="email" required>
+
+                                <small class="form-text" id="error-paciente-correo">
+                                </small>
+
+                            </div>
+
+                            <!-- Fecha de nacimiento -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-fecha-nacimiento" class="form-label">
+                                    Fecha de nacimiento
+                                </label>
+
+                                <input type="date" id="paciente-fecha-nacimiento" class="form-control"
+                                    autocomplete="bday">
+
+                                <small class="form-text" id="error-paciente-fecha-nacimiento">
+                                </small>
+
+                            </div>
+
+                            <!-- Región -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-region" class="form-label">
+                                    Región
+                                </label>
+
+                                <select id="paciente-region" class="form-select" required>
+
+                                    <option value="">Seleccione una región</option>
+                                    <option value="Valparaíso">Valparaíso</option>
+                                    <option value="Metropolitana">Metropolitana</option>
+                                    <option value="La Araucanía">La Araucanía</option>
+                                </select>
+
+                                <small class="form-text" id="error-paciente-region">
+                                </small>
+
+                            </div>
+
+                            <!-- Comuna -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-comuna" class="form-label">
+                                    Comuna
+                                </label>
+
+                                <select id="paciente-comuna" class="form-select" disabled required>
+
+                                    <option value="">Seleccione una comuna</option>
+                                </select>
+
+                                <small class="form-text" id="error-paciente-comuna">
+                                </small>
+
+                            </div>
+
+                            <!-- Dirección -->
+                            <div class="col-12 col-md-6">
+
+                                <label for="paciente-direccion" class="form-label">
+                                    Dirección
+                                </label>
+
+                                <input type="text" id="paciente-direccion" class="form-control"
+                                    placeholder="Ej: Avenida Alemania 450" maxlength="120" autocomplete="street-address"
+                                    required>
+
+                                <small class="form-text" id="error-paciente-direccion">
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <div class="admin-form-acciones">
+
+                            <a href="admin-pacientes.html" class="admin-btn-cancelar">
+                                Cancelar
+                            </a>
+
+                            <button type="submit" class="admin-btn-guardar">
+
+                                <i class="bi bi-check-lg"></i>
+                                Guardar paciente
+                            </button>
+
+                        </div>
+
+                        <div id="mensaje-form-paciente" class="admin-form-mensaje" role="alert" aria-live="polite">
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </section>
+
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
