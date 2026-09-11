@@ -110,83 +110,112 @@ if (contenedor) {
     });
 }
 
+// Sofía - Planes y servicios
 
+const planesNutriVida = [
+    {
+        id: "consulta-inicial",
+        nombre: "Evaluación y consulta inicial",
+        descripcion: "Evaluación antropométrica, diagnóstico nutricional y pauta personalizada.",
+        precio: 35000
+    },
+    {
+        id: "plan-integral",
+        nombre: "Plan nutricional integral",
+        descripcion: "Incluye dos controles mensuales, seguimiento y guía de compras.",
+        precio: 60000
+    },
+    {
+        id: "nutricion-deportiva",
+        nombre: "Plan de nutrición deportiva",
+        descripcion: "Alimentación, suplementación y análisis del rendimiento.",
+        precio: 50000
+    }
+];
 
 // Sofía - Agendamiento de citas
 
 const formularioAgenda = document.getElementById("formulario-agenda");
+const campoPlanCita = document.getElementById("plan-cita");
 const campoNutricionista = document.getElementById("nutricionista");
 const campoMotivo = document.getElementById("motivo");
 const campoFechaCita = document.getElementById("fecha-cita");
 const campoHoraCita = document.getElementById("hora-cita");
 const mensajeAgenda = document.getElementById("mensaje-agenda");
-const listaCitas = document.getElementById("lista-citas");
+
+
+// Mostrar los precios con formato chileno.
+function formatearPrecio(precio) {
+    return "$" + Number(precio).toLocaleString("es-CL") + " CLP";
+}
+
+// Recuperar el carrito guardado o crear uno vacío.
+function obtenerCarrito() {
+    return JSON.parse(localStorage.getItem("carritoNutriVida")) || [];
+}
+
+// Guardar el carrito y actualizar el contador del navbar.
+function guardarCarrito(carrito) {
+    localStorage.setItem("carritoNutriVida", JSON.stringify(carrito));
+    actualizarContadorCarrito();
+}
+
+// Mostrar la cantidad de consultas del carrito en todas las páginas.
+function actualizarContadorCarrito() {
+    const contadoresCarrito = document.querySelectorAll("#contador-carrito");
+    const carrito = obtenerCarrito();
+
+    contadoresCarrito.forEach(function (contador) {
+        contador.textContent = carrito.length;
+    });
+}
+
+actualizarContadorCarrito();
 
 if (formularioAgenda) {
+    // Establecer como fecha mínima el día actual.
+    const hoy = new Date().toISOString().split("T")[0];
+    campoFechaCita.min = hoy;
 
-    // Cargar citas guardadas o crear arreglo vacío
-    let citas = JSON.parse(localStorage.getItem("citasNutriVida")) || [];
+    // Leer el plan enviado desde index.html mediante ?plan=id-del-plan.
+    const parametrosURL = new URLSearchParams(window.location.search);
+    const idPlanRecibido = parametrosURL.get("plan");
 
-    function guardarCitas() {
-        localStorage.setItem("citasNutriVida", JSON.stringify(citas));
-    }
+    const planRecibido = planesNutriVida.find(function (plan) {
+        return plan.id === idPlanRecibido;
+    });
 
-    function renderCitas() {
-        listaCitas.innerHTML = "";
-
-        if (citas.length === 0) {
-            listaCitas.innerHTML = "<p class='text-muted'>No tienes citas agendadas.</p>";
-            return;
-        }
-
-        citas.forEach(function (cita, indice) {
-            const columna = document.createElement("div");
-            columna.className = "col-12 col-md-6";
-
-            columna.innerHTML = `
-                <div class="card p-3">
-                    <p class="mb-1">${cita.nutricionista}</p>
-                    <p class="mb-1">${cita.motivo}</p>
-                    <p class="mb-1">${cita.fecha} - ${cita.hora}</p>
-                    <button class="btn btn-sm btn-outline-danger boton-cancelar" data-indice="${indice}">
-                        Cancelar cita
-                    </button>
-                </div>
-            `;
-
-            listaCitas.appendChild(columna);
-        });
-
-        const botonesCancelar = document.querySelectorAll(".boton-cancelar");
-
-        botonesCancelar.forEach(function (boton) {
-            boton.addEventListener("click", function () {
-                const indice = Number(boton.dataset.indice);
-                citas.splice(indice, 1);
-                guardarCitas();
-                renderCitas();
-
-                mensajeAgenda.textContent = "Cita cancelada correctamente";
-                mensajeAgenda.className = "alert alert-warning mt-4";
-            });
-        });
+    // Preseleccionar el plan cuando el usuario viene desde una tarjeta de index.html.
+    if (planRecibido && campoPlanCita) {
+        campoPlanCita.value = planRecibido.id;
     }
 
     formularioAgenda.addEventListener("submit", function (evento) {
         evento.preventDefault();
 
-        const nutricionista = campoNutricionista.value;
+        const idPlan = campoPlanCita ? campoPlanCita.value : "";
+        const idNutricionista = Number(campoNutricionista.value);
         const motivo = campoMotivo.value.trim();
         const fecha = campoFechaCita.value;
         const hora = campoHoraCita.value;
 
-        if (nutricionista === "" || motivo === "" || fecha === "" || hora === "") {
+        if (
+            idPlan === "" ||
+            campoNutricionista.value === "" ||
+            motivo === "" ||
+            fecha === "" ||
+            hora === ""
+        ) {
             mensajeAgenda.textContent = "Debe completar todos los campos";
             mensajeAgenda.className = "alert alert-danger mt-4";
             return;
         }
 
-        const hoy = new Date().toISOString().split("T")[0];
+        if (motivo.length < 5) {
+            mensajeAgenda.textContent = "El motivo debe tener al menos 5 caracteres";
+            mensajeAgenda.className = "alert alert-danger mt-4";
+            return;
+        }
 
         if (fecha < hoy) {
             mensajeAgenda.textContent = "No puede agendar una cita en una fecha pasada";
@@ -194,18 +223,167 @@ if (formularioAgenda) {
             return;
         }
 
-        citas.push({ nutricionista, motivo, fecha, hora });
-        guardarCitas();
-        renderCitas();
+        const planSeleccionado = planesNutriVida.find(function (plan) {
+            return plan.id === idPlan;
+        });
 
-        mensajeAgenda.textContent = "Cita agendada correctamente para " + nutricionista + " el " + fecha + " a las " + hora;
+        const nutricionistaSeleccionado = nutricionistas.find(function (nutricionista) {
+            return nutricionista.id === idNutricionista;
+        });
+
+        if (!planSeleccionado || !nutricionistaSeleccionado) {
+            mensajeAgenda.textContent = "No fue posible encontrar el plan o el nutricionista";
+            mensajeAgenda.className = "alert alert-danger mt-4";
+            return;
+        }
+
+        const nuevaConsulta = {
+            id: Date.now(),
+            planId: planSeleccionado.id,
+            servicio: planSeleccionado.nombre,
+            precio: planSeleccionado.precio,
+            nutricionistaId: nutricionistaSeleccionado.id,
+            nutricionista: nutricionistaSeleccionado.nombre,
+            motivo: motivo,
+            fecha: fecha,
+            hora: hora
+        };
+
+        const carrito = obtenerCarrito();
+        carrito.push(nuevaConsulta);
+        guardarCarrito(carrito);
+
+        mensajeAgenda.textContent = "Consulta agregada al carrito correctamente";
         mensajeAgenda.className = "alert alert-success mt-4";
 
         formularioAgenda.reset();
+
+        setTimeout(function () {
+            window.location.href = "carrito.html";
+        }, 800);
+    });
+}
+
+// Sofía - Carrito simulado
+
+const listaCarrito = document.getElementById("lista-carrito");
+const mensajeCarritoVacio = document.getElementById("carrito-vacio");
+const cantidadCarrito = document.getElementById("cantidad-carrito");
+const totalCarrito = document.getElementById("total-carrito");
+const botonConfirmarCarrito = document.getElementById("boton-confirmar-carrito");
+const mensajeCarrito = document.getElementById("mensaje-carrito");
+
+if (listaCarrito) {
+    let carrito = obtenerCarrito();
+
+    function renderCarrito() {
+        listaCarrito.innerHTML = "";
+
+        if (carrito.length === 1) {
+            cantidadCarrito.textContent = "1 consulta";
+        } else {
+            cantidadCarrito.textContent = carrito.length + " consultas";
+        }
+
+        let total = 0;
+
+        carrito.forEach(function (consulta) {
+            total += consulta.precio;
+        });
+
+        totalCarrito.textContent = formatearPrecio(total);
+
+        if (carrito.length === 0) {
+            mensajeCarritoVacio.classList.remove("d-none");
+            botonConfirmarCarrito.disabled = true;
+            actualizarContadorCarrito();
+            return;
+        }
+
+        mensajeCarritoVacio.classList.add("d-none");
+        botonConfirmarCarrito.disabled = false;
+
+        carrito.forEach(function (consulta) {
+            const articulo = document.createElement("article");
+            articulo.className = "carrito-item";
+
+            articulo.innerHTML = `
+                <div class="carrito-item-informacion">
+                    <h3 class="carrito-item-servicio">${consulta.servicio}</h3>
+                    <p class="carrito-item-dato">
+                        <strong>Nutricionista:</strong> ${consulta.nutricionista}
+                    </p>
+                    <p class="carrito-item-dato">
+                        <strong>Motivo:</strong> ${consulta.motivo}
+                    </p>
+                    <p class="carrito-item-dato">
+                        <strong>Fecha:</strong> ${consulta.fecha}
+                    </p>
+                    <p class="carrito-item-dato">
+                        <strong>Horario:</strong> ${consulta.hora} horas
+                    </p>
+                </div>
+
+                <div class="carrito-item-acciones">
+                    <p class="carrito-item-precio">
+                        ${formatearPrecio(consulta.precio)}
+                    </p>
+                    <button type="button" class="carrito-eliminar" data-id="${consulta.id}">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </button>
+                </div>
+            `;
+
+            listaCarrito.appendChild(articulo);
+        });
+
+        const botonesEliminarCarrito = document.querySelectorAll(".carrito-eliminar");
+
+        botonesEliminarCarrito.forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                const idConsulta = Number(boton.dataset.id);
+
+                carrito = carrito.filter(function (consulta) {
+                    return consulta.id !== idConsulta;
+                });
+
+                guardarCarrito(carrito);
+                renderCarrito();
+            });
+        });
+
+        actualizarContadorCarrito();
+    }
+
+    botonConfirmarCarrito.addEventListener("click", function () {
+        if (carrito.length === 0) {
+            return;
+        }
+
+        const citasGuardadas = JSON.parse(localStorage.getItem("citasNutriVida")) || [];
+
+        carrito.forEach(function (consulta) {
+            citasGuardadas.push(consulta);
+        });
+
+        localStorage.setItem("citasNutriVida", JSON.stringify(citasGuardadas));
+
+        carrito = [];
+        guardarCarrito(carrito);
+        renderCarrito();
+
+        mensajeCarrito.textContent = "Agendamiento confirmado correctamente";
+        mensajeCarrito.className = "alert alert-success carrito-mensaje";
+
+        setTimeout(function () {
+            window.location.href = "agendar.html";
+        }, 1200);
     });
 
-    renderCitas();
+    renderCarrito();
 }
+
 
 
 // Sofía - Dashboard admin 

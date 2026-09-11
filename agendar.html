@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>NutriVida</title>
+    <title>NutriVida - Agendar</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,6 +49,16 @@
                         <li class="nav-item">
                             <a class="nav-link" href="registro.html">Registrarse</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.html">
+                                <i class="bi bi-cart3"></i>
+                                Carrito
+
+                                <span id="contador-carrito" class="badge rounded-pill bg-warning text-dark">
+                                    0
+                                </span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -74,6 +84,34 @@
 
                     <form id="formulario-agenda" name="formularioAgenda" class="agendar-formulario" novalidate>
 
+                        <!-- Plan seleccionado -->
+                        <div class="agendar-campo">
+                            <label for="plan-cita" class="form-label agendar-label">
+                                Plan o servicio
+                            </label>
+
+                            <select id="plan-cita" name="planCita" class="form-select agendar-control"
+                                aria-describedby="error-plan-cita" required>
+
+                                <option value="">Seleccione un plan</option>
+
+                                <option value="consulta-inicial">
+                                    Evaluación y consulta inicial - $35.000 CLP
+                                </option>
+
+                                <option value="plan-integral">
+                                    Plan nutricional integral - $60.000 CLP
+                                </option>
+
+                                <option value="nutricion-deportiva">
+                                    Plan de nutrición deportiva - $50.000 CLP
+                                </option>
+                            </select>
+
+                            <small id="error-plan-cita" class="agendar-error" aria-live="polite">
+                            </small>
+                        </div>
+
                         <!-- Nutricionista -->
                         <div class="agendar-campo">
                             <label for="nutricionista" class="form-label agendar-label">
@@ -84,20 +122,20 @@
                                 aria-describedby="error-nutricionista" required>
                                 <option value="">Seleccione un nutricionista</option>
 
-                                <option value="Dra. Camila Torres">
-                                    Dra. Camila Torres - Nutrición clínica
+                                <option value="1">
+                                    Dra. Camila Torres
                                 </option>
 
-                                <option value="Lic. Mateo Silva">
-                                    Lic. Mateo Silva - Nutrición deportiva
+                                <option value="2">
+                                    Lic. Mateo Silva
                                 </option>
 
-                                <option value="Dra. Valeria Rojas">
-                                    Dra. Valeria Rojas - Enfermedades metabólicas
+                                <option value="3">
+                                    Dra. Valeria Rojas
                                 </option>
 
-                                <option value="Lic. Gabriel Morales">
-                                    Lic. Gabriel Morales - Alimentación vegetariana
+                                <option value="4">
+                                    Lic. Gabriel Morales
                                 </option>
                             </select>
 
@@ -147,8 +185,9 @@
                             <small id="error-hora-cita" class="agendar-error" aria-live="polite"></small>
                         </div>
 
-                        <button type="submit" id="boton-agendar" class="btn agendar-boton w-100">
-                            Agendar cita
+                        <button type="submit" id="boton-agregar-carrito" class="btn agendar-boton w-100">
+                            <i class="bi bi-cart-plus"></i>
+                            Agregar al carrito
                         </button>
 
                     </form>
@@ -156,25 +195,6 @@
                     <div id="mensaje-agenda" class="agendar-mensaje" role="alert" aria-live="polite"></div>
 
                 </div>
-            </div>
-
-        </section>
-
-        <!-- Sección de citas guardadas -->
-        <section class="citas-seccion" aria-labelledby="titulo-citas">
-
-            <div class="citas-encabezado">
-                <h2 class="citas-titulo" id="titulo-citas">
-                    Mis citas agendadas
-                </h2>
-
-                <p class="citas-descripcion">
-                    Aquí podrás revisar o cancelar tus citas.
-                </p>
-            </div>
-
-            <div id="lista-citas" class="citas-lista row g-3">
-                <!-- Se cargan dinámicamente desde js/app.js -->
             </div>
 
         </section>
