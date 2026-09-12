@@ -949,14 +949,20 @@ function validarCorreo(correo) {
 }
 
 function validarRUN(run) {
-    const runLimpio = run
+    const runIngresado = run.trim();
+
+    // Exige puntos y guion: 18.345.678-5 o 9.876.543-K
+    const formatoRUN = /^\d{1,2}\.\d{3}\.\d{3}-[\dKk]$/;
+
+    if (!formatoRUN.test(runIngresado)) {
+        return false;
+    }
+
+    // Elimina puntos y guion para calcular el dígito verificador
+    const runLimpio = runIngresado
         .replace(/\./g, "")
         .replace(/-/g, "")
         .toUpperCase();
-
-    if (!/^[0-9]{7,8}[0-9K]$/.test(runLimpio)) {
-        return false;
-    }
 
     const cuerpo = runLimpio.slice(0, -1);
     const digitoIngresado = runLimpio.slice(-1);
@@ -1100,7 +1106,7 @@ function validarCampoRUN(campo, elementoError) {
         return mostrarEstadoCampo(
             campo,
             elementoError,
-            "Ingresa un RUN válido, sin puntos ni guion."
+            "Ingrese el RUN con puntos y guion. Ejemplo: 18.345.678-5."
         );
     }
 
@@ -1386,10 +1392,9 @@ if (formularioRegistro) {
     }
 
     function comprobarTelefonoRegistro() {
-        const telefonoLimpio =
-            telefonoRegistro.value.replace(/\D/g, "");
+        const telefono = telefonoRegistro.value.trim();
 
-        if (telefonoRegistro.value.trim() === "") {
+        if (telefono === "") {
             return mostrarEstadoCampo(
                 telefonoRegistro,
                 errorTelefonoRegistro,
@@ -1397,14 +1402,13 @@ if (formularioRegistro) {
             );
         }
 
-        if (
-            telefonoLimpio.length < 8 ||
-            telefonoLimpio.length > 12
-        ) {
+        const formatoTelefono = /^\+569\d{8}$/;
+
+        if (!formatoTelefono.test(telefono)) {
             return mostrarEstadoCampo(
                 telefonoRegistro,
                 errorTelefonoRegistro,
-                "El teléfono debe contener entre 8 y 12 números."
+                "Ingrese un teléfono con formato +56912345678."
             );
         }
 
