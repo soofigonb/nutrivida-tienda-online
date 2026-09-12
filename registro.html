@@ -4,119 +4,440 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro paciente - Nutrivida</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <title>Registro de paciente - NutriVida</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="bg-light d-flex flex-column min-vh-100">
+
     <header>
+
         <nav class="navbar navbar-expand-lg">
+
             <div class="container-fluid">
-                <a class="navbar-brand" href="index.html">NutriVida</a>
+
+                <a class="navbar-brand" href="index.html">
+                    NutriVida
+                </a>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú de navegación">
+
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="collapse navbar-collapse" id="navbarNav">
+
                     <ul class="navbar-nav ms-auto">
+
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="index.html">Home</a>
+                            <a class="nav-link" href="index.html">
+                                Home
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="index.html#nosotros">Nosotros</a>
+                            <a class="nav-link" href="index.html#nosotros">
+                                Nosotros
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <li class="nav-item">
-                            <a class="nav-link" href="agendar.html">Agendar</a>
+                            <a class="nav-link" href="index.html#servicios">
+                                Servicios
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="index.html#contacto">Contacto</a>
+                            <a class="nav-link" href="index.html#blogs">
+                                Blogs
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="login.html">Iniciar Sesión</a>
+                            <a class="nav-link" href="agendar.html">
+                                Agendar
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link" href="registro.html">Registrarse</a>
+                            <a class="nav-link" href="index.html#contacto">
+                                Contacto
+                            </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">
+                                Iniciar Sesión
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="registro.html" aria-current="page">
+                                Registrarse
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+
+                            <a class="nav-link" href="carrito.html">
+
+                                <i class="bi bi-cart3"></i>
+                                Carrito
+
+                                <span id="contador-carrito" class="badge rounded-pill bg-warning text-dark">
+                                    0
+                                </span>
+
+                            </a>
+
+                        </li>
+
                     </ul>
+
                 </div>
+
             </div>
+
         </nav>
-    </header>     <a class="nav-link" href="index.html#blogs">Blogs</a>
-                        </li>
-    <div class="container my-4">
-        
-        <div class="mx-auto" style="max-width: 900px;">
-            <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-                <h2 class="m-0" style="color: #2c3e6e;">Nuevo paciente</h2>
-            </div>
-        </div>
 
-        <div class="card shadow-sm border-0 mx-auto" style="max-width: 900px;">
-            <div class="card-body p-4">
-                <div class="row align-items-center">
+    </header>
 
-                    <div class="col-md-4 text-center mb-3 mb-md-0">
-                        <img src="img/registro1.jpg" alt="Registro" class="img-fluid rounded"
-                            style="width: 100%; max-height: 400px; object-fit: cover;">
-                    </div>
+    <main class="container flex-grow-1 py-5">
 
-                    <div class="col-md-8">
-                        <form id="formPaciente" class="needs-validation" novalidate>
-                            <div class="row g-2">
-                                <div class="col-6 mb-1">
-                                    <label class="form-label small mb-1">Nombre</label>
-                                    <input type="text" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-6 mb-1">
-                                    <label class="form-label small mb-1">Apellidos</label>
-                                    <input type="text" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-12 mb-1">
-                                    <label class="form-label small mb-1">Correo electrónico</label>
-                                    <input type="email" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-12 mb-1">
-                                    <label class="form-label small mb-1">Teléfono</label>
-                                    <input type="tel" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-6 mb-1">
-                                    <label class="form-label small mb-1">Contraseña</label>
-                                    <input type="password" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-6 mb-1">
-                                    <label class="form-label small mb-1">Confirmar contraseña</label>
-                                    <input type="password" class="form-control form-control-sm" required>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <label class="form-label small mb-1">Región</label>
-                                    <select class="form-select form-select-sm" required>
-                                        <option value="">Seleccione región</option>
-                                        <option value="region1">Región de los Ríos</option>
-                                        <option value="region2">Región de los Lagos</option>
-                                        <option value="region3">Región de la Araucanía</option>
-                                    </select>
-                                </div>
-                                <div class="col-6 mb-2">
-                                    <label class="form-label small mb-1">Comuna</label>
-                                    <select class="form-select form-select-sm" required>
-                                        <option value="">Seleccione comuna</option>
-                                        <option value="comuna1">Valdivia</option>
-                                        <option value="comuna2">Puerto Montt</option>
-                                        <option value="comuna3">Temuco</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 mt-3">
-                                    <button type="submit" class="btn btn-info text-white w-100">Registrar paciente</button>
-                                </div>
-                            </div>
-                        </form>
+        <section class="row justify-content-center">
+
+            <div class="col-12 col-xl-10">
+
+                <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+
+                    <div>
+                        <h1 class="h2 text-secondary mb-1">
+                            Registrarse
+                        </h1>
                     </div>
 
                 </div>
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body p-4">
+
+                        <div class="row align-items-stretch g-4">
+
+                            <!-- Imagen -->
+                            <div class="col-12 col-lg-4 text-center">
+
+                                <img src="img/registro1.jpg" alt="Registro de paciente en NutriVida"
+                                    class="img-fluid rounded w-100 h-100 object-fit-cover">
+
+                            </div>
+
+                            <!-- Formulario -->
+                            <div class="col-12 col-lg-8">
+
+                                <form id="formulario-registro" class="needs-validation" novalidate>
+
+                                    <div class="row g-3">
+
+                                        <!-- Nombre -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="nombre-registro" class="form-label">
+                                                Nombre
+                                            </label>
+
+                                            <input type="text" id="nombre-registro" name="nombre" class="form-control"
+                                                minlength="2" maxlength="50" autocomplete="given-name"
+                                                aria-describedby="error-nombre-registro" required>
+
+                                            <small id="error-nombre-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Apellidos -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="apellidos-registro" class="form-label">
+                                                Apellidos
+                                            </label>
+
+                                            <input type="text" id="apellidos-registro" name="apellidos"
+                                                class="form-control" minlength="2" maxlength="80"
+                                                autocomplete="family-name" aria-describedby="error-apellidos-registro"
+                                                required>
+
+                                            <small id="error-apellidos-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- RUN -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="run-registro" class="form-label">
+                                                RUN
+                                            </label>
+
+                                            <input type="text" id="run-registro" name="run" class="form-control"
+                                                placeholder="Ej: 18.345.678-5" maxlength="12" autocomplete="off"
+                                                aria-describedby="error-run-registro" required>
+
+                                            <small id="error-run-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Fecha de nacimiento -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="fecha-nacimiento-registro" class="form-label">
+                                                Fecha de nacimiento
+                                                <span class="text-muted small">
+                                                    (opcional)
+                                                </span>
+                                            </label>
+
+                                            <input type="date" id="fecha-nacimiento-registro" name="fechaNacimiento"
+                                                class="form-control" autocomplete="bday"
+                                                aria-describedby="error-fecha-nacimiento-registro">
+
+                                            <small id="error-fecha-nacimiento-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Correo -->
+                                        <div class="col-12">
+
+                                            <label for="correo-registro" class="form-label">
+                                                Correo electrónico
+                                            </label>
+
+                                            <input type="email" id="correo-registro" name="correo" class="form-control"
+                                                placeholder="correo@ejemplo.com" autocomplete="email"
+                                                aria-describedby="error-correo-registro" required>
+
+                                            <small id="error-correo-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Teléfono -->
+                                        <div class="col-12">
+
+                                            <label for="telefono-registro" class="form-label">
+                                                Teléfono
+                                            </label>
+
+                                            <input type="tel" id="telefono-registro" name="telefono"
+                                                class="form-control" placeholder="+56 9 1234 5678" autocomplete="tel"
+                                                aria-describedby="error-telefono-registro" required>
+
+                                            <small id="error-telefono-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Contraseña -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="contrasena-registro" class="form-label">
+                                                Contraseña
+                                            </label>
+
+                                            <input type="password" id="contrasena-registro" name="contrasena"
+                                                class="form-control" minlength="6" autocomplete="new-password"
+                                                aria-describedby="error-contrasena-registro" required>
+
+                                            <small id="error-contrasena-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Confirmar contraseña -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="confirmar-contrasena-registro" class="form-label">
+                                                Confirmar contraseña
+                                            </label>
+
+                                            <input type="password" id="confirmar-contrasena-registro"
+                                                name="confirmarContrasena" class="form-control" minlength="6"
+                                                autocomplete="new-password"
+                                                aria-describedby="error-confirmar-contrasena-registro" required>
+
+                                            <small id="error-confirmar-contrasena-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Región -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="region-registro" class="form-label">
+                                                Región
+                                            </label>
+
+                                            <select id="region-registro" name="region" class="form-select"
+                                                aria-describedby="error-region-registro" required>
+
+                                                <option value="">
+                                                    Seleccione una región
+                                                </option>
+
+                                                <option value="Los Ríos">
+                                                    Región de Los Ríos
+                                                </option>
+
+                                                <option value="Los Lagos">
+                                                    Región de Los Lagos
+                                                </option>
+
+                                                <option value="La Araucanía">
+                                                    Región de La Araucanía
+                                                </option>
+
+                                                <option value="Valparaíso">
+                                                    Región de Valparaíso
+                                                </option>
+
+                                            </select>
+
+                                            <small id="error-region-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Comuna -->
+                                        <div class="col-12 col-md-6">
+
+                                            <label for="comuna-registro" class="form-label">
+                                                Comuna
+                                            </label>
+
+                                            <select id="comuna-registro" name="comuna" class="form-select"
+                                                aria-describedby="error-comuna-registro" disabled required>
+
+                                                <option value="">
+                                                    Seleccione una comuna
+                                                </option>
+
+                                            </select>
+
+                                            <small id="error-comuna-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Dirección -->
+                                        <div class="col-12">
+
+                                            <label for="direccion-registro" class="form-label">
+                                                Dirección
+                                            </label>
+
+                                            <input type="text" id="direccion-registro" name="direccion"
+                                                class="form-control" placeholder="Ej: Avenida Alemania 450"
+                                                maxlength="120" autocomplete="street-address"
+                                                aria-describedby="error-direccion-registro" required>
+
+                                            <small id="error-direccion-registro" class="text-danger">
+                                            </small>
+
+                                        </div>
+
+                                        <!-- Botón -->
+                                        <div class="col-12 mt-4">
+
+                                            <button type="submit" class="btn btn-info text-white w-100">
+
+                                                <i class="bi bi-person-plus"></i>
+                                                Registrar paciente
+                                            </button>
+
+                                        </div>
+
+                                        <div class="col-12">
+
+                                            <div id="mensaje-registro" role="alert" aria-live="polite">
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </form>
+
+                                <div class="text-center mt-4">
+
+                                    <small class="text-muted">
+                                        ¿Ya tienes una cuenta?
+
+                                        <a href="login.html" class="text-decoration-none">
+                                            Inicia sesión aquí
+                                        </a>
+                                    </small>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer-contacto py-4 text-center mt-auto">
+
+        <div class="container">
+
+            <div class="mb-2">
+
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <i class="bi bi-instagram"></i>
+                </a>
+
+                <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+                    <i class="bi bi-whatsapp"></i>
+                </a>
+
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                    <i class="bi bi-facebook"></i>
+                </a>
+
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                    <i class="bi bi-youtube"></i>
+                </a>
+
+            </div>
+
+            <p class="mb-1">
+                Clínica Nutricional NutriVida.
+                Todos los derechos reservados.
+            </p>
+
+            <p class="mb-0 small">
+                Dirección: Calle Manuel Montt 850, Temuco, Chile |
+                Teléfono: +56 9 1234 5678 |
+                Correo: contacto@nutrividaclinica.cl
+            </p>
+
         </div>
     </div>
 
