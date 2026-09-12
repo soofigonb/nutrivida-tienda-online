@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Carrito de consultas - NutriVida</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oleo+Script:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="index.html">NutriVida</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" aria-current="page" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#nosotros">Nosotros</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="agendar.html">Agendar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#contacto">Contacto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">Iniciar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="registro.html">Registrarse</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.html">
+                                <i class="bi bi-cart3"></i>
+                                Carrito
+
+                                <span id="contador-carrito" class="badge rounded-pill bg-warning text-dark">
+                                    0
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="carrito-main">
+
+        <section class="carrito-pagina">
+
+            <div class="carrito-presentacion text-center">
+
+                <span class="carrito-etiqueta">
+                    RESUMEN DE COMPRA
+                </span>
+
+                <h1 class="carrito-titulo">
+                    Mi carrito
+                </h1>
+
+                <p class="carrito-descripcion">
+                    Revisa los datos de tus consultas antes de confirmar
+                    el agendamiento.
+                </p>
+
+            </div>
+
+            <div class="carrito-contenedor">
+
+                <div class="carrito-encabezado">
+
+                    <div>
+                        <h2 class="carrito-subtitulo">
+                            Consultas seleccionadas
+                        </h2>
+
+                        <p class="carrito-indicacion">
+                            Puedes eliminar una consulta antes de confirmar.
+                        </p>
+                    </div>
+
+                    <span id="cantidad-carrito" class="carrito-cantidad">
+                        0 consultas
+                    </span>
+
+                </div>
+
+                <!-- Aquí JavaScript mostrará los productos -->
+                <div id="lista-carrito" class="carrito-lista"></div>
+
+                <!-- Se muestra solamente cuando el carrito está vacío -->
+                <p id="carrito-vacio" class="carrito-vacio">
+                    Todavía no has agregado una consulta.
+                </p>
+
+                <div class="carrito-total">
+
+                    <span>Total:</span>
+
+                    <strong id="total-carrito">
+                        $0 CLP
+                    </strong>
+
+                </div>
+
+                <div class="carrito-acciones">
+
+                    <a href="index.html#servicios" class="btn carrito-seguir-comprando">
+
+                        <i class="bi bi-arrow-left"></i>
+                        Seguir revisando planes
+                    </a>
+
+                    <button type="button" id="boton-confirmar-carrito" class="btn carrito-confirmar" disabled>
+
+                        <i class="bi bi-check-circle"></i>
+                        Confirmar agendamiento
+                    </button>
+
+                </div>
+
+                <div id="mensaje-carrito" class="carrito-mensaje" role="alert" aria-live="polite">
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer-contacto py-4 text-center">
+        <div class="container">
+            <div class="mb-2">
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i
+                        class="bi bi-instagram"></i></a>
+                <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i
+                        class="bi bi-whatsapp"></i></a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
+                        class="bi bi-facebook"></i></a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i
+                        class="bi bi-youtube"></i></a>
+            </div>
+            <p class="mb-1">Clínica Nutricional NutriVida. Todos los derechos reservados.</p>
+            <p class="mb-0 small">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo:
+                contacto@nutrividaclinica.cl</p>
+        </div>
+    </footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="js/app.js" defer></script>
+</body>
+
+</html>

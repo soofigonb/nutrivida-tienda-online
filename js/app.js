@@ -5,7 +5,7 @@ const botonPromocion = document.getElementById("boton-promocion");
 const promocion = document.getElementById("promocion");
 
 if (botonPromocion && promocion) {
-    botonPromocion.addEventListener("click", function(){
+    botonPromocion.addEventListener("click", function () {
         promocion.classList.toggle("d-none");
 
         if (promocion.classList.contains("d-none")) {
@@ -58,7 +58,7 @@ const detalleModal = document.getElementById("detalle-nutricionista-info");
 if (contenedor) {
     contenedor.innerHTML = "";
 
-    nutricionistas.forEach(function(nutri){
+    nutricionistas.forEach(function (nutri) {
         const article = document.createElement("article");
         article.className = "tarjeta";
 
@@ -82,103 +82,140 @@ if (contenedor) {
 
     const botonesAgregar = document.querySelectorAll(".boton-agregar");
 
-    botonesAgregar.forEach(function(boton){
-        boton.addEventListener("click", function(){
+    botonesAgregar.forEach(function (boton) {
+        boton.addEventListener("click", function () {
             const idNutri = Number(boton.dataset.id);
             const encontrado = nutricionistas.find(n => n.id === idNutri);
 
             if (encontrado && detalleModal) {
                 detalleModal.innerHTML = `
-                    <div class="alert alert-success mt-3" role="alert">
-                        <h4 class="alert-heading">${encontrado.nombre}</h4>
+                    <div class="alert alert-success mt-3 position-relative" role="alert">
+                        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" id="cerrar-detalle-nutri" aria-label="Cerrar detalle"></button>
+                        <h4 class="alert-heading pe-4">${encontrado.nombre}</h4>
                         <p><strong>Especialidad:</strong> ${encontrado.especialidad}</p>
                         <p><strong>Modalidad:</strong> ${encontrado.modalidad}</p>
                         <hr>
                         <p class="mb-0">${encontrado.experiencia}</p>
                     </div>
                 `;
+
+                const btnCerrar = document.getElementById("cerrar-detalle-nutri");
+                if (btnCerrar) {
+                    btnCerrar.addEventListener("click", function () {
+                        detalleModal.innerHTML = "";
+                    });
+                }
             }
         });
     });
 }
 
+// Sofía - Planes y servicios
 
+const planesNutriVida = [
+    {
+        id: "consulta-inicial",
+        nombre: "Evaluación y consulta inicial",
+        descripcion: "Evaluación antropométrica, diagnóstico nutricional y pauta personalizada.",
+        precio: 35000
+    },
+    {
+        id: "plan-integral",
+        nombre: "Plan nutricional integral",
+        descripcion: "Incluye dos controles mensuales, seguimiento y guía de compras.",
+        precio: 60000
+    },
+    {
+        id: "nutricion-deportiva",
+        nombre: "Plan de nutrición deportiva",
+        descripcion: "Alimentación, suplementación y análisis del rendimiento.",
+        precio: 50000
+    }
+];
 
 // Sofía - Agendamiento de citas
 
 const formularioAgenda = document.getElementById("formulario-agenda");
+const campoPlanCita = document.getElementById("plan-cita");
 const campoNutricionista = document.getElementById("nutricionista");
 const campoMotivo = document.getElementById("motivo");
 const campoFechaCita = document.getElementById("fecha-cita");
 const campoHoraCita = document.getElementById("hora-cita");
 const mensajeAgenda = document.getElementById("mensaje-agenda");
-const listaCitas = document.getElementById("lista-citas");
+
+
+// Mostrar los precios con formato chileno.
+function formatearPrecio(precio) {
+    return "$" + Number(precio).toLocaleString("es-CL") + " CLP";
+}
+
+// Recuperar el carrito guardado o crear uno vacío.
+function obtenerCarrito() {
+    return JSON.parse(localStorage.getItem("carritoNutriVida")) || [];
+}
+
+// Guardar el carrito y actualizar el contador del navbar.
+function guardarCarrito(carrito) {
+    localStorage.setItem("carritoNutriVida", JSON.stringify(carrito));
+    actualizarContadorCarrito();
+}
+
+// Mostrar la cantidad de consultas del carrito en todas las páginas.
+function actualizarContadorCarrito() {
+    const contadoresCarrito = document.querySelectorAll("#contador-carrito");
+    const carrito = obtenerCarrito();
+
+    contadoresCarrito.forEach(function (contador) {
+        contador.textContent = carrito.length;
+    });
+}
+
+actualizarContadorCarrito();
 
 if (formularioAgenda) {
+    // Establecer como fecha mínima el día actual.
+    const hoy = new Date().toISOString().split("T")[0];
+    campoFechaCita.min = hoy;
 
-    // Cargar citas guardadas o crear arreglo vacío
-    let citas = JSON.parse(localStorage.getItem("citasNutriVida")) || [];
+    // Leer el plan enviado desde index.html mediante ?plan=id-del-plan.
+    const parametrosURL = new URLSearchParams(window.location.search);
+    const idPlanRecibido = parametrosURL.get("plan");
 
-    function guardarCitas() {
-        localStorage.setItem("citasNutriVida", JSON.stringify(citas));
-    }
+    const planRecibido = planesNutriVida.find(function (plan) {
+        return plan.id === idPlanRecibido;
+    });
 
-    function renderCitas() {
-        listaCitas.innerHTML = "";
-
-        if (citas.length === 0) {
-            listaCitas.innerHTML = "<p class='text-muted'>No tienes citas agendadas.</p>";
-            return;
-        }
-
-        citas.forEach(function (cita, indice) {
-            const columna = document.createElement("div");
-            columna.className = "col-12 col-md-6";
-
-            columna.innerHTML = `
-                <div class="card p-3">
-                    <p class="mb-1">${cita.nutricionista}</p>
-                    <p class="mb-1">${cita.motivo}</p>
-                    <p class="mb-1">${cita.fecha} - ${cita.hora}</p>
-                    <button class="btn btn-sm btn-outline-danger boton-cancelar" data-indice="${indice}">
-                        Cancelar cita
-                    </button>
-                </div>
-            `;
-
-            listaCitas.appendChild(columna);
-        });
-
-        const botonesCancelar = document.querySelectorAll(".boton-cancelar");
-
-        botonesCancelar.forEach(function (boton) {
-            boton.addEventListener("click", function () {
-                const indice = Number(boton.dataset.indice);
-                citas.splice(indice, 1);
-                guardarCitas();
-                renderCitas();
-
-                mensajeAgenda.textContent = "Cita cancelada correctamente";
-                mensajeAgenda.className = "alert alert-warning mt-4";
-            });
-        });
+    // Preseleccionar el plan cuando el usuario viene desde una tarjeta de index.html.
+    if (planRecibido && campoPlanCita) {
+        campoPlanCita.value = planRecibido.id;
     }
 
     formularioAgenda.addEventListener("submit", function (evento) {
         evento.preventDefault();
 
-        const nutricionista = campoNutricionista.value;
+        const idPlan = campoPlanCita ? campoPlanCita.value : "";
+        const idNutricionista = Number(campoNutricionista.value);
         const motivo = campoMotivo.value.trim();
         const fecha = campoFechaCita.value;
         const hora = campoHoraCita.value;
 
-        if (nutricionista === "" || motivo === "" || fecha === "" || hora === "") {
+        if (
+            idPlan === "" ||
+            campoNutricionista.value === "" ||
+            motivo === "" ||
+            fecha === "" ||
+            hora === ""
+        ) {
             mensajeAgenda.textContent = "Debe completar todos los campos";
             mensajeAgenda.className = "alert alert-danger mt-4";
             return;
         }
 
-        const hoy = new Date().toISOString().split("T")[0];
+        if (motivo.length < 5) {
+            mensajeAgenda.textContent = "El motivo debe tener al menos 5 caracteres";
+            mensajeAgenda.className = "alert alert-danger mt-4";
+            return;
+        }
 
         if (fecha < hoy) {
             mensajeAgenda.textContent = "No puede agendar una cita en una fecha pasada";
@@ -186,18 +223,167 @@ if (formularioAgenda) {
             return;
         }
 
-        citas.push({ nutricionista, motivo, fecha, hora });
-        guardarCitas();
-        renderCitas();
+        const planSeleccionado = planesNutriVida.find(function (plan) {
+            return plan.id === idPlan;
+        });
 
-        mensajeAgenda.textContent = "Cita agendada correctamente para " + nutricionista + " el " + fecha + " a las " + hora;
+        const nutricionistaSeleccionado = nutricionistas.find(function (nutricionista) {
+            return nutricionista.id === idNutricionista;
+        });
+
+        if (!planSeleccionado || !nutricionistaSeleccionado) {
+            mensajeAgenda.textContent = "No fue posible encontrar el plan o el nutricionista";
+            mensajeAgenda.className = "alert alert-danger mt-4";
+            return;
+        }
+
+        const nuevaConsulta = {
+            id: Date.now(),
+            planId: planSeleccionado.id,
+            servicio: planSeleccionado.nombre,
+            precio: planSeleccionado.precio,
+            nutricionistaId: nutricionistaSeleccionado.id,
+            nutricionista: nutricionistaSeleccionado.nombre,
+            motivo: motivo,
+            fecha: fecha,
+            hora: hora
+        };
+
+        const carrito = obtenerCarrito();
+        carrito.push(nuevaConsulta);
+        guardarCarrito(carrito);
+
+        mensajeAgenda.textContent = "Consulta agregada al carrito correctamente";
         mensajeAgenda.className = "alert alert-success mt-4";
 
         formularioAgenda.reset();
+
+        setTimeout(function () {
+            window.location.href = "carrito.html";
+        }, 800);
+    });
+}
+
+// Sofía - Carrito simulado
+
+const listaCarrito = document.getElementById("lista-carrito");
+const mensajeCarritoVacio = document.getElementById("carrito-vacio");
+const cantidadCarrito = document.getElementById("cantidad-carrito");
+const totalCarrito = document.getElementById("total-carrito");
+const botonConfirmarCarrito = document.getElementById("boton-confirmar-carrito");
+const mensajeCarrito = document.getElementById("mensaje-carrito");
+
+if (listaCarrito) {
+    let carrito = obtenerCarrito();
+
+    function renderCarrito() {
+        listaCarrito.innerHTML = "";
+
+        if (carrito.length === 1) {
+            cantidadCarrito.textContent = "1 consulta";
+        } else {
+            cantidadCarrito.textContent = carrito.length + " consultas";
+        }
+
+        let total = 0;
+
+        carrito.forEach(function (consulta) {
+            total += consulta.precio;
+        });
+
+        totalCarrito.textContent = formatearPrecio(total);
+
+        if (carrito.length === 0) {
+            mensajeCarritoVacio.classList.remove("d-none");
+            botonConfirmarCarrito.disabled = true;
+            actualizarContadorCarrito();
+            return;
+        }
+
+        mensajeCarritoVacio.classList.add("d-none");
+        botonConfirmarCarrito.disabled = false;
+
+        carrito.forEach(function (consulta) {
+            const articulo = document.createElement("article");
+            articulo.className = "carrito-item";
+
+            articulo.innerHTML = `
+                <div class="carrito-item-informacion">
+                    <h3 class="carrito-item-servicio">${consulta.servicio}</h3>
+                    <p class="carrito-item-dato">
+                        <strong>Nutricionista:</strong> ${consulta.nutricionista}
+                    </p>
+                    <p class="carrito-item-dato">
+                        <strong>Motivo:</strong> ${consulta.motivo}
+                    </p>
+                    <p class="carrito-item-dato">
+                        <strong>Fecha:</strong> ${consulta.fecha}
+                    </p>
+                    <p class="carrito-item-dato">
+                        <strong>Horario:</strong> ${consulta.hora} horas
+                    </p>
+                </div>
+
+                <div class="carrito-item-acciones">
+                    <p class="carrito-item-precio">
+                        ${formatearPrecio(consulta.precio)}
+                    </p>
+                    <button type="button" class="carrito-eliminar" data-id="${consulta.id}">
+                        <i class="bi bi-trash"></i>
+                        Eliminar
+                    </button>
+                </div>
+            `;
+
+            listaCarrito.appendChild(articulo);
+        });
+
+        const botonesEliminarCarrito = document.querySelectorAll(".carrito-eliminar");
+
+        botonesEliminarCarrito.forEach(function (boton) {
+            boton.addEventListener("click", function () {
+                const idConsulta = Number(boton.dataset.id);
+
+                carrito = carrito.filter(function (consulta) {
+                    return consulta.id !== idConsulta;
+                });
+
+                guardarCarrito(carrito);
+                renderCarrito();
+            });
+        });
+
+        actualizarContadorCarrito();
+    }
+
+    botonConfirmarCarrito.addEventListener("click", function () {
+        if (carrito.length === 0) {
+            return;
+        }
+
+        const citasGuardadas = JSON.parse(localStorage.getItem("citasNutriVida")) || [];
+
+        carrito.forEach(function (consulta) {
+            citasGuardadas.push(consulta);
+        });
+
+        localStorage.setItem("citasNutriVida", JSON.stringify(citasGuardadas));
+
+        carrito = [];
+        guardarCarrito(carrito);
+        renderCarrito();
+
+        mensajeCarrito.textContent = "Agendamiento confirmado correctamente";
+        mensajeCarrito.className = "alert alert-success carrito-mensaje";
+
+        setTimeout(function () {
+            window.location.href = "agendar.html";
+        }, 1200);
     });
 
-    renderCitas();
+    renderCarrito();
 }
+
 
 
 // Sofía - Dashboard admin 
@@ -235,9 +421,39 @@ const sinPacientes = document.getElementById("sin-pacientes");
 if (tablaPacientes) {
 
     const pacientesPorDefecto = [
-        { id: 1, nombre: "Ana Muñoz", apellidos: "Fuentes", correo: "ana.munoz@gmail.com", tipo: "Cliente" },
-        { id: 2, nombre: "Diego Paredes", apellidos: "Reyes", correo: "diego.paredes@duoc.cl", tipo: "Cliente" },
-        { id: 3, nombre: "Francisca Vidal", apellidos: "Concha", correo: "francisca.vidal@gmail.com", tipo: "Vendedor" }
+        {
+            id: 1,
+            nombre: "Ana",
+            apellidos: "Muñoz Fuentes",
+            run: "18.345.678-5",
+            correo: "ana.munoz@gmail.com",
+            fechaNacimiento: "1998-05-14",
+            region: "La Araucanía",
+            comuna: "Temuco",
+            direccion: "Avenida Alemania 450"
+        },
+        {
+            id: 2,
+            nombre: "Diego",
+            apellidos: "Paredes Reyes",
+            run: "19.234.567-8",
+            correo: "diego.paredes@duoc.cl",
+            fechaNacimiento: "2000-09-22",
+            region: "La Araucanía",
+            comuna: "Padre Las Casas",
+            direccion: "Villa Los Robles 235"
+        },
+        {
+            id: 3,
+            nombre: "Francisca",
+            apellidos: "Vidal Concha",
+            run: "17.456.789-2",
+            correo: "francisca.vidal@gmail.com",
+            fechaNacimiento: "1996-12-03",
+            region: "La Araucanía",
+            comuna: "Villarrica",
+            direccion: "Calle Pedro de Valdivia 765"
+        }
     ];
 
     let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || pacientesPorDefecto;
@@ -260,16 +476,45 @@ if (tablaPacientes) {
             const fila = document.createElement("tr");
 
             fila.innerHTML = `
-                <td>${paciente.nombre} ${paciente.apellidos}</td>
+                <td>
+                    <strong>
+                        ${paciente.nombre} ${paciente.apellidos}
+                    </strong>
+                </td>
+
+                <td>${paciente.run}</td>
+
                 <td>${paciente.correo}</td>
-                <td><span class="badge admin-badge-tipo">${paciente.tipo}</span></td>
+
+                <td>${paciente.fechaNacimiento}</td>
+
+                <td>${paciente.region}</td>
+
+                <td>
+                    <span class="admin-badge-tipo">
+                        ${paciente.comuna}
+                    </span>
+                </td>
+
+                <td>${paciente.direccion}</td>
+
                 <td class="text-end">
-                    <a href="admin-form-paciente.html?id=${paciente.id}" class="btn btn-sm btn-outline-secondary me-1">
+
+                    <a href="admin-form-paciente.html?id=${paciente.id}"
+                        class="btn btn-sm btn-outline-secondary me-1"
+                        aria-label="Editar a ${paciente.nombre}">
+
                         <i class="bi bi-pencil"></i>
                     </a>
-                    <button class="btn btn-sm btn-outline-danger boton-eliminar-paciente" data-id="${paciente.id}">
+
+                    <button type="button"
+                        class="btn btn-sm btn-outline-danger boton-eliminar-paciente"
+                        data-id="${paciente.id}"
+                        aria-label="Eliminar a ${paciente.nombre}">
+
                         <i class="bi bi-trash"></i>
                     </button>
+
                 </td>
             `;
 
@@ -446,35 +691,133 @@ if (formNutricionista) {
 
 // Sofía - Formulario nuevo / editar paciente (admin)
 
-
 const formPaciente = document.getElementById("form-paciente");
 
 if (formPaciente) {
 
-    const parametros = new URLSearchParams(window.location.search);
-    const idEditar = parametros.get("id") ? Number(parametros.get("id")) : null;
+    const parametros =
+        new URLSearchParams(window.location.search);
 
-    let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
+    const idEditar = parametros.get("id")
+        ? Number(parametros.get("id"))
+        : null;
 
-    const tituloForm = document.getElementById("titulo-form-paciente");
-    const campoNombre = document.getElementById("paciente-nombre");
-    const campoApellidos = document.getElementById("paciente-apellidos");
-    const campoCorreo = document.getElementById("paciente-correo");
-    const campoTipo = document.getElementById("paciente-tipo");
-    const mensajeForm = document.getElementById("mensaje-form-paciente");
+    let pacientes =
+        JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
 
-    // Si viene un id en la URL, precargamos los datos para editar
+    const tituloForm =
+        document.getElementById("titulo-form-paciente");
+
+    const campoNombre =
+        document.getElementById("paciente-nombre");
+
+    const campoApellidos =
+        document.getElementById("paciente-apellidos");
+
+    const campoRun =
+        document.getElementById("paciente-run");
+
+    const campoCorreo =
+        document.getElementById("paciente-correo");
+
+    const campoFechaNacimiento =
+        document.getElementById("paciente-fecha-nacimiento");
+
+    const campoRegion =
+        document.getElementById("paciente-region");
+
+    const campoComuna =
+        document.getElementById("paciente-comuna");
+
+    const campoDireccion =
+        document.getElementById("paciente-direccion");
+
+    const mensajeForm =
+        document.getElementById("mensaje-form-paciente");
+
+    const comunasPorRegion = {
+        "Valparaíso": [
+            "Valparaíso",
+            "Viña del Mar",
+            "Quilpué",
+            "Villa Alemana"
+        ],
+        "Metropolitana": [
+            "Santiago",
+            "Providencia",
+            "Ñuñoa",
+            "Maipú"
+        ],
+        "La Araucanía": [
+            "Temuco",
+            "Padre Las Casas",
+            "Villarrica",
+            "Pucón"
+        ]
+    };
+
+    function cargarComunas(region, comunaSeleccionada) {
+        campoComuna.innerHTML =
+            '<option value="">Seleccione una comuna</option>';
+
+        if (!region || !comunasPorRegion[region]) {
+            campoComuna.disabled = true;
+            return;
+        }
+
+        campoComuna.disabled = false;
+
+        comunasPorRegion[region].forEach(function (comuna) {
+            const opcion = document.createElement("option");
+
+            opcion.value = comuna;
+            opcion.textContent = comuna;
+
+            if (comuna === comunaSeleccionada) {
+                opcion.selected = true;
+            }
+
+            campoComuna.appendChild(opcion);
+        });
+    }
+
+    campoRegion.addEventListener("change", function () {
+        cargarComunas(campoRegion.value, "");
+    });
+
     if (idEditar !== null) {
-        const pacienteExistente = pacientes.find(function (p) {
-            return p.id === idEditar;
+        const pacienteExistente = pacientes.find(function (paciente) {
+            return paciente.id === idEditar;
         });
 
         if (pacienteExistente) {
             tituloForm.textContent = "Editar paciente";
-            campoNombre.value = pacienteExistente.nombre;
-            campoApellidos.value = pacienteExistente.apellidos;
-            campoCorreo.value = pacienteExistente.correo;
-            campoTipo.value = pacienteExistente.tipo;
+
+            campoNombre.value =
+                pacienteExistente.nombre || "";
+
+            campoApellidos.value =
+                pacienteExistente.apellidos || "";
+
+            campoRun.value =
+                pacienteExistente.run || "";
+
+            campoCorreo.value =
+                pacienteExistente.correo || "";
+
+            campoFechaNacimiento.value =
+                pacienteExistente.fechaNacimiento || "";
+
+            campoRegion.value =
+                pacienteExistente.region || "";
+
+            cargarComunas(
+                pacienteExistente.region,
+                pacienteExistente.comuna
+            );
+
+            campoDireccion.value =
+                pacienteExistente.direccion || "";
         }
     }
 
@@ -483,117 +826,90 @@ if (formPaciente) {
 
         const nombre = campoNombre.value.trim();
         const apellidos = campoApellidos.value.trim();
+        const run = campoRun.value.trim();
         const correo = campoCorreo.value.trim();
-        const tipo = campoTipo.value;
+        const fechaNacimiento = campoFechaNacimiento.value;
+        const region = campoRegion.value;
+        const comuna = campoComuna.value;
+        const direccion = campoDireccion.value.trim();
 
-        // Validación básica. Reemplazar por las funciones de validación de Jonathan (en este mismo app.js)
-        document.addEventListener("DOMContentLoaded", function () {
-    const formPaciente = document.getElementById("formPaciente");
+        if (
+            nombre === "" ||
+            apellidos === "" ||
+            run === "" ||
+            correo === "" ||
+            region === "" ||
+            comuna === "" ||
+            direccion === ""
+        ) {
+            mensajeForm.textContent =
+                "Debe completar todos los campos obligatorios";
 
-    const idEditar = localStorage.getItem("idPacienteEditar") //paciente existente
-        ? parseInt(localStorage.getItem("idPacienteEditar")) 
-        : null;
+            mensajeForm.className =
+                "alert alert-danger admin-form-mensaje";
 
-    if (formPaciente) {
-        formPaciente.addEventListener("submit", function (e) {
-            e.preventDefault(); // Evita que el formulario se envíe automáticamente
+            return;
+        }
 
-            const nombreInput = document.getElementById("nombre");
-            const apellidosInput = document.getElementById("apellidos");
-            const correoInput = document.getElementById("correo");
-            const telefonoInput = document.getElementById("telefono");
-            const passwordInput = document.getElementById("password");
-            const confirmarPasswordInput = document.getElementById("confirmarPassword");
-            const regionInput = document.getElementById("region");
-            const comunaInput = document.getElementById("comuna");
-            const mensajeForm = document.getElementById("mensajeForm");
+        const correoValido =
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 
-            //obtener valores
-            const nombre = nombreInput.value.trim();
-            const apellidos = apellidosInput.value.trim();
-            const correo = correoInput.value.trim();
-            const telefono = telefonoInput.value.trim();
-            const password = passwordInput.value.trim();
-            const confirmarPassword = confirmarPasswordInput.value.trim();
-            const region = regionInput.value;
-            const comuna = comunaInput.value;
+        if (!correoValido) {
+            mensajeForm.textContent =
+                "Debe ingresar un correo electrónico válido";
 
-            function mostrarError(mensaje) {
-                mensajeForm.textContent = mensaje;
-                mensajeForm.className = "alert alert-danger mt-2 py-2 small";
-            }
+            mensajeForm.className =
+                "alert alert-danger admin-form-mensaje";
 
-            
-            if (!nombre || !apellidos || !correo || !telefono || !password || !confirmarPassword || !region || !comuna) {
-                mostrarError("Debe completar todos los campos del formulario.");
-                return;
-            }
-            
-            const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!regexEmail.test(correo)) {
-                mostrarError("Por favor, ingrese un correo electrónico válido.");
-                correoInput.focus();
-                return;
-            }
+            return;
+        }
 
-            const regexTelefono = /^[0-9]{8,12}$/;
-            if (!regexTelefono.test(telefono)) {
-                mostrarError("El teléfono debe contener solo números (mínimo 8 dígitos).");
-                telefonoInput.focus();
-                return;
-            }
+        const datosPaciente = {
+            nombre: nombre,
+            apellidos: apellidos,
+            run: run,
+            correo: correo,
+            fechaNacimiento: fechaNacimiento,
+            region: region,
+            comuna: comuna,
+            direccion: direccion
+        };
 
-            if (password.length < 6) {
-                mostrarError("La contraseña debe tener al menos 6 caracteres.");
-                passwordInput.focus();
-                return;
-            }
+        if (idEditar !== null) {
 
-            if (password !== confirmarPassword) {
-                mostrarError("Las contraseñas no coinciden. Por favor, verifíquelas.");
-                confirmarPasswordInput.focus();
-                return;
-            }
+            pacientes = pacientes.map(function (paciente) {
+                if (paciente.id === idEditar) {
+                    return {
+                        id: paciente.id,
+                        ...datosPaciente
+                    };
+                }
 
-            // Si todas las validaciones pasan, se limpia el mensaje de error
-            mensajeForm.textContent = "";
-            mensajeForm.className = "";
+                return paciente;
+            });
 
-            let pacientes = JSON.parse(localStorage.getItem("pacientesNutriVida")) || [];
+        } else {
 
-            if (idEditar !== null) {
-                pacientes = pacientes.map(function (p) {
-                    if (p.id === idEditar) {
-                        return { id: p.id, nombre, apellidos, correo, telefono, password, region, comuna };
-                    }
-                    return p;
-                });
-                localStorage.removeItem("idPacienteEditar");
-            } else {
-                const nuevoId = pacientes.length > 0
-                    ? Math.max.apply(null, pacientes.map(function (p) { return p.id; })) + 1
-                    : 1;
+            const nuevoId = pacientes.length > 0
+                ? Math.max.apply(
+                    null,
+                    pacientes.map(function (paciente) {
+                        return paciente.id;
+                    })
+                ) + 1
+                : 1;
 
-                pacientes.push({
-                    id: nuevoId,
-                    nombre,
-                    apellidos,
-                    correo,
-                    telefono,
-                    password,
-                    region,
-                    comuna
-                });
-            }
+            pacientes.push({
+                id: nuevoId,
+                ...datosPaciente
+            });
+        }
 
-            localStorage.setItem("pacientesNutriVida", JSON.stringify(pacientes));
-            
-            mensajeForm.textContent = "¡Paciente registrado exitosamente!";
-            mensajeForm.className = "alert alert-success mt-2 py-2 small";
+        localStorage.setItem(
+            "pacientesNutriVida",
+            JSON.stringify(pacientes)
+        );
 
-            setTimeout(function () {
-                window.location.href = "admin-pacientes.html";
-            }, 1000);
-        });
-    }
+        window.location.href = "admin-pacientes.html";
+    });
 }

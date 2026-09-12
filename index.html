@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clínica Nutricional NutriVida</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,7 @@
         href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&family=Cormorant:ital,wght@0,300..700;1,300..700&family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Google+Sans+Flex:opsz,wght@6..144,1..1000&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Oleo+Script:wght@400;700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Spectral:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Zilla+Slab:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap"
         rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="css/style.css">
 
 
@@ -40,7 +41,12 @@
                             <a class="nav-link" href="index.html#nosotros">Nosotros</a>
                         </li>
                         <li class="nav-item">
-                            <li class="nav-item">
+                            <a class="nav-link" href="index.html#servicios">Servicios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html#blogs">Blogs</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="agendar.html">Agendar</a>
                         </li>
                         <li class="nav-item">
@@ -52,6 +58,16 @@
                         <li class="nav-item">
                             <a class="nav-link" href="registro.html">Registrarse</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="carrito.html">
+                                <i class="bi bi-cart3"></i>
+                                Carrito
+
+                                <span id="contador-carrito" class="badge rounded-pill bg-warning text-dark">
+                                    0
+                                </span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -60,129 +76,418 @@
                         </li>
                    
 
-    <main>
+    <main class="inicio-main">
 
-        <!-- Inicio / Hero -->
-        <section id="inicio" class="hero">
-            <div>
-                <p class="etiqueta">Atención nutricional en Temuco</p>
-                <h2>Un cambio de hábitos cambia tu vida</h2>
-                <p>Atención personalizada en nutrición clínica, deportiva, metabólica y vegetariana. Más de 8 años
-                    acompañando la salud de nuestros pacientes en la Región de La Araucanía.</p>
-                <div class="mt-3">
-                    <a class="boton" href="#nutricionistas">Ver nutricionistas</a>
+        <!-- Sección principal -->
+        <section id="inicio" class="inicio-hero">
+            <div class="container">
+                <div class="row align-items-center g-4">
+
+                    <div class="col-12 col-lg-6">
+                        <div class="inicio-hero-contenido">
+                            <p class="inicio-etiqueta">
+                                Atención nutricional en Temuco
+                            </p>
+
+                            <h1 class="inicio-titulo">
+                                Un cambio de hábitos cambia tu vida
+                            </h1>
+
+                            <p class="inicio-descripcion">
+                                Atención personalizada en nutrición clínica, deportiva,
+                                metabólica y vegetariana. Más de 8 años acompañando la
+                                salud de nuestros pacientes en la Región de La Araucanía.
+                            </p>
+
+                            <div class="inicio-acciones">
+                                <a class="inicio-boton-principal" href="#nutricionistas">
+                                    Ver nutricionistas
+                                </a>
+
+                                <a class="inicio-boton-secundario" href="agendar.html">
+                                    Agendar una cita
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-6">
+                        <div class="inicio-hero-imagen">
+                            <img src="img/hero.png" alt="Atención nutricional personalizada en NutriVida">
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
 
-        <!-- Promoción -->
-        <section class="container py-4">
-            <button id="boton-promocion" class="btn btn-warning">
-                Mostrar promoción
-            </button>
+        <!-- Nosotros -->
+        <section id="nosotros" class="nosotros-seccion">
+            <div class="container">
 
-            <div id="promocion" class="alert alert-success mt-3 d-none">
-                ✨ <strong>Evaluación inicial:</strong> Durante este mes, agendando tu primera consulta online incluye
-                medición de composición corporal sin costo adicional.
+                <div class="seccion-encabezado">
+                    <p class="seccion-etiqueta">Conócenos</p>
+                    <h2 class="seccion-titulo">Sobre nosotros</h2>
+                    <p class="seccion-descripcion">
+                        Promovemos una alimentación saludable mediante una atención
+                        profesional, cercana y personalizada.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+
+                    <div class="col-12 col-md-6">
+                        <article class="nosotros-tarjeta">
+                            <div class="nosotros-icono">
+                                <i class="bi bi-heart-pulse"></i>
+                            </div>
+
+                            <h3>Nuestra historia</h3>
+
+                            <p>
+                                Clínica Nutricional NutriVida nació en 2016 en Temuco
+                                con el objetivo de promover hábitos saludables y prevenir
+                                enfermedades mediante la alimentación.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <article class="nosotros-tarjeta">
+                            <div class="nosotros-icono">
+                                <i class="bi bi-bullseye"></i>
+                            </div>
+
+                            <h3>Nuestra misión</h3>
+
+                            <p>
+                                Guiar a nuestros pacientes en la construcción de hábitos
+                                saludables y sostenibles mediante planes personalizados,
+                                respaldo científico y acompañamiento profesional.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <article class="nosotros-tarjeta">
+                            <div class="nosotros-icono">
+                                <i class="bi bi-people"></i>
+                            </div>
+
+                            <h3>Nuestro equipo</h3>
+
+                            <p>
+                                Contamos con profesionales especializados en nutrición
+                                clínica, deportiva, enfermedades metabólicas y
+                                alimentación basada en plantas.
+                            </p>
+                        </article>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                        <article class="nosotros-tarjeta">
+                            <div class="nosotros-icono">
+                                <i class="bi bi-clipboard2-heart"></i>
+                            </div>
+
+                            <h3>Áreas de atención</h3>
+
+                            <ul class="nosotros-lista">
+                                <li>Pérdida de peso y reeducación alimentaria.</li>
+                                <li>Control de diabetes e hipertensión.</li>
+                                <li>Nutrición deportiva.</li>
+                                <li>Alimentación vegetariana y vegana.</li>
+                            </ul>
+                        </article>
+                    </div>
+
+                </div>
             </div>
         </section>
 
-        <!-- Sección Nosotros -->
-        <section id="nosotros">
-            <h2>Sobre nosotros</h2>
-            <article>
-                <p class="etiqueta">Nuestra historia</p>
-                <p>Clínica Nutricional NutriVida nació en 2016 en Temuco con el objetivo de promover hábitos saludables
-                    y prevención médica a través de la alimentación. Atendemos aproximadamente a 60 pacientes por semana
-                    en controles periódicos cada 15 días o mensualmente.</p>
-                <p>Nuestras áreas principales de atención son:</p>
-                <ul>
-                    <li>Pérdida de peso y reeducación alimentaria</li>
-                    <li>Control de enfermedades metabólicas (diabetes e hipertensión)</li>
-                    <li>Nutrición deportiva y rendimiento físico</li>
-                    <li>Alimentación vegetariana y vegana balanceada</li>
-                </ul>
-            </article>
-        </section>
+        <!-- Nutricionistas -->
+        <section id="nutricionistas" class="nutricionistas-seccion">
+            <div class="container">
 
-        <!-- Sección Nutricionistas -->
-        <section id="nutricionistas">
-            <h2>Nuestros nutricionistas</h2>
+                <div class="seccion-encabezado">
+                    <p class="seccion-etiqueta">Nuestro equipo</p>
+                    <h2 class="seccion-titulo">Nuestros nutricionistas</h2>
+                    <p class="seccion-descripcion">
+                        Encuentra al profesional adecuado según tus objetivos y
+                        necesidades nutricionales.
+                    </p>
+                </div>
 
-            <div id="contenedor-nutricionistas" class="productos">
-                <!-- Se carga dinámicamente desde js/app.js -->
+                <div id="contenedor-nutricionistas" class="nutricionistas-grid">
+                    <!-- Se carga dinámicamente desde js/app.js -->
+                </div>
+
+                <div id="detalle-nutricionista-info" class="nutricionista-detalle" aria-live="polite"></div>
+
             </div>
-
-            <div id="detalle-nutricionista-info" class="mt-4"></div>
         </section>
 
-        <!-- Sección Blogs -->
-        <section id="blogs">
-            <h2>Blogs y tips de salud</h2>
-            <div class="productos">
+        <!-- Servicios -->
+        <section id="servicios" class="servicios-seccion">
+            <div class="container">
 
-                <article class="tarjeta">
-                    <img src="img/blog1.png" alt="Alimentación antiinflamatoria">
-                    <span class="etiqueta">Tips de nutrición</span>
-                    <h3 class="mt-2">Guía de alimentación antiinflamatoria</h3>
-                    <p>Alimentos que ayudan a reducir la inflamación crónica, mejorar la digestión y aumentar tus
-                        niveles de energía diarios.</p>
-                    <a href="blog-detalle-1.html" class="boton mt-2">Leer artículo completo</a>
-                </article>
+                <div class="servicios-encabezado">
+                    <div>
+                        <p class="seccion-etiqueta">Elige tu atención</p>
+                        <h2 class="seccion-titulo">Planes y servicios</h2>
+                    </div>
 
-                <article class="tarjeta">
-                    <img src="img/blog2.png" alt="Hidratación deportiva">
-                    <span class="etiqueta">Nutrición deportiva</span>
-                    <h3 class="mt-2">Hidratación y rendimiento en el deporte</h3>
-                    <p>Estrategias prácticas de hidratación antes, durante y después del ejercicio para evitar calambres
-                        y optimizar tu rendimiento.</p>
-                    <a href="blog-detalle-2.html" class="boton mt-2">Leer artículo completo</a>
-                </article>
+                    <button type="button" id="boton-promocion" class="promocion-boton">
+                        Mostrar promoción
+                    </button>
+                </div>
 
+                <div id="promocion" class="promocion-mensaje d-none" role="alert" aria-live="polite">
+                    <strong>Evaluación inicial con descuento:</strong>
+                    Durante este mes, al agendar tu primera consulta online,
+                    recibirás una medición de composición corporal sin costo adicional.
+                </div>
+
+                <div class="servicios-grid">
+
+                    <article class="servicio-tarjeta">
+                        <img src="img/blog1.png" alt="Evaluación nutricional inicial" class="servicio-imagen">
+
+                        <div class="servicio-contenido">
+                            <span class="servicio-etiqueta">
+                                Presencial u online
+                            </span>
+
+                            <h3>Evaluación y consulta inicial</h3>
+
+                            <p>
+                                Evaluación antropométrica, diagnóstico nutricional
+                                y pauta de alimentación personalizada.
+                            </p>
+
+                            <p class="servicio-precio">$35.000 CLP</p>
+
+                            <a href="agendar.html?plan=consulta-inicial" class="servicio-boton">
+                                Agendar servicio
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="servicio-tarjeta">
+                        <img src="img/blog2.png" alt="Plan nutricional mensual" class="servicio-imagen">
+
+                        <div class="servicio-contenido">
+                            <span class="servicio-etiqueta">Plan mensual</span>
+
+                            <h3>Plan nutricional integral</h3>
+
+                            <p>
+                                Incluye dos controles mensuales, ajuste de minuta,
+                                seguimiento y guía de compras.
+                            </p>
+
+                            <p class="servicio-precio">$60.000 CLP</p>
+
+                            <a href="agendar.html?plan=plan-integral" class="servicio-boton">
+                                Agendar servicio
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="servicio-tarjeta">
+                        <img src="img/registro1.jpg" alt="Plan de nutrición deportiva" class="servicio-imagen">
+
+                        <div class="servicio-contenido">
+                            <span class="servicio-etiqueta">
+                                Deporte y rendimiento
+                            </span>
+
+                            <h3>Plan de nutrición deportiva</h3>
+
+                            <p>
+                                Estrategias de alimentación, suplementación
+                                personalizada y análisis del rendimiento.
+                            </p>
+
+                            <p class="servicio-precio">$50.000 CLP</p>
+
+                            <a href="agendar.html?plan=nutricion-deportiva" class="servicio-boton">
+                                Agendar servicio
+                            </a>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Blogs -->
+        <section id="blogs" class="blogs-seccion">
+            <div class="container">
+
+                <div class="seccion-encabezado">
+                    <p class="seccion-etiqueta">Contenido saludable</p>
+                    <h2 class="seccion-titulo">Blogs y consejos</h2>
+                    <p class="seccion-descripcion">
+                        Revisa nuestros consejos para incorporar hábitos saludables
+                        en tu vida diaria.
+                    </p>
+                </div>
+
+                <div class="blogs-grid">
+
+                    <article class="blog-tarjeta">
+                        <img src="img/blog1.png" alt="Alimentación antiinflamatoria" class="blog-imagen">
+
+                        <div class="blog-contenido">
+                            <span class="blog-etiqueta">Tips de nutrición</span>
+
+                            <h3>Guía de alimentación antiinflamatoria</h3>
+
+                            <p>
+                                Conoce alimentos que ayudan a reducir la inflamación,
+                                mejorar la digestión y aumentar tus niveles de energía.
+                            </p>
+
+                            <a href="blog-detalle-1.html" class="blog-enlace">
+                                Leer artículo
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article class="blog-tarjeta">
+                        <img src="img/blog2.png" alt="Hidratación para el rendimiento deportivo" class="blog-imagen">
+
+                        <div class="blog-contenido">
+                            <span class="blog-etiqueta">Nutrición deportiva</span>
+
+                            <h3>Hidratación y rendimiento deportivo</h3>
+
+                            <p>
+                                Aprende estrategias de hidratación para antes, durante
+                                y después del ejercicio.
+                            </p>
+
+                            <a href="blog-detalle-2.html" class="blog-enlace">
+                                Leer artículo
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Contacto -->
+        <section id="contacto" class="contacto-seccion">
+            <div class="container">
+                <div class="row align-items-center g-4">
+
+                    <div class="col-12 col-lg-5">
+                        <div class="contacto-informacion">
+                            <p class="seccion-etiqueta">Estamos para ayudarte</p>
+                            <h2 class="contacto-titulo">Contáctanos</h2>
+
+                            <p class="contacto-descripcion">
+                                Escríbenos si tienes preguntas sobre nuestros
+                                profesionales, planes o tipos de atención.
+                            </p>
+
+                            <ul class="contacto-lista">
+                                <li>
+                                    <i class="bi bi-geo-alt"></i>
+                                    Calle Manuel Montt 850, Temuco
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-telephone"></i>
+                                    +56 9 1234 5678
+                                </li>
+
+                                <li>
+                                    <i class="bi bi-envelope"></i>
+                                    contacto@nutrividaclinica.cl
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-7">
+                        <form id="formulario-contacto" name="formularioContacto" class="contacto-formulario" novalidate>
+
+                            <div class="contacto-campo">
+                                <label for="nombre-contacto" class="contacto-label">
+                                    Nombre
+                                </label>
+
+                                <input type="text" id="nombre-contacto" name="nombre"
+                                    class="form-control contacto-control" autocomplete="name" required>
+
+                                <small id="error-nombre-contacto" class="contacto-error"></small>
+                            </div>
+
+                            <div class="contacto-campo">
+                                <label for="correo-contacto" class="contacto-label">
+                                    Correo electrónico
+                                </label>
+
+                                <input type="email" id="correo-contacto" name="correo"
+                                    class="form-control contacto-control" autocomplete="email" required>
+
+                                <small id="error-correo-contacto" class="contacto-error"></small>
+                            </div>
+
+                            <div class="contacto-campo">
+                                <label for="mensaje-contacto" class="contacto-label">
+                                    Mensaje
+                                </label>
+
+                                <textarea id="mensaje-contacto" name="mensaje" class="form-control contacto-control"
+                                    rows="5" minlength="10" maxlength="500" required></textarea>
+
+                                <small id="error-mensaje-contacto" class="contacto-error"></small>
+                            </div>
+
+                            <button type="submit" id="boton-contacto" class="contacto-boton">
+                                Enviar mensaje
+                            </button>
+
+                            <div id="mensaje-contacto-resultado" class="contacto-resultado" role="alert"
+                                aria-live="polite"></div>
+
+                        </form>
+                    </div>
+
+                </div>
             </div>
         </section>
 
     </main>
-    <section id="contacto" class="py-5">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <h3 class="text-center mb-4">Contáctanos</h3>
-                    <form class="needs-validation" novalidate>
-                        <div class="mb-3">
-                            <label class="form-label">Nombre</label>
-                            <input type="text" class="form-control" id="nombre" required>
-                            <div class="invalid-feedback">
-                                Por favor, ingresa tu nombre.
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" id="correo" required>
-                            <div class="invalid-feedback">
-                                Por favor, ingresa un correo electrónico válido.
-                            </div>
-                        </div>
-                            <div class="mb-3">
-                                <label class="form-label">Mensaje</label>
-                                <textarea class="form-control" id="mensaje" rows="4" required minlength="10"></textarea>
-                                <div class="invalid-feedback">Mínimo 10 caracteres para el mensaje.
 
-                                </div>
-                                <button type="submit" class="btn w-100 text-white" style="background-color: #047857;">Enviar mensaje</button>
-                            </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
+
+
     <footer class="footer-contacto py-4 text-center">
-        <p class="mb-1">Clínica Nutricional NutriVida. Todos los derechos reservados.</p>
-        <p class="mb-0">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo: contacto@nutrividaclínica.cl</p>
+        <div class="container">
+            <div class="mb-2">
+                <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i
+                        class="bi bi-instagram"></i></a>
+                <a href="https://wa.me/56912345678" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><i
+                        class="bi bi-whatsapp"></i></a>
+                <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
+                        class="bi bi-facebook"></i></a>
+                <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i
+                        class="bi bi-youtube"></i></a>
+            </div>
+            <p class="mb-1">Clínica Nutricional NutriVida. Todos los derechos reservados.</p>
+            <p class="mb-0 small">Dirección: Calle Manuel Montt 850, Temuco, Chile | Teléfono: +56 9 1234 5678 | Correo:
+                contacto@nutrividaclinica.cl</p>
+        </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
     <script src="js/app.js" defer></script>
 </body>
