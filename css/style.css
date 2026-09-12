@@ -205,6 +205,16 @@ header {
     padding-left: 20px;
 }
 
+.nosotros-video-contenedor {
+    border: 1px solid #d8c4b8;
+    background-color: #fffaf4 !important;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.nosotros-video-contenedor:hover {
+    border-color: #047857;
+}
+
 /* Nutricionistas */
 
 .nutricionistas-seccion {
