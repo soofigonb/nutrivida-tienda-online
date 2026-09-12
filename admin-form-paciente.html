@@ -119,7 +119,8 @@
                                 </label>
 
                                 <input type="text" id="paciente-apellidos" class="form-control" minlength="2"
-                                    maxlength="80" autocomplete="family-name" required>
+                                    maxlength="100" autocomplete="family-name"
+                                    aria-describedby="error-paciente-apellidos" required>
 
                                 <small class="form-text" id="error-paciente-apellidos">
                                 </small>
@@ -133,8 +134,9 @@
                                     RUN
                                 </label>
 
-                                <input type="text" id="paciente-run" class="form-control" placeholder="Ej: 18.345.678-5"
-                                    maxlength="12" autocomplete="off" required>
+                                <input type="text" id="paciente-run" class="form-control" placeholder="Ej: 183456785"
+                                    minlength="7" maxlength="9" autocomplete="off" aria-describedby="error-paciente-run"
+                                    required>
 
                                 <small class="form-text" id="error-paciente-run">
                                 </small>
@@ -215,9 +217,8 @@
                                     Dirección
                                 </label>
 
-                                <input type="text" id="paciente-direccion" class="form-control"
-                                    placeholder="Ej: Avenida Alemania 450" maxlength="120" autocomplete="street-address"
-                                    required>
+                                <input type="text" id="paciente-direccion" class="form-control" maxlength="300"
+                                    autocomplete="street-address" aria-describedby="error-paciente-direccion" required>
 
                                 <small class="form-text" id="error-paciente-direccion">
                                 </small>

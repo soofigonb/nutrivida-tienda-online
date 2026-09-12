@@ -913,3 +913,951 @@ if (formPaciente) {
         window.location.href = "admin-pacientes.html";
     });
 }
+
+// VALIDACIONES REUTILIZABLES DEL PROYECTO
+// Jonathan - Login, registro y contacto
+// Reutilizadas en los formularios administrativos
+
+
+const dominiosCorreoPermitidos = [
+    "@duoc.cl",
+    "@profesor.duoc.cl",
+    "@gmail.com"
+];
+
+function validarLargo(texto, minimo, maximo) {
+    const valor = texto.trim();
+    return valor.length >= minimo && valor.length <= maximo;
+}
+
+function validarCorreo(correo) {
+    const valor = correo.trim().toLowerCase();
+
+    const formatoCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!formatoCorreo.test(valor)) {
+        return false;
+    }
+
+    if (valor.length > 100) {
+        return false;
+    }
+
+    return dominiosCorreoPermitidos.some(function (dominio) {
+        return valor.endsWith(dominio);
+    });
+}
+
+function validarRUN(run) {
+    const runLimpio = run
+        .replace(/\./g, "")
+        .replace(/-/g, "")
+        .toUpperCase();
+
+    if (!/^[0-9]{7,8}[0-9K]$/.test(runLimpio)) {
+        return false;
+    }
+
+    const cuerpo = runLimpio.slice(0, -1);
+    const digitoIngresado = runLimpio.slice(-1);
+
+    let suma = 0;
+    let multiplicador = 2;
+
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+        suma += Number(cuerpo[i]) * multiplicador;
+
+        multiplicador++;
+
+        if (multiplicador === 8) {
+            multiplicador = 2;
+        }
+    }
+
+    const resto = 11 - (suma % 11);
+
+    let digitoCalculado;
+
+    if (resto === 11) {
+        digitoCalculado = "0";
+    } else if (resto === 10) {
+        digitoCalculado = "K";
+    } else {
+        digitoCalculado = String(resto);
+    }
+
+    return digitoCalculado === digitoIngresado;
+}
+
+function mostrarEstadoCampo(campo, elementoError, mensaje) {
+    if (!campo || !elementoError) {
+        return false;
+    }
+
+    elementoError.textContent = mensaje;
+    campo.classList.remove("is-valid");
+    campo.classList.add("is-invalid");
+
+    return false;
+}
+
+function mostrarCampoValido(campo, elementoError) {
+    if (!campo || !elementoError) {
+        return true;
+    }
+
+    elementoError.textContent = "";
+    campo.classList.remove("is-invalid");
+    campo.classList.add("is-valid");
+
+    return true;
+}
+
+function limpiarEstadoCampo(campo, elementoError) {
+    if (!campo || !elementoError) {
+        return;
+    }
+
+    elementoError.textContent = "";
+    campo.classList.remove("is-invalid", "is-valid");
+}
+
+function validarCampoTexto(
+    campo,
+    elementoError,
+    nombreCampo,
+    minimo,
+    maximo
+) {
+    const valor = campo.value.trim();
+
+    if (valor === "") {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            nombreCampo + " es obligatorio."
+        );
+    }
+
+    if (!validarLargo(valor, minimo, maximo)) {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            nombreCampo +
+            " debe tener entre " +
+            minimo +
+            " y " +
+            maximo +
+            " caracteres."
+        );
+    }
+
+    return mostrarCampoValido(campo, elementoError);
+}
+
+function validarCampoCorreo(campo, elementoError) {
+    const valor = campo.value.trim();
+
+    if (valor === "") {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            "El correo electrónico es obligatorio."
+        );
+    }
+
+    if (valor.length > 100) {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            "El correo no puede superar los 100 caracteres."
+        );
+    }
+
+    if (!validarCorreo(valor)) {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            "Utiliza un correo @duoc.cl, @profesor.duoc.cl o @gmail.com."
+        );
+    }
+
+    return mostrarCampoValido(campo, elementoError);
+}
+
+function validarCampoRUN(campo, elementoError) {
+    const valor = campo.value.trim();
+
+    if (valor === "") {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            "El RUN es obligatorio."
+        );
+    }
+
+    if (!validarRUN(valor)) {
+        return mostrarEstadoCampo(
+            campo,
+            elementoError,
+            "Ingresa un RUN válido, sin puntos ni guion."
+        );
+    }
+
+    return mostrarCampoValido(campo, elementoError);
+}
+
+
+// ================================================================
+// VALIDACIÓN DEL LOGIN
+// ================================================================
+
+const formularioLogin = document.getElementById("formulario-login");
+
+if (formularioLogin) {
+    const correoLogin = document.getElementById("correo-login");
+    const contrasenaLogin = document.getElementById("contrasena-login");
+
+    const errorCorreoLogin =
+        document.getElementById("error-correo-login");
+
+    const errorContrasenaLogin =
+        document.getElementById("error-contrasena-login");
+
+    const mensajeLogin =
+        document.getElementById("mensaje-login");
+
+    function comprobarCorreoLogin() {
+        return validarCampoCorreo(
+            correoLogin,
+            errorCorreoLogin
+        );
+    }
+
+    function comprobarContrasenaLogin() {
+        const contrasena = contrasenaLogin.value;
+
+        if (contrasena === "") {
+            return mostrarEstadoCampo(
+                contrasenaLogin,
+                errorContrasenaLogin,
+                "La contraseña es obligatoria."
+            );
+        }
+
+        if (contrasena.length < 4 || contrasena.length > 10) {
+            return mostrarEstadoCampo(
+                contrasenaLogin,
+                errorContrasenaLogin,
+                "La contraseña debe tener entre 4 y 10 caracteres."
+            );
+        }
+
+        return mostrarCampoValido(
+            contrasenaLogin,
+            errorContrasenaLogin
+        );
+    }
+
+    correoLogin.addEventListener("input", comprobarCorreoLogin);
+    correoLogin.addEventListener("blur", comprobarCorreoLogin);
+
+    contrasenaLogin.addEventListener(
+        "input",
+        comprobarContrasenaLogin
+    );
+
+    contrasenaLogin.addEventListener(
+        "blur",
+        comprobarContrasenaLogin
+    );
+
+    formularioLogin.addEventListener("submit", function (evento) {
+        evento.preventDefault();
+
+        const correoCorrecto = comprobarCorreoLogin();
+        const contrasenaCorrecta = comprobarContrasenaLogin();
+
+        if (!correoCorrecto || !contrasenaCorrecta) {
+            mensajeLogin.textContent =
+                "Revisa los datos antes de iniciar sesión.";
+
+            mensajeLogin.className = "alert alert-danger mt-3";
+            return;
+        }
+
+        const sesion = {
+            correo: correoLogin.value.trim(),
+            fechaIngreso: new Date().toISOString()
+        };
+
+        localStorage.setItem(
+            "sesionNutriVida",
+            JSON.stringify(sesion)
+        );
+
+        mensajeLogin.textContent =
+            "Inicio de sesión realizado correctamente.";
+
+        mensajeLogin.className = "alert alert-success mt-3";
+
+        setTimeout(function () {
+            window.location.href = "index.html";
+        }, 1000);
+    });
+}
+
+
+// ================================================================
+// REGIONES Y COMUNAS DEL REGISTRO
+// ================================================================
+
+const comunasRegistroPorRegion = {
+    "Los Ríos": [
+        "Valdivia",
+        "La Unión",
+        "Panguipulli",
+        "Río Bueno"
+    ],
+
+    "Los Lagos": [
+        "Puerto Montt",
+        "Puerto Varas",
+        "Osorno",
+        "Castro"
+    ],
+
+    "La Araucanía": [
+        "Temuco",
+        "Padre Las Casas",
+        "Villarrica",
+        "Pucón"
+    ],
+
+    "Valparaíso": [
+        "Valparaíso",
+        "Viña del Mar",
+        "Quilpué",
+        "Villa Alemana"
+    ]
+};
+
+function actualizarComunasRegistro(
+    campoRegion,
+    campoComuna,
+    comunaSeleccionada
+) {
+    campoComuna.innerHTML =
+        '<option value="">Seleccione una comuna</option>';
+
+    const regionSeleccionada = campoRegion.value;
+    const comunas = comunasRegistroPorRegion[regionSeleccionada];
+
+    if (!comunas) {
+        campoComuna.disabled = true;
+        return;
+    }
+
+    campoComuna.disabled = false;
+
+    comunas.forEach(function (comuna) {
+        const opcion = document.createElement("option");
+
+        opcion.value = comuna;
+        opcion.textContent = comuna;
+
+        if (comuna === comunaSeleccionada) {
+            opcion.selected = true;
+        }
+
+        campoComuna.appendChild(opcion);
+    });
+}
+
+
+// ================================================================
+// VALIDACIÓN DEL REGISTRO
+// ================================================================
+
+const formularioRegistro =
+    document.getElementById("formulario-registro");
+
+if (formularioRegistro) {
+    const nombreRegistro =
+        document.getElementById("nombre-registro");
+
+    const apellidosRegistro =
+        document.getElementById("apellidos-registro");
+
+    const runRegistro =
+        document.getElementById("run-registro");
+
+    const fechaNacimientoRegistro =
+        document.getElementById("fecha-nacimiento-registro");
+
+    const correoRegistro =
+        document.getElementById("correo-registro");
+
+    const telefonoRegistro =
+        document.getElementById("telefono-registro");
+
+    const contrasenaRegistro =
+        document.getElementById("contrasena-registro");
+
+    const confirmarContrasenaRegistro =
+        document.getElementById("confirmar-contrasena-registro");
+
+    const regionRegistro =
+        document.getElementById("region-registro");
+
+    const comunaRegistro =
+        document.getElementById("comuna-registro");
+
+    const direccionRegistro =
+        document.getElementById("direccion-registro");
+
+    const errorNombreRegistro =
+        document.getElementById("error-nombre-registro");
+
+    const errorApellidosRegistro =
+        document.getElementById("error-apellidos-registro");
+
+    const errorRunRegistro =
+        document.getElementById("error-run-registro");
+
+    const errorCorreoRegistro =
+        document.getElementById("error-correo-registro");
+
+    const errorTelefonoRegistro =
+        document.getElementById("error-telefono-registro");
+
+    const errorContrasenaRegistro =
+        document.getElementById("error-contrasena-registro");
+
+    const errorConfirmarContrasenaRegistro =
+        document.getElementById(
+            "error-confirmar-contrasena-registro"
+        );
+
+    const errorRegionRegistro =
+        document.getElementById("error-region-registro");
+
+    const errorComunaRegistro =
+        document.getElementById("error-comuna-registro");
+
+    const errorDireccionRegistro =
+        document.getElementById("error-direccion-registro");
+
+    const mensajeRegistro =
+        document.getElementById("mensaje-registro");
+
+    function comprobarNombreRegistro() {
+        return validarCampoTexto(
+            nombreRegistro,
+            errorNombreRegistro,
+            "El nombre",
+            2,
+            50
+        );
+    }
+
+    function comprobarApellidosRegistro() {
+        return validarCampoTexto(
+            apellidosRegistro,
+            errorApellidosRegistro,
+            "Los apellidos",
+            2,
+            100
+        );
+    }
+
+    function comprobarRUNRegistro() {
+        return validarCampoRUN(
+            runRegistro,
+            errorRunRegistro
+        );
+    }
+
+    function comprobarCorreoRegistro() {
+        return validarCampoCorreo(
+            correoRegistro,
+            errorCorreoRegistro
+        );
+    }
+
+    function comprobarTelefonoRegistro() {
+        const telefonoLimpio =
+            telefonoRegistro.value.replace(/\D/g, "");
+
+        if (telefonoRegistro.value.trim() === "") {
+            return mostrarEstadoCampo(
+                telefonoRegistro,
+                errorTelefonoRegistro,
+                "El teléfono es obligatorio."
+            );
+        }
+
+        if (
+            telefonoLimpio.length < 8 ||
+            telefonoLimpio.length > 12
+        ) {
+            return mostrarEstadoCampo(
+                telefonoRegistro,
+                errorTelefonoRegistro,
+                "El teléfono debe contener entre 8 y 12 números."
+            );
+        }
+
+        return mostrarCampoValido(
+            telefonoRegistro,
+            errorTelefonoRegistro
+        );
+    }
+
+    function comprobarContrasenaRegistro() {
+        const contrasena = contrasenaRegistro.value;
+
+        if (contrasena === "") {
+            return mostrarEstadoCampo(
+                contrasenaRegistro,
+                errorContrasenaRegistro,
+                "La contraseña es obligatoria."
+            );
+        }
+
+        if (contrasena.length < 4 || contrasena.length > 10) {
+            return mostrarEstadoCampo(
+                contrasenaRegistro,
+                errorContrasenaRegistro,
+                "La contraseña debe tener entre 4 y 10 caracteres."
+            );
+        }
+
+        return mostrarCampoValido(
+            contrasenaRegistro,
+            errorContrasenaRegistro
+        );
+    }
+
+    function comprobarConfirmacionContrasena() {
+        const confirmacion = confirmarContrasenaRegistro.value;
+
+        if (confirmacion === "") {
+            return mostrarEstadoCampo(
+                confirmarContrasenaRegistro,
+                errorConfirmarContrasenaRegistro,
+                "Debes confirmar la contraseña."
+            );
+        }
+
+        if (confirmacion !== contrasenaRegistro.value) {
+            return mostrarEstadoCampo(
+                confirmarContrasenaRegistro,
+                errorConfirmarContrasenaRegistro,
+                "Las contraseñas no coinciden."
+            );
+        }
+
+        return mostrarCampoValido(
+            confirmarContrasenaRegistro,
+            errorConfirmarContrasenaRegistro
+        );
+    }
+
+    function comprobarRegionRegistro() {
+        if (regionRegistro.value === "") {
+            return mostrarEstadoCampo(
+                regionRegistro,
+                errorRegionRegistro,
+                "Debes seleccionar una región."
+            );
+        }
+
+        return mostrarCampoValido(
+            regionRegistro,
+            errorRegionRegistro
+        );
+    }
+
+    function comprobarComunaRegistro() {
+        if (comunaRegistro.value === "") {
+            return mostrarEstadoCampo(
+                comunaRegistro,
+                errorComunaRegistro,
+                "Debes seleccionar una comuna."
+            );
+        }
+
+        return mostrarCampoValido(
+            comunaRegistro,
+            errorComunaRegistro
+        );
+    }
+
+    function comprobarDireccionRegistro() {
+        return validarCampoTexto(
+            direccionRegistro,
+            errorDireccionRegistro,
+            "La dirección",
+            3,
+            300
+        );
+    }
+
+    nombreRegistro.addEventListener(
+        "input",
+        comprobarNombreRegistro
+    );
+
+    apellidosRegistro.addEventListener(
+        "input",
+        comprobarApellidosRegistro
+    );
+
+    runRegistro.addEventListener(
+        "input",
+        comprobarRUNRegistro
+    );
+
+    correoRegistro.addEventListener(
+        "input",
+        comprobarCorreoRegistro
+    );
+
+    telefonoRegistro.addEventListener(
+        "input",
+        comprobarTelefonoRegistro
+    );
+
+    contrasenaRegistro.addEventListener("input", function () {
+        comprobarContrasenaRegistro();
+
+        if (confirmarContrasenaRegistro.value !== "") {
+            comprobarConfirmacionContrasena();
+        }
+    });
+
+    confirmarContrasenaRegistro.addEventListener(
+        "input",
+        comprobarConfirmacionContrasena
+    );
+
+    regionRegistro.addEventListener("change", function () {
+        actualizarComunasRegistro(
+            regionRegistro,
+            comunaRegistro,
+            ""
+        );
+
+        comprobarRegionRegistro();
+        limpiarEstadoCampo(
+            comunaRegistro,
+            errorComunaRegistro
+        );
+    });
+
+    comunaRegistro.addEventListener(
+        "change",
+        comprobarComunaRegistro
+    );
+
+    direccionRegistro.addEventListener(
+        "input",
+        comprobarDireccionRegistro
+    );
+
+    formularioRegistro.addEventListener(
+        "submit",
+        function (evento) {
+            evento.preventDefault();
+
+            const nombreCorrecto = comprobarNombreRegistro();
+            const apellidosCorrectos =
+                comprobarApellidosRegistro();
+
+            const runCorrecto = comprobarRUNRegistro();
+            const correoCorrecto = comprobarCorreoRegistro();
+            const telefonoCorrecto =
+                comprobarTelefonoRegistro();
+
+            const contrasenaCorrecta =
+                comprobarContrasenaRegistro();
+
+            const confirmacionCorrecta =
+                comprobarConfirmacionContrasena();
+
+            const regionCorrecta = comprobarRegionRegistro();
+            const comunaCorrecta = comprobarComunaRegistro();
+            const direccionCorrecta =
+                comprobarDireccionRegistro();
+
+            const formularioCorrecto =
+                nombreCorrecto &&
+                apellidosCorrectos &&
+                runCorrecto &&
+                correoCorrecto &&
+                telefonoCorrecto &&
+                contrasenaCorrecta &&
+                confirmacionCorrecta &&
+                regionCorrecta &&
+                comunaCorrecta &&
+                direccionCorrecta;
+
+            if (!formularioCorrecto) {
+                mensajeRegistro.textContent =
+                    "Revisa los campos marcados antes de registrarte.";
+
+                mensajeRegistro.className =
+                    "alert alert-danger mt-3";
+
+                return;
+            }
+
+            let pacientesRegistrados =
+                JSON.parse(
+                    localStorage.getItem("pacientesNutriVida")
+                ) || [];
+
+            const correoIngresado =
+                correoRegistro.value.trim().toLowerCase();
+
+            const runIngresado =
+                runRegistro.value
+                    .replace(/\./g, "")
+                    .replace(/-/g, "")
+                    .toUpperCase();
+
+            const correoRepetido =
+                pacientesRegistrados.some(function (paciente) {
+                    return (
+                        paciente.correo &&
+                        paciente.correo.toLowerCase() ===
+                        correoIngresado
+                    );
+                });
+
+            const runRepetido =
+                pacientesRegistrados.some(function (paciente) {
+                    const runGuardado = String(
+                        paciente.run || ""
+                    )
+                        .replace(/\./g, "")
+                        .replace(/-/g, "")
+                        .toUpperCase();
+
+                    return runGuardado === runIngresado;
+                });
+
+            if (correoRepetido) {
+                mostrarEstadoCampo(
+                    correoRegistro,
+                    errorCorreoRegistro,
+                    "Este correo ya se encuentra registrado."
+                );
+
+                return;
+            }
+
+            if (runRepetido) {
+                mostrarEstadoCampo(
+                    runRegistro,
+                    errorRunRegistro,
+                    "Este RUN ya se encuentra registrado."
+                );
+
+                return;
+            }
+
+            const nuevoId =
+                pacientesRegistrados.length > 0
+                    ? Math.max.apply(
+                        null,
+                        pacientesRegistrados.map(
+                            function (paciente) {
+                                return Number(paciente.id) || 0;
+                            }
+                        )
+                    ) + 1
+                    : 1;
+
+            const nuevoPaciente = {
+                id: nuevoId,
+                nombre: nombreRegistro.value.trim(),
+                apellidos: apellidosRegistro.value.trim(),
+                run: runIngresado,
+                correo: correoIngresado,
+                telefono: telefonoRegistro.value.trim(),
+                contrasena: contrasenaRegistro.value,
+                fechaNacimiento:
+                    fechaNacimientoRegistro.value,
+                region: regionRegistro.value,
+                comuna: comunaRegistro.value,
+                direccion: direccionRegistro.value.trim()
+            };
+
+            pacientesRegistrados.push(nuevoPaciente);
+
+            localStorage.setItem(
+                "pacientesNutriVida",
+                JSON.stringify(pacientesRegistrados)
+            );
+
+            mensajeRegistro.textContent =
+                "Paciente registrado correctamente.";
+
+            mensajeRegistro.className =
+                "alert alert-success mt-3";
+
+            formularioRegistro.reset();
+            comunaRegistro.disabled = true;
+
+            formularioRegistro
+                .querySelectorAll(".is-valid, .is-invalid")
+                .forEach(function (campo) {
+                    campo.classList.remove(
+                        "is-valid",
+                        "is-invalid"
+                    );
+                });
+
+            setTimeout(function () {
+                window.location.href = "login.html";
+            }, 1200);
+        }
+    );
+}
+
+
+// ================================================================
+// VALIDACIÓN DEL FORMULARIO DE CONTACTO
+// ================================================================
+
+const formularioContacto =
+    document.getElementById("formulario-contacto");
+
+if (formularioContacto) {
+    const nombreContacto =
+        document.getElementById("nombre-contacto");
+
+    const correoContacto =
+        document.getElementById("correo-contacto");
+
+    const mensajeContacto =
+        document.getElementById("mensaje-contacto");
+
+    const errorNombreContacto =
+        document.getElementById("error-nombre-contacto");
+
+    const errorCorreoContacto =
+        document.getElementById("error-correo-contacto");
+
+    const errorMensajeContacto =
+        document.getElementById("error-mensaje-contacto");
+
+    const resultadoContacto =
+        document.getElementById("mensaje-contacto-resultado");
+
+    function comprobarNombreContacto() {
+        return validarCampoTexto(
+            nombreContacto,
+            errorNombreContacto,
+            "El nombre",
+            2,
+            100
+        );
+    }
+
+    function comprobarCorreoContacto() {
+        return validarCampoCorreo(
+            correoContacto,
+            errorCorreoContacto
+        );
+    }
+
+    function comprobarMensajeContacto() {
+        return validarCampoTexto(
+            mensajeContacto,
+            errorMensajeContacto,
+            "El mensaje",
+            2,
+            500
+        );
+    }
+
+    nombreContacto.addEventListener(
+        "input",
+        comprobarNombreContacto
+    );
+
+    nombreContacto.addEventListener(
+        "blur",
+        comprobarNombreContacto
+    );
+
+    correoContacto.addEventListener(
+        "input",
+        comprobarCorreoContacto
+    );
+
+    correoContacto.addEventListener(
+        "blur",
+        comprobarCorreoContacto
+    );
+
+    mensajeContacto.addEventListener(
+        "input",
+        comprobarMensajeContacto
+    );
+
+    mensajeContacto.addEventListener(
+        "blur",
+        comprobarMensajeContacto
+    );
+
+    formularioContacto.addEventListener(
+        "submit",
+        function (evento) {
+            evento.preventDefault();
+
+            const nombreCorrecto =
+                comprobarNombreContacto();
+
+            const correoCorrecto =
+                comprobarCorreoContacto();
+
+            const mensajeCorrecto =
+                comprobarMensajeContacto();
+
+            if (
+                !nombreCorrecto ||
+                !correoCorrecto ||
+                !mensajeCorrecto
+            ) {
+                resultadoContacto.textContent =
+                    "Revisa los campos marcados.";
+
+                resultadoContacto.className =
+                    "alert alert-danger mt-3";
+
+                return;
+            }
+
+            resultadoContacto.textContent =
+                "Tu formulario de contacto fue enviado correctamente.";
+
+            resultadoContacto.className =
+                "alert alert-success mt-3";
+
+            formularioContacto.reset();
+
+            formularioContacto
+                .querySelectorAll(".is-valid, .is-invalid")
+                .forEach(function (campo) {
+                    campo.classList.remove(
+                        "is-valid",
+                        "is-invalid"
+                    );
+                });
+        }
+    );
+}
