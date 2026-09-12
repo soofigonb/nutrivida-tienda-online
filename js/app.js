@@ -112,23 +112,21 @@ if (contenedor) {
 
 // Sofía - Planes y servicios
 
+
 const planesNutriVida = [
     {
         id: "consulta-inicial",
         nombre: "Evaluación y consulta inicial",
-        descripcion: "Evaluación antropométrica, diagnóstico nutricional y pauta personalizada.",
         precio: 35000
     },
     {
         id: "plan-integral",
         nombre: "Plan nutricional integral",
-        descripcion: "Incluye dos controles mensuales, seguimiento y guía de compras.",
         precio: 60000
     },
     {
         id: "nutricion-deportiva",
         nombre: "Plan de nutrición deportiva",
-        descripcion: "Alimentación, suplementación y análisis del rendimiento.",
         precio: 50000
     }
 ];
@@ -851,12 +849,19 @@ if (formPaciente) {
             return;
         }
 
-        const correoValido =
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
-
-        if (!correoValido) {
+        if (!validarRUN(run)) {
             mensajeForm.textContent =
-                "Debe ingresar un correo electrónico válido";
+                "Ingrese un RUN válido con puntos y guion. Ejemplo: 12.345.678-5.";
+
+            mensajeForm.className =
+                "alert alert-danger admin-form-mensaje";
+
+            return;
+        }
+
+        if (!validarCorreo(correo)) {
+            mensajeForm.textContent =
+                "Utilice un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.";
 
             mensajeForm.className =
                 "alert alert-danger admin-form-mensaje";
