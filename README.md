@@ -89,6 +89,7 @@ La plataforma permite seleccionar un plan nutricional, agendar una atención con
 
    ```bash
    git clone https://github.com/soofigonb/nutrivida-tienda-online.git
+   ```
 
 ## 📁 Estructura general
 
@@ -113,5 +114,4 @@ nutrivida-tienda-online/
 ├── admin-form-nutricionista.html
 └── README.md
 
----
 
