@@ -134,11 +134,11 @@
                                     RUN
                                 </label>
 
-                                <input type="text" id="run-registro" name="run" class="form-control"
-                                    placeholder="Ej: 18.345.678-5" minlength="11" maxlength="12" autocomplete="off"
-                                    aria-describedby="error-run-registro" required>
-                                <small class="form-text" id="error-paciente-run">
-                                </small>
+                                <input type="text" id="paciente-run" name="run" class="form-control"
+                                    placeholder="Ej: 12.345.678-5" minlength="11" maxlength="12" autocomplete="off"
+                                    aria-describedby="error-paciente-run" required>
+
+                                <small class="form-text" id="error-paciente-run"></small>
 
                             </div>
 
@@ -150,7 +150,8 @@
                                 </label>
 
                                 <input type="email" id="paciente-correo" class="form-control"
-                                    placeholder="nombre@correo.cl" autocomplete="email" required>
+                                    placeholder="nombre@gmail.com" maxlength="100" autocomplete="email"
+                                    aria-describedby="error-paciente-correo" required>
 
                                 <small class="form-text" id="error-paciente-correo">
                                 </small>
