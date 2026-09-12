@@ -171,7 +171,7 @@
                                             </label>
 
                                             <input type="text" id="apellidos-registro" name="apellidos"
-                                                class="form-control" minlength="2" maxlength="80"
+                                                class="form-control" minlength="2" maxlength="100"
                                                 autocomplete="family-name" aria-describedby="error-apellidos-registro"
                                                 required>
 
@@ -188,8 +188,8 @@
                                             </label>
 
                                             <input type="text" id="run-registro" name="run" class="form-control"
-                                                placeholder="Ej: 18.345.678-5" maxlength="12" autocomplete="off"
-                                                aria-describedby="error-run-registro" required>
+                                                placeholder="Ej: 183456785" minlength="7" maxlength="9"
+                                                autocomplete="off" aria-describedby="error-run-registro" required>
 
                                             <small id="error-run-registro" class="text-danger">
                                             </small>
@@ -223,7 +223,7 @@
                                             </label>
 
                                             <input type="email" id="correo-registro" name="correo" class="form-control"
-                                                placeholder="correo@ejemplo.com" autocomplete="email"
+                                                placeholder="correo@gmail.com" maxlength="100" autocomplete="email"
                                                 aria-describedby="error-correo-registro" required>
 
                                             <small id="error-correo-registro" class="text-danger">
@@ -255,8 +255,9 @@
                                             </label>
 
                                             <input type="password" id="contrasena-registro" name="contrasena"
-                                                class="form-control" minlength="6" autocomplete="new-password"
-                                                aria-describedby="error-contrasena-registro" required>
+                                                class="form-control" minlength="4" maxlength="10"
+                                                autocomplete="new-password" aria-describedby="error-contrasena-registro"
+                                                required>
 
                                             <small id="error-contrasena-registro" class="text-danger">
                                             </small>
@@ -271,8 +272,8 @@
                                             </label>
 
                                             <input type="password" id="confirmar-contrasena-registro"
-                                                name="confirmarContrasena" class="form-control" minlength="6"
-                                                autocomplete="new-password"
+                                                name="confirmarContrasena" class="form-control" minlength="4"
+                                                maxlength="10" autocomplete="new-password"
                                                 aria-describedby="error-confirmar-contrasena-registro" required>
 
                                             <small id="error-confirmar-contrasena-registro" class="text-danger">
@@ -347,7 +348,7 @@
 
                                             <input type="text" id="direccion-registro" name="direccion"
                                                 class="form-control" placeholder="Ej: Avenida Alemania 450"
-                                                maxlength="120" autocomplete="street-address"
+                                                maxlength="300" autocomplete="street-address"
                                                 aria-describedby="error-direccion-registro" required>
 
                                             <small id="error-direccion-registro" class="text-danger">

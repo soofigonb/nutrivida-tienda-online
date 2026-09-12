@@ -421,7 +421,8 @@
                                 </label>
 
                                 <input type="text" id="nombre-contacto" name="nombre"
-                                    class="form-control contacto-control" autocomplete="name" required>
+                                    class="form-control contacto-control" maxlength="100" autocomplete="name"
+                                    aria-describedby="error-nombre-contacto" required>
 
                                 <small id="error-nombre-contacto" class="contacto-error"></small>
                             </div>
@@ -432,7 +433,8 @@
                                 </label>
 
                                 <input type="email" id="correo-contacto" name="correo"
-                                    class="form-control contacto-control" autocomplete="email" required>
+                                    class="form-control contacto-control" maxlength="100" autocomplete="email"
+                                    aria-describedby="error-correo-contacto" required>
 
                                 <small id="error-correo-contacto" class="contacto-error"></small>
                             </div>
@@ -443,7 +445,7 @@
                                 </label>
 
                                 <textarea id="mensaje-contacto" name="mensaje" class="form-control contacto-control"
-                                    rows="5" minlength="10" maxlength="500" required></textarea>
+                                    maxlength="500" aria-describedby="error-mensaje-contacto" required></textarea>
 
                                 <small id="error-mensaje-contacto" class="contacto-error"></small>
                             </div>
@@ -453,7 +455,8 @@
                             </button>
 
                             <div id="mensaje-contacto-resultado" class="contacto-resultado" role="alert"
-                                aria-live="polite"></div>
+                                aria-live="polite">
+                            </div>
 
                         </form>
                     </div>
