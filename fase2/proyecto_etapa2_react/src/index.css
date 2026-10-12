@@ -1,0 +1,29 @@
+/* ========================================
+   1. CONFIGURACIÓN GENERAL
+   ======================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ========================================
+   2. CUERPO DE LA PÁGINA
+   ======================================== */
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background-color: #fffaf4;
+  color: #2f241f;
+  font-family: "Roboto", Arial, sans-serif;
+}
+
+/* ========================================
+   3. CONTENEDOR PRINCIPAL DE REACT
+   ======================================== */
+
+#root {
+  min-height: 100vh;
+}

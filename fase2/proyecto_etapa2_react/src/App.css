@@ -1,0 +1,1025 @@
+/* ========================================
+   1. BARRA DE NAVEGACIÓN
+   ======================================== */
+
+/* Contenedor del menú */
+
+.navbar-nutrivida {
+  background-color: #0f766e;
+  padding: 0.75rem 1rem;
+}
+
+/* Nombre de la clínica */
+
+.navbar-nutrivida .navbar-brand {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+/* Enlaces del menú */
+
+.navbar-nutrivida .nav-link {
+  color: #fff;
+}
+
+.navbar-nutrivida .nav-link:hover,
+.navbar-nutrivida .nav-link:focus {
+  color: #fde68a;
+}
+
+/* ========================================
+   2. PÁGINA DE INICIO
+   ======================================== */
+
+.inicio-main {
+  width: 100%;
+}
+
+/* ========================================
+   3. ENCABEZADOS COMPARTIDOS
+   ======================================== */
+
+/* Contenedor del encabezado */
+
+.seccion-encabezado {
+  max-width: 680px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+/* Texto pequeño sobre el título */
+
+.seccion-etiqueta {
+  margin-bottom: 8px;
+  color: #047857;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* Título de la sección */
+
+.seccion-titulo {
+  margin-bottom: 12px;
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.8rem, 4vw, 2.3rem);
+  font-weight: 600;
+}
+
+/* Descripción de la sección */
+
+.seccion-descripcion {
+  margin-bottom: 0;
+  color: #6b7280;
+  font-family: "Roboto", sans-serif;
+  line-height: 1.7;
+}
+
+/* ========================================
+   4. PORTADA — HERO
+   ======================================== */
+
+/* Fondo y contenedor */
+
+.inicio-hero {
+  padding: 72px 24px;
+  background-color: #d1fae5;
+}
+
+.inicio-hero-contenido {
+  max-width: 580px;
+}
+
+/* Textos de la portada */
+
+.inicio-etiqueta {
+  margin-bottom: 8px;
+  color: #047857;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.inicio-titulo {
+  margin-bottom: 20px;
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.inicio-descripcion {
+  margin-bottom: 0;
+  color: #4b5563;
+  font-family: "Roboto", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+/* Distribución de los botones */
+
+.inicio-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+/* Estilos compartidos de los botones */
+
+.inicio-boton-principal,
+.inicio-boton-secundario {
+  display: inline-block;
+  padding: 12px 20px;
+  border: 2px solid #047857;
+  border-radius: 8px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* Botón: Ver nutricionistas */
+
+.inicio-boton-principal {
+  color: white;
+  background-color: #047857;
+}
+
+/* Botón: Agendar una cita */
+
+.inicio-boton-secundario {
+  color: #047857;
+  background-color: transparent;
+}
+
+/* Efecto al pasar el cursor */
+
+.inicio-boton-principal:hover,
+.inicio-boton-secundario:hover {
+  color: white;
+  background-color: #036548;
+  transform: translateY(-2px);
+}
+
+/* Imagen de la portada */
+
+.inicio-hero-imagen img {
+  display: block;
+  width: 100%;
+  height: 420px;
+  border-radius: 20px;
+  object-fit: cover;
+  box-shadow: 0 16px 35px rgba(47, 36, 31, 0.15);
+}
+
+/* ========================================
+   5. SECCIÓN NOSOTROS
+   ======================================== */
+
+/* Fondo y espaciado */
+
+.nosotros-seccion {
+  padding: 80px 24px;
+  background-color: #fffaf4;
+}
+
+/* Tarjetas informativas */
+
+.nosotros-tarjeta {
+  height: 100%;
+  padding: 28px;
+  border: 1px solid #d8c4b8;
+  border-radius: 14px;
+  background-color: white;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.nosotros-tarjeta:hover {
+  border-color: #047857;
+  transform: translateY(-3px);
+}
+
+/* Iconos de las tarjetas */
+
+.nosotros-icono {
+  display: flex;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 18px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #047857;
+  background-color: #d1fae5;
+  font-size: 1.3rem;
+}
+
+/* Títulos de las tarjetas */
+
+.nosotros-tarjeta h3 {
+  margin-bottom: 12px;
+  font-family: "Fraunces", serif;
+  font-size: 1.4rem;
+}
+
+/* Párrafos y lista de áreas de atención */
+
+.nosotros-tarjeta p,
+.nosotros-lista {
+  margin-bottom: 0;
+  color: #6b7280;
+  font-family: "Roboto", sans-serif;
+  line-height: 1.7;
+}
+
+.nosotros-lista {
+  padding-left: 20px;
+}
+
+/* ========================================
+   6. SECCIÓN NUTRICIONISTAS
+   ======================================== */
+
+/* Fondo y espaciado */
+
+.nutricionistas-seccion {
+  padding: 80px 24px;
+  background-color: white;
+}
+
+/* Distribución de las tarjetas */
+
+.nutricionistas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Tarjetas */
+
+.nutricionista-tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid #d8c4b8;
+  border-radius: 14px;
+  background-color: #fffaf4;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.nutricionista-tarjeta:hover {
+  border-color: #047857;
+  transform: translateY(-3px);
+}
+
+/* Fotografías */
+
+.nutricionista-foto {
+  display: block;
+  width: 100%;
+  height: 340px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+/* Modalidad y nombre */
+
+.nutricionista-modalidad {
+  color: #047857;
+  font-weight: 600;
+}
+
+.nutricionista-tarjeta h3 {
+  margin: 8px 0;
+  font-family: "Fraunces", serif;
+  font-size: 1.4rem;
+}
+
+/* Especialidad y experiencia */
+
+.nutricionista-especialidad {
+  margin-bottom: 8px;
+  color: #047857;
+  font-weight: 700;
+}
+
+.nutricionista-experiencia {
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* Botón de detalle */
+
+.nutricionista-boton {
+  width: 100%;
+  margin-top: auto;
+  padding: 10px 18px;
+  border: 1px solid #047857;
+  border-radius: 8px;
+  color: #047857;
+  background-color: transparent;
+  font-weight: 600;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.nutricionista-boton:hover {
+  color: white;
+  background-color: #047857;
+}
+
+/* Información del nutricionista seleccionado */
+
+.nutricionista-detalle:not(:empty) {
+  margin-top: 24px;
+}
+
+/* ========================================
+   7. PLANES Y SERVICIOS
+   ======================================== */
+
+/* Fondo y espaciado */
+
+.servicios-seccion {
+  padding: 80px 24px;
+  background-color: #f0fdf4;
+}
+
+/* Título y botón de promoción */
+
+.servicios-encabezado {
+  display: flex;
+  margin-bottom: 32px;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* Botón de promoción */
+
+.promocion-boton {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border: 1px solid #d97706;
+  border-radius: 8px;
+  color: #7c2d12;
+  background-color: #fef3c7;
+  font-weight: 700;
+}
+
+.promocion-boton:hover {
+  color: white;
+  background-color: #d97706;
+}
+
+/* Mensaje de promoción */
+
+.promocion-mensaje {
+  margin-bottom: 28px;
+  padding: 16px 20px;
+  border: 1px solid #6ee7b7;
+  border-radius: 10px;
+  color: #065f46;
+  background-color: #d1fae5;
+  line-height: 1.7;
+}
+
+/* Distribución de las tarjetas */
+
+.servicios-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Tarjetas */
+
+.servicio-tarjeta {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid #d8c4b8;
+  border-radius: 14px;
+  background-color: white;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.servicio-tarjeta:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(47, 36, 31, 0.1);
+}
+
+/* Imágenes */
+
+.servicio-imagen {
+  display: block;
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+}
+
+/* Contenido de las tarjetas */
+
+.servicio-contenido {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px;
+}
+
+.servicio-etiqueta {
+  color: #047857;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.servicio-contenido h3 {
+  margin: 10px 0 12px;
+  font-family: "Fraunces", serif;
+  font-size: 1.4rem;
+}
+
+.servicio-descripcion {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* Precios */
+
+.servicio-precio {
+  margin-top: auto;
+  color: #047857;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Enlaces para agendar */
+
+.servicio-boton {
+  display: inline-block;
+  align-self: flex-start;
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: white;
+  background-color: #047857;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.servicio-boton:hover {
+  color: white;
+  background-color: #036548;
+}
+
+/* ========================================
+   8. SECCIÓN BLOGS Y CONSEJOS
+   ======================================== */
+
+/* Fondo y distribución de las tarjetas */
+
+.blogs-seccion {
+  padding: 80px 24px;
+  background-color: #fffaf4;
+}
+
+.blogs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+/* Tarjetas de los artículos */
+
+.blog-tarjeta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #d8c4b8;
+  border-radius: 14px;
+  background-color: white;
+}
+
+/* Imágenes */
+
+.blog-imagen {
+  display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+}
+
+/* Contenido de las tarjetas */
+
+.blog-contenido {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.blog-etiqueta {
+  color: #047857;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.blog-contenido h3 {
+  margin: 10px 0 12px;
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: 1.4rem;
+}
+
+.blog-contenido p {
+  color: #6b7280;
+  line-height: 1.7;
+}
+
+/* Enlaces para leer y volver */
+
+.blog-enlace {
+  align-self: flex-start;
+  margin-top: auto;
+  color: #047857;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.blog-enlace:hover,
+.blog-enlace:focus-visible {
+  color: #036548;
+  text-decoration: underline;
+}
+
+/* ========================================
+   9. PÁGINAS DE LOS ARTÍCULOS
+   ======================================== */
+
+/* Fondo y contenedor principal */
+
+.blog-detalle-main {
+  padding: 48px 24px 80px;
+  background-color: #fffaf4;
+}
+
+.blog-detalle-navegacion {
+  max-width: 900px;
+  margin: 0 auto 24px;
+}
+
+.blog-detalle-articulo {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px;
+  border: 1px solid #d8c4b8;
+  border-radius: 16px;
+  background-color: white;
+}
+
+/* Título y datos del autor */
+
+.blog-detalle-titulo {
+  margin: 12px 0 20px;
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.2;
+}
+
+.blog-detalle-informacion {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+  margin-bottom: 28px;
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Imagen principal y descripción */
+
+.blog-detalle-figura {
+  margin-bottom: 28px;
+}
+
+.blog-detalle-imagen {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border-radius: 12px;
+  object-fit: cover;
+}
+
+.blog-detalle-figura figcaption {
+  margin-top: 10px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+/* Introducción y secciones del artículo */
+
+.blog-detalle-introduccion {
+  color: #4b5563;
+  font-size: 1.1rem;
+  line-height: 1.8;
+}
+
+.blog-detalle-seccion {
+  margin-top: 28px;
+}
+
+.blog-detalle-seccion h2,
+.blog-detalle-consejo h2 {
+  margin-bottom: 12px;
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: 1.45rem;
+}
+
+.blog-detalle-seccion p,
+.blog-detalle-lista {
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+.blog-detalle-lista {
+  padding-left: 24px;
+}
+
+.blog-detalle-lista li {
+  margin-bottom: 10px;
+}
+
+/* Consejo destacado */
+
+.blog-detalle-consejo {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #d1fae5;
+}
+
+.blog-consejo-icono {
+  flex-shrink: 0;
+  color: #047857;
+  font-size: 1.8rem;
+}
+
+.blog-detalle-consejo p {
+  margin-bottom: 0;
+  color: #065f46;
+  line-height: 1.7;
+}
+
+/* Invitación para agendar */
+
+.blog-detalle-accion {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #d8c4b8;
+  text-align: center;
+}
+
+/* ========================================
+   10. SECCIÓN CONTACTO
+   ======================================== */
+
+/* Fondo y espaciado */
+
+.contacto-seccion {
+  padding: 80px 24px;
+  background-color: #f0fdf4;
+}
+
+/* Descripción de la clínica */
+
+.contacto-descripcion {
+  margin-bottom: 24px;
+  color: #4b5563;
+  line-height: 1.8;
+}
+
+/* Dirección, teléfono y correo */
+
+.contacto-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.contacto-lista li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.contacto-lista i {
+  flex-shrink: 0;
+  color: #047857;
+  font-size: 1.2rem;
+}
+
+.contacto-lista a {
+  color: #047857;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.contacto-lista a:hover,
+.contacto-lista a:focus-visible {
+  text-decoration: underline;
+}
+
+/* Contenedor del formulario */
+
+.contacto-formulario {
+  padding: 32px;
+  border: 1px solid #d8c4b8;
+  border-radius: 16px;
+  background-color: white;
+}
+
+/* Etiquetas y campos */
+
+.contacto-formulario .form-label {
+  color: #2f241f;
+  font-weight: 600;
+}
+
+.contacto-formulario .form-control {
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.contacto-formulario .form-control:focus {
+  border-color: #047857;
+  box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.15);
+}
+
+/* Campos inválidos */
+
+.contacto-formulario .form-control.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+/* Área del mensaje */
+
+.contacto-formulario textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Botón para enviar */
+
+.contacto-boton {
+  padding: 12px 24px;
+  border-color: #047857;
+  border-radius: 8px;
+  background-color: #047857;
+  font-weight: 600;
+}
+
+.contacto-boton:hover,
+.contacto-boton:focus-visible {
+  border-color: #036548;
+  background-color: #036548;
+}
+
+/* ========================================
+   11. PIE DE PÁGINA — FOOTER
+   ======================================== */
+
+/* Fondo y espaciado */
+
+.footer-nutrivida {
+  padding: 32px 24px;
+  color: white;
+  background-color: #0f766e;
+  text-align: center;
+}
+
+/* Distribución de las redes sociales */
+
+.footer-redes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+/* Enlaces e iconos de las redes */
+
+.footer-redes a {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  color: white;
+  font-size: 1.3rem;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.footer-redes a:hover {
+  color: #0f766e;
+  background-color: #d1fae5;
+}
+
+/* Texto de derechos reservados */
+
+.footer-derechos {
+  margin-bottom: 12px;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+/* Dirección, teléfono y correo */
+
+.footer-datos {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+  font-style: normal;
+  line-height: 1.7;
+}
+
+.footer-datos a {
+  color: white;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.footer-datos a:hover {
+  text-decoration: underline;
+}
+
+/* Indicador de foco al navegar con el teclado */
+
+.footer-nutrivida a:focus-visible {
+  outline: 3px solid #fde68a;
+  outline-offset: 4px;
+}
+
+/* ========================================
+   12. DISEÑO RESPONSIVE
+   ======================================== */
+
+/* Tablets y pantallas menores a 992px */
+
+@media (max-width: 991.98px) {
+  .servicios-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Pantallas menores a 768px */
+
+@media (max-width: 767.98px) {
+  .nutricionistas-grid,
+  .servicios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .servicios-encabezado {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+    /* Blogs: una tarjeta por fila */
+
+  .blogs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Celulares: pantallas de hasta 575.98px */
+
+@media (max-width: 575.98px) {
+  /* Portada */
+
+  .inicio-hero {
+    padding: 40px 12px;
+  }
+
+  .inicio-hero-imagen img {
+    height: 280px;
+  }
+
+  /* Nosotros */
+
+  .nosotros-seccion {
+    padding: 48px 12px;
+  }
+
+  /* Nutricionistas */
+
+  .nutricionistas-seccion {
+    padding: 48px 12px;
+  }
+
+  .nutricionista-foto {
+    height: 280px;
+  }
+
+  /* Servicios */
+
+  .servicios-seccion {
+    padding: 48px 12px;
+  }
+
+    /* Sección Blogs */
+
+  .blogs-seccion {
+    padding: 48px 12px;
+  }
+
+  .blog-imagen {
+    height: 220px;
+  }
+
+  /* Artículos en celulares */
+
+  .blog-detalle-main {
+    padding: 32px 12px 48px;
+  }
+
+  .blog-detalle-articulo {
+    padding: 20px;
+  }
+
+  .blog-detalle-imagen {
+    height: 240px;
+  }
+
+  .blog-detalle-consejo {
+    padding: 18px;
+  }
+
+    /* Contacto */
+
+  .contacto-seccion {
+    padding: 48px 12px;
+  }
+
+  .contacto-formulario {
+    padding: 20px;
+  }
+
+  .contacto-boton {
+    width: 100%;
+  }
+
+    /* Footer */
+
+  .footer-nutrivida {
+    padding: 28px 12px;
+  }
+
+  .footer-datos {
+    flex-direction: column;
+    align-items: center;
+  }
+}
