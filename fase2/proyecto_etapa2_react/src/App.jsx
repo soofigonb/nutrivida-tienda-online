@@ -5,6 +5,8 @@ import BlogDetalle1 from './pages/BlogDetalle1.jsx'
 import BlogDetalle2 from './pages/BlogDetalle2.jsx'
 import Footer from './components/Footer.jsx'
 import './App.css'
+import Registro from './pages/Registro'
+import Login from './pages/Login'
 
 function PaginaPendiente({ titulo }) {
   return (
@@ -44,12 +46,12 @@ function App() {
 
         <Route
           path="/login"
-          element={<PaginaPendiente titulo="Iniciar sesión" />}
+          element={<Login/>}
         />
 
         <Route
           path="/registro"
-          element={<PaginaPendiente titulo="Registro" />}
+          element={<Registro />}
         />
 
         <Route
