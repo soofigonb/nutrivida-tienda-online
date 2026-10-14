@@ -1,12 +1,15 @@
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Inicio from './pages/Inicio.jsx'
+import Agendar from './pages/Agendar.jsx'
+import Carrito from './pages/Carrito.jsx'
 import BlogDetalle1 from './pages/BlogDetalle1.jsx'
 import BlogDetalle2 from './pages/BlogDetalle2.jsx'
 import Footer from './components/Footer.jsx'
 import './App.css'
 import Registro from './pages/Registro'
 import Login from './pages/Login'
+import { CarritoProvider } from './context/CarritoContext.jsx'
 
 function PaginaPendiente({ titulo }) {
   return (
@@ -24,49 +27,37 @@ function PaginaPendiente({ titulo }) {
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
+      <CarritoProvider>
+        <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Inicio />} />
+        <Routes>
+          <Route path="/" element={<Inicio />} />
 
-        <Route
-          path="/agendar"
-          element={<PaginaPendiente titulo="Agendar una cita" />}
-        />
+          <Route path="/agendar" element={<Agendar />} />
 
-        <Route
-          path="/blogs/alimentacion-antiinflamatoria"
-          element={<BlogDetalle1 />}
-        />
+          <Route
+            path="/blogs/alimentacion-antiinflamatoria"
+            element={<BlogDetalle1 />}
+          />
 
-        <Route
-          path="/blogs/hidratacion-deportiva"
-          element={<BlogDetalle2 />}
-        />
+          <Route
+            path="/blogs/hidratacion-deportiva"
+            element={<BlogDetalle2 />}
+          />
 
-        <Route
-          path="/login"
-          element={<Login/>}
-        />
+          <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/registro"
-          element={<Registro />}
-        />
+          <Route path="/registro" element={<Registro />} />
 
-        <Route
-          path="/carrito"
-          element={<PaginaPendiente titulo="Carrito" />}
-        />
+          <Route path="/carrito" element={<Carrito />} />
 
-        <Route
-          path="*"
-          element={<PaginaPendiente titulo="Página no encontrada" />}
-        />
-
-      </Routes>
-      <Footer />
-
+          <Route
+            path="*"
+            element={<PaginaPendiente titulo="Página no encontrada" />}
+          />
+        </Routes>
+        <Footer />
+      </CarritoProvider>
     </BrowserRouter>
   )
 }
