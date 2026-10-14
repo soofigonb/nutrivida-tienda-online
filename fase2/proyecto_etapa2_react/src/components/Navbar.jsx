@@ -1,9 +1,14 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Container, Nav, Navbar as NavbarBootstrap } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { CarritoContext } from '../context/CarritoContext'
 
-function Navbar({ cantidadCarrito = 0 }) {
+function Navbar({ cantidadCarrito }) {
   const [expandido, setExpandido] = useState(false)
+  const carritoContext = useContext(CarritoContext)
+
+  const cantidadMostrar =
+    cantidadCarrito !== undefined ? cantidadCarrito : carritoContext?.cantidad || 0
 
   return (
     <header>
@@ -68,8 +73,8 @@ function Navbar({ cantidadCarrito = 0 }) {
               <Nav.Link as={Link} to="/carrito" eventKey="carrito">
                 <i className="bi bi-cart3 me-1" aria-hidden="true" />
                 Carrito
-                <span className="badge rounded-pill bg-warning text-dark ms-2">
-                  {cantidadCarrito}
+                <span className="badge rounded-pill bg-warning text-dark ms-2" id="contador-carrito">
+                  {cantidadMostrar}
                 </span>
               </Nav.Link>
             </Nav>
