@@ -1,14 +1,23 @@
 import { useContext, useState } from 'react'
-import { Container, Nav, Navbar as NavbarBootstrap } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Container, Nav, Navbar as NavbarBootstrap, Button } from 'react-bootstrap'
+import { Link, useNavigate } from 'react-router-dom'
 import { CarritoContext } from '../context/CarritoContext'
+import { AuthContext } from '../context/AuthContext' // Importamos el AuthContext
 
 function Navbar({ cantidadCarrito }) {
   const [expandido, setExpandido] = useState(false)
   const carritoContext = useContext(CarritoContext)
+  const { usuario, cerrarSesion } = useContext(AuthContext) // Consumimos el usuario y la función para cerrar sesión
+  const navigate = useNavigate()
 
   const cantidadMostrar =
     cantidadCarrito !== undefined ? cantidadCarrito : carritoContext?.cantidad || 0
+
+  const handleCerrarSesion = () => {
+    cerrarSesion()
+    setExpandido(false)
+    navigate('/login')
+  }
 
   return (
     <header>
@@ -35,7 +44,7 @@ function Navbar({ cantidadCarrito }) {
 
           <NavbarBootstrap.Collapse id="menu-nutrivida">
             <Nav
-              className="ms-auto"
+              className="ms-auto align-items-center"
               onSelect={() => setExpandido(false)}
             >
               <Nav.Link as={Link} to="/" eventKey="inicio">
@@ -62,13 +71,36 @@ function Navbar({ cantidadCarrito }) {
                 Contacto
               </Nav.Link>
 
-              <Nav.Link as={Link} to="/login" eventKey="login">
-                Iniciar sesión
-              </Nav.Link>
+              {/* CONEXIÓN DE SESIÓN EN EL MENÚ */}
+              {usuario ? (
+                // Muestra el nombre y botón de cerrar sesión si hay usuario
+                <>
+                  <Navbar.Text className="me-3 fw-bold text-light px-2">
+                    Hola, {usuario.nombre}
+                  </Navbar.Text>
 
-              <Nav.Link as={Link} to="/registro" eventKey="registro">
-                Registrarse
-              </Nav.Link>
+                  <Nav.Item className="my-1 my-xl-0 me-xl-2">
+                    <Button 
+                      variant="outline-danger" 
+                      size="sm" 
+                      onClick={handleCerrarSesion}
+                    >
+                      Cerrar sesión
+                    </Button>
+                  </Nav.Item>
+                </>
+              ) : (
+                // Muestra Iniciar sesión y Registrarse si NO hay usuario
+                <>
+                  <Nav.Link as={Link} to="/login" eventKey="login">
+                    Iniciar sesión
+                  </Nav.Link>
+
+                  <Nav.Link as={Link} to="/registro" eventKey="registro">
+                    Registrarse
+                  </Nav.Link>
+                </>
+              )}
 
               <Nav.Link as={Link} to="/carrito" eventKey="carrito">
                 <i className="bi bi-cart3 me-1" aria-hidden="true" />
