@@ -8,7 +8,7 @@ import { regionesComunas } from '../data/regionesComunas';
 // Permite solo letras (con tildes, eñes) y espacios entre palabras
 const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+(?:\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ]+)*\$/;
 
-// RegEx para correo electrónico
+// RegEx para correo electrónico válido
 const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$/;
 
 // Formatea el RUT automáticamente a XX.XXX.XXX-X
@@ -24,15 +24,23 @@ const formatearRut = (rut) => {
   return `${cuerpoFormateado}-${dv}`;
 };
 
-// Función para validar RUN chileno (Módulo 11)
+// Función para validar RUN chileno (Módulo 11 + Estructura y Longitud)
 const validarRutChileno = (rut) => {
   if (!rut) return false;
+
+  // Limpiamos dejando solo dígitos y K
   const limpio = rut.replace(/[^0-9kK]/g, '').toUpperCase();
-  if (limpio.length < 2) return false;
+
+  // 1. Validar longitud total (Mínimo 8 caracteres ej: 7.654.321-K, Máximo 9 ej: 20.123.456-7)
+  if (limpio.length < 8 || limpio.length > 9) return false;
 
   const cuerpo = limpio.slice(0, -1);
   const dvIngresado = limpio.slice(-1);
 
+  // 2. Validar que el cuerpo sea puramente numérico, no empiece con 0 y tenga entre 7 y 8 dígitos
+  if (!/^[1-9]\d{6,7}\$/.test(cuerpo)) return false;
+
+  // 3. Algoritmo Módulo 11 para el Dígito Verificador
   let suma = 0;
   let multiplicador = 2;
 
@@ -83,16 +91,18 @@ export default function Registro() {
     const correoLimpio = data.correo.replace(/\s+/g, '').toLowerCase();
 
     const resultado = registrarPaciente({
-      rut: rutLimpio,
+      run: rutLimpio,         // Usar 'run' de la EV1
+      rut: rutLimpio,         // Mantener 'rut' por compatibilidad
       nombre: data.nombre.trim(),
       apellidos: data.apellidos.trim(),
       correo: correoLimpio,
-      telefono: data.telefono?.trim() || '',
-      direccion: data.direccion?.trim() || '',
+      telefono: data.telefono.trim(),
+      direccion: data.direccion.trim(),
       fechaNacimiento: data.fechaNacimiento || '',
       region: data.region,
       comuna: data.comuna,
-      password: data.password,
+      contrasena: data.password, // Usar 'contrasena' de la EV1
+      password: data.password,   // Mantener 'password' por compatibilidad
       rol: 'paciente'
     });
 
@@ -178,7 +188,7 @@ export default function Registro() {
                     {...register('rut', {
                       required: 'El RUT es obligatorio',
                       validate: (val) =>
-                        validarRutChileno(val) || 'RUT inválido (el dígito verificador no coincide)'
+                        validarRutChileno(val) || 'RUT inválido (formato o dígito verificador incorrecto)'
                     })}
                     onChange={(e) => {
                       const rutFormateado = formatearRut(e.target.value);
@@ -209,23 +219,50 @@ export default function Registro() {
                   </Form.Control.Feedback>
                 </Form.Group>
 
-                {/* Teléfono (Opcional) */}
+                {/* Teléfono (Obligatorio) */}
                 <Form.Group className="mb-3" controlId="controlIdTelefono">
-                  <Form.Label>Teléfono (Opcional)</Form.Label>
+                  <Form.Label>Teléfono *</Form.Label>
                   <Form.Control
                     type="tel"
-                    placeholder="+56912345678"
-                    {...register('telefono')}
+                    placeholder="Ej: 912345678 o +56912345678"
+                    {...register('telefono', {
+                      required: 'El teléfono es obligatorio',
+                      validate: (val) =>
+                        /^[0-9+ ]+\$/.test(val.trim()) || 'El teléfono solo debe contener números',
+                      minLength: {
+                        value: 8,
+                        message: 'El teléfono debe tener al menos 8 dígitos'
+                      },
+                      maxLength: {
+                        value: 12,
+                        message: 'El teléfono no debe superar los 12 caracteres'
+                      }
+                    })}
+                    isInvalid={!!errors.telefono}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.telefono?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
-                {/* Dirección (Opcional) */}
+                {/* Dirección (Obligatoria) */}
                 <Form.Group className="mb-3" controlId="controlIdDireccion">
-                  <Form.Label>Dirección (Opcional)</Form.Label>
+                  <Form.Label>Dirección *</Form.Label>
                   <Form.Control
                     type="text"
-                    {...register('direccion')}
+                    placeholder="Ej: Av. Alemania 123"
+                    {...register('direccion', {
+                      required: 'La dirección es obligatoria',
+                      minLength: {
+                        value: 5,
+                        message: 'La dirección debe tener al menos 5 caracteres'
+                      }
+                    })}
+                    isInvalid={!!errors.direccion}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.direccion?.message}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
                 {/* Fecha de Nacimiento (Opcional) */}

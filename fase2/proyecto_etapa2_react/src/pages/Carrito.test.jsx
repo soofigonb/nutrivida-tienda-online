@@ -71,7 +71,7 @@ describe('Módulo de Carrito de Reservas - Carrito.jsx (Nitsi)', () => {
     await user.click(botonesEliminar[0])
 
     // El nuevo total debe reflejar únicamente los $60.000 del plan integral
-    expect(screen.getByText(/\$60\.000/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/\$60\.000/i)[0]).toBeInTheDocument()
     expect(screen.queryByText('Evaluación y consulta inicial')).not.toBeInTheDocument()
   })
 

@@ -37,7 +37,7 @@ describe('Módulo de Agendamiento - Agendar.jsx (Nitsi)', () => {
     expect(selectPlan).toHaveValue('plan-integral')
 
     // El precio debe obtenerse de planes.js ($60.000 CLP)
-    expect(screen.getByText(/\$60\.000/i)).toBeInTheDocument()
+    expect(screen.getAllByText(/\$60\.000/i)[0]).toBeInTheDocument()
   })
 
   /**

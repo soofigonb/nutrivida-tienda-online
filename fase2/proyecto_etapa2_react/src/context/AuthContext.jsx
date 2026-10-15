@@ -15,12 +15,25 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
-  // Función auxiliar para obtener pacientes de forma segura
+  // Función auxiliar para obtener pacientes de forma segura y unificar claves (run/rut, contrasena/password)
   const obtenerPacientesGuardados = () => {
     try {
       const saved = localStorage.getItem('pacientesNutriVida');
       const parsed = saved ? JSON.parse(saved) : [];
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+
+      // Mapeamos para garantizar que datos antiguos tengan tanto run/rut como contrasena/password
+      return parsed.map((p) => {
+        const valRun = (p.run || p.rut || '').replace(/[^0-9kK]/g, '').toUpperCase();
+        const valPass = p.contrasena || p.password || p.clave || '';
+        return {
+          ...p,
+          run: valRun,
+          rut: valRun,
+          contrasena: valPass,
+          password: valPass
+        };
+      });
     } catch (error) {
       console.error('Error al leer pacientesNutriVida desde localStorage:', error);
       return [];
@@ -35,21 +48,26 @@ export const AuthProvider = ({ children }) => {
     // 2. Lectura protegida de la lista de pacientes
     const pacientes = obtenerPacientesGuardados();
     
-    const rutNuevo = limpiarRut(nuevoPaciente.rut);
+    const rutNuevo = limpiarRut(nuevoPaciente.run || nuevoPaciente.rut);
     const correoNuevo = limpiarCorreo(nuevoPaciente.correo);
+    const passNueva = nuevoPaciente.contrasena || nuevoPaciente.password || '';
 
-    if (pacientes.some(p => limpiarRut(p.rut) === rutNuevo)) {
-      return { exito: false, campo: 'rut', mensaje: 'El RUT ya está registrado' };
+    if (pacientes.some(p => limpiarRut(p.run || p.rut) === rutNuevo)) {
+      return { exito: false, campo: 'rut', mensaje: 'El RUN/RUT ya está registrado' };
     }
 
     if (pacientes.some(p => limpiarCorreo(p.correo) === correoNuevo)) {
       return { exito: false, campo: 'correo', mensaje: 'El correo ya está registrado' };
     }
 
+    // Guardamos el registro con ambas nomenclaturas (run/rut y contrasena/password) para unificar con el CRUD
     const pacienteAInsertar = {
       ...nuevoPaciente,
+      run: rutNuevo,
       rut: rutNuevo,
       correo: correoNuevo,
+      contrasena: passNueva,
+      password: passNueva,
       id: Date.now().toString()
     };
 
@@ -65,11 +83,16 @@ export const AuthProvider = ({ children }) => {
     return { exito: true };
   };
 
-  const iniciarSesion = (correo, password) => {
-    const correoLimpio = limpiarCorreo(correo);
+  const iniciarSesion = (identificador, password) => {
+    const busquedaLimpia = limpiarCorreo(identificador);
+    const rutBuscado = limpiarRut(identificador);
 
-    if (correoLimpio === 'admin@nutrivida.cl' && password === 'admin123') {
-      const adminUser = { id: 'admin', nombre: 'Administrador', correo: correoLimpio, rol: 'admin' };
+    // Administrador por defecto
+    if (
+      (busquedaLimpia === 'admin@nutrivida.cl' || rutBuscado === 'ADMIN') &&
+      password === 'admin123'
+    ) {
+      const adminUser = { id: 'admin', nombre: 'Administrador', correo: 'admin@nutrivida.cl', rol: 'admin' };
       setUsuario(adminUser);
       try {
         localStorage.setItem('sesionNutriVida', JSON.stringify(adminUser));
@@ -79,15 +102,26 @@ export const AuthProvider = ({ children }) => {
       return { exito: true, usuario: adminUser };
     }
 
-    // 3. Lectura protegida al iniciar sesión
+    // 3. Lectura protegida al iniciar sesión (permite ingresar por Correo o RUN/RUT)
     const pacientes = obtenerPacientesGuardados();
     
-    const paciente = pacientes.find(
-      p => limpiarCorreo(p.correo) === correoLimpio && p.password === password
-    );
+    const paciente = pacientes.find((p) => {
+      const coincideCorreo = limpiarCorreo(p.correo) === busquedaLimpia;
+      const coincideRun = limpiarRut(p.run || p.rut) === rutBuscado;
+      const coincidePass = (p.contrasena || p.password) === password;
+
+      return (coincideCorreo || coincideRun) && coincidePass;
+    });
 
     if (paciente) {
-      const userSesion = { id: paciente.id, nombre: paciente.nombre, correo: paciente.correo, rol: paciente.rol };
+      const userSesion = {
+        id: paciente.id,
+        nombre: paciente.nombre,
+        correo: paciente.correo,
+        run: paciente.run || paciente.rut,
+        rut: paciente.rut || paciente.run,
+        rol: paciente.rol
+      };
       setUsuario(userSesion);
       try {
         localStorage.setItem('sesionNutriVida', JSON.stringify(userSesion));
