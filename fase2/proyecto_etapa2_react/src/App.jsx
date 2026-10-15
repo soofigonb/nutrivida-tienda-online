@@ -10,6 +10,7 @@ import './App.css'
 import Registro from './pages/Registro'
 import Login from './pages/Login'
 import { CarritoProvider } from './context/CarritoContext.jsx'
+import ScrollNavegacion from './components/ScrollNavegacion.jsx'
 
 function PaginaPendiente({ titulo }) {
   return (
@@ -28,6 +29,8 @@ function App() {
   return (
     <BrowserRouter>
       <CarritoProvider>
+
+        <ScrollNavegacion />
         <Navbar />
 
         <Routes>
@@ -56,7 +59,9 @@ function App() {
             element={<PaginaPendiente titulo="Página no encontrada" />}
           />
         </Routes>
+
         <Footer />
+
       </CarritoProvider>
     </BrowserRouter>
   )
