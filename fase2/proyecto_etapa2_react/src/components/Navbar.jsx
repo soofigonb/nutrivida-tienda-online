@@ -1,23 +1,44 @@
 import { useContext, useState } from 'react'
-import { Container, Nav, Navbar as NavbarBootstrap, Button } from 'react-bootstrap'
+import {
+  Button,
+  Container,
+  Nav,
+  Navbar as NavbarBootstrap,
+} from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import { CarritoContext } from '../context/CarritoContext'
-import { AuthContext } from '../context/AuthContext' // Importamos el AuthContext
+import { AuthContext } from '../context/AuthContext'
 
 function Navbar({ cantidadCarrito }) {
+  // ========================================
+  // 1. ESTADOS Y CONTEXTOS
+  // ========================================
+
   const [expandido, setExpandido] = useState(false)
+
   const carritoContext = useContext(CarritoContext)
-  const { usuario, cerrarSesion } = useContext(AuthContext) // Consumimos el usuario y la función para cerrar sesión
+  const { usuario, cerrarSesion } = useContext(AuthContext)
+
   const navigate = useNavigate()
 
   const cantidadMostrar =
-    cantidadCarrito !== undefined ? cantidadCarrito : carritoContext?.cantidad || 0
+    cantidadCarrito !== undefined
+      ? cantidadCarrito
+      : carritoContext?.cantidad || 0
 
-  const handleCerrarSesion = () => {
+  // ========================================
+  // 2. CERRAR SESIÓN
+  // ========================================
+
+  function handleCerrarSesion() {
     cerrarSesion()
     setExpandido(false)
     navigate('/login')
   }
+
+  // ========================================
+  // 3. BARRA DE NAVEGACIÓN
+  // ========================================
 
   return (
     <header>
@@ -29,6 +50,7 @@ function Navbar({ cantidadCarrito }) {
         data-bs-theme="dark"
       >
         <Container fluid>
+          {/* Nombre de la clínica */}
           <NavbarBootstrap.Brand
             as={Link}
             to="/"
@@ -37,6 +59,7 @@ function Navbar({ cantidadCarrito }) {
             NutriVida
           </NavbarBootstrap.Brand>
 
+          {/* Menú para pantallas pequeñas */}
           <NavbarBootstrap.Toggle
             aria-controls="menu-nutrivida"
             aria-label="Abrir o cerrar menú"
@@ -47,42 +70,71 @@ function Navbar({ cantidadCarrito }) {
               className="ms-auto align-items-center"
               onSelect={() => setExpandido(false)}
             >
-              <Nav.Link as={Link} to="/" eventKey="inicio">
+              {/* Inicio */}
+              <Nav.Link
+                as={Link}
+                to="/"
+                eventKey="inicio"
+              >
                 Home
               </Nav.Link>
 
-              <Nav.Link href="/#nosotros" eventKey="nosotros">
+              {/* Secciones de la página de inicio */}
+              <Nav.Link
+                as={Link}
+                to="/#nosotros"
+                eventKey="nosotros"
+              >
                 Nosotros
               </Nav.Link>
 
-              <Nav.Link href="/#servicios" eventKey="servicios">
+              <Nav.Link
+                as={Link}
+                to="/#servicios"
+                eventKey="servicios"
+              >
                 Servicios
               </Nav.Link>
 
-              <Nav.Link href="/#blogs" eventKey="blogs">
+              <Nav.Link
+                as={Link}
+                to="/#blogs"
+                eventKey="blogs"
+              >
                 Blogs
               </Nav.Link>
 
-              <Nav.Link as={Link} to="/agendar" eventKey="agendar">
+              {/* Agendamiento */}
+              <Nav.Link
+                as={Link}
+                to="/agendar"
+                eventKey="agendar"
+              >
                 Agendar
               </Nav.Link>
 
-              <Nav.Link href="/#contacto" eventKey="contacto">
+              {/* Sección de contacto */}
+              <Nav.Link
+                as={Link}
+                to="/#contacto"
+                eventKey="contacto"
+              >
                 Contacto
               </Nav.Link>
 
-              {/* CONEXIÓN DE SESIÓN EN EL MENÚ */}
+              {/* Opciones según la sesión */}
               {usuario ? (
-                // Muestra el nombre y botón de cerrar sesión si hay usuario
                 <>
-                  <Navbar.Text className="me-3 fw-bold text-light px-2">
+                  <NavbarBootstrap.Text
+                    className="me-3 fw-bold text-light px-2"
+                  >
                     Hola, {usuario.nombre}
-                  </Navbar.Text>
+                  </NavbarBootstrap.Text>
 
                   <Nav.Item className="my-1 my-xl-0 me-xl-2">
-                    <Button 
-                      variant="outline-danger" 
-                      size="sm" 
+                    <Button
+                      variant="outline-light"
+                      size="sm"
                       onClick={handleCerrarSesion}
                     >
                       Cerrar sesión
@@ -90,22 +142,42 @@ function Navbar({ cantidadCarrito }) {
                   </Nav.Item>
                 </>
               ) : (
-                // Muestra Iniciar sesión y Registrarse si NO hay usuario
                 <>
-                  <Nav.Link as={Link} to="/login" eventKey="login">
+                  <Nav.Link
+                    as={Link}
+                    to="/login"
+                    eventKey="login"
+                  >
                     Iniciar sesión
                   </Nav.Link>
 
-                  <Nav.Link as={Link} to="/registro" eventKey="registro">
+                  <Nav.Link
+                    as={Link}
+                    to="/registro"
+                    eventKey="registro"
+                  >
                     Registrarse
                   </Nav.Link>
                 </>
               )}
 
-              <Nav.Link as={Link} to="/carrito" eventKey="carrito">
-                <i className="bi bi-cart3 me-1" aria-hidden="true" />
+              {/* Carrito */}
+              <Nav.Link
+                as={Link}
+                to="/carrito"
+                eventKey="carrito"
+              >
+                <i
+                  className="bi bi-cart3 me-1"
+                  aria-hidden="true"
+                />
+
                 Carrito
-                <span className="badge rounded-pill bg-warning text-dark ms-2" id="contador-carrito">
+
+                <span
+                  className="badge rounded-pill bg-warning text-dark ms-2"
+                  id="contador-carrito"
+                >
                   {cantidadMostrar}
                 </span>
               </Nav.Link>

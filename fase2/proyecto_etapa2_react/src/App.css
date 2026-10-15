@@ -2,21 +2,15 @@
    1. BARRA DE NAVEGACIÓN
    ======================================== */
 
-/* Contenedor del menú */
-
 .navbar-nutrivida {
   background-color: #0f766e;
   padding: 0.75rem 1rem;
 }
 
-/* Nombre de la clínica */
-
 .navbar-nutrivida .navbar-brand {
   font-size: 1.6rem;
   font-weight: 700;
 }
-
-/* Enlaces del menú */
 
 .navbar-nutrivida .nav-link {
   color: #fff;
@@ -39,15 +33,11 @@
    3. ENCABEZADOS COMPARTIDOS
    ======================================== */
 
-/* Contenedor del encabezado */
-
 .seccion-encabezado {
   max-width: 680px;
   margin: 0 auto 40px;
   text-align: center;
 }
-
-/* Texto pequeño sobre el título */
 
 .seccion-etiqueta {
   margin-bottom: 8px;
@@ -59,8 +49,6 @@
   text-transform: uppercase;
 }
 
-/* Título de la sección */
-
 .seccion-titulo {
   margin-bottom: 12px;
   color: #2f241f;
@@ -68,8 +56,6 @@
   font-size: clamp(1.8rem, 4vw, 2.3rem);
   font-weight: 600;
 }
-
-/* Descripción de la sección */
 
 .seccion-descripcion {
   margin-bottom: 0;
@@ -82,7 +68,7 @@
    4. PORTADA — HERO
    ======================================== */
 
-/* Fondo y contenedor */
+/* Fondo y contenido */
 
 .inicio-hero {
   padding: 72px 24px;
@@ -93,7 +79,7 @@
   max-width: 580px;
 }
 
-/* Textos de la portada */
+/* Textos */
 
 .inicio-etiqueta {
   margin-bottom: 8px;
@@ -122,7 +108,7 @@
   line-height: 1.8;
 }
 
-/* Distribución de los botones */
+/* Botones */
 
 .inicio-acciones {
   display: flex;
@@ -130,8 +116,6 @@
   gap: 12px;
   margin-top: 28px;
 }
-
-/* Estilos compartidos de los botones */
 
 .inicio-boton-principal,
 .inicio-boton-secundario {
@@ -148,21 +132,15 @@
     transform 0.2s ease;
 }
 
-/* Botón: Ver nutricionistas */
-
 .inicio-boton-principal {
   color: white;
   background-color: #047857;
 }
 
-/* Botón: Agendar una cita */
-
 .inicio-boton-secundario {
   color: #047857;
   background-color: transparent;
 }
-
-/* Efecto al pasar el cursor */
 
 .inicio-boton-principal:hover,
 .inicio-boton-secundario:hover {
@@ -171,7 +149,7 @@
   transform: translateY(-2px);
 }
 
-/* Imagen de la portada */
+/* Imagen */
 
 .inicio-hero-imagen img {
   display: block;
@@ -186,14 +164,12 @@
    5. SECCIÓN NOSOTROS
    ======================================== */
 
-/* Fondo y espaciado */
-
 .nosotros-seccion {
   padding: 80px 24px;
   background-color: #fffaf4;
 }
 
-/* Tarjetas informativas */
+/* Tarjetas */
 
 .nosotros-tarjeta {
   height: 100%;
@@ -211,7 +187,7 @@
   transform: translateY(-3px);
 }
 
-/* Iconos de las tarjetas */
+/* Iconos */
 
 .nosotros-icono {
   display: flex;
@@ -226,15 +202,13 @@
   font-size: 1.3rem;
 }
 
-/* Títulos de las tarjetas */
+/* Textos y listas */
 
 .nosotros-tarjeta h3 {
   margin-bottom: 12px;
   font-family: "Fraunces", serif;
   font-size: 1.4rem;
 }
-
-/* Párrafos y lista de áreas de atención */
 
 .nosotros-tarjeta p,
 .nosotros-lista {
@@ -252,14 +226,12 @@
    6. SECCIÓN NUTRICIONISTAS
    ======================================== */
 
-/* Fondo y espaciado */
-
 .nutricionistas-seccion {
   padding: 80px 24px;
   background-color: white;
 }
 
-/* Distribución de las tarjetas */
+/* Distribución */
 
 .nutricionistas-grid {
   display: grid;
@@ -300,7 +272,7 @@
   object-fit: contain;
 }
 
-/* Modalidad y nombre */
+/* Datos del profesional */
 
 .nutricionista-modalidad {
   color: #047857;
@@ -312,8 +284,6 @@
   font-family: "Fraunces", serif;
   font-size: 1.4rem;
 }
-
-/* Especialidad y experiencia */
 
 .nutricionista-especialidad {
   margin-bottom: 8px;
@@ -327,7 +297,7 @@
   line-height: 1.7;
 }
 
-/* Botón de detalle */
+/* Botón y detalle */
 
 .nutricionista-boton {
   width: 100%;
@@ -348,8 +318,6 @@
   background-color: #047857;
 }
 
-/* Información del nutricionista seleccionado */
-
 .nutricionista-detalle:not(:empty) {
   margin-top: 24px;
 }
@@ -358,14 +326,10 @@
    7. PLANES Y SERVICIOS
    ======================================== */
 
-/* Fondo y espaciado */
-
 .servicios-seccion {
   padding: 80px 24px;
   background-color: #f0fdf4;
 }
-
-/* Título y botón de promoción */
 
 .servicios-encabezado {
   display: flex;
@@ -375,7 +339,7 @@
   gap: 20px;
 }
 
-/* Botón de promoción */
+/* Promoción */
 
 .promocion-boton {
   flex-shrink: 0;
@@ -392,8 +356,6 @@
   background-color: #d97706;
 }
 
-/* Mensaje de promoción */
-
 .promocion-mensaje {
   margin-bottom: 28px;
   padding: 16px 20px;
@@ -404,15 +366,13 @@
   line-height: 1.7;
 }
 
-/* Distribución de las tarjetas */
+/* Tarjetas */
 
 .servicios-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
 }
-
-/* Tarjetas */
 
 .servicio-tarjeta {
   display: flex;
@@ -432,8 +392,6 @@
   box-shadow: 0 12px 24px rgba(47, 36, 31, 0.1);
 }
 
-/* Imágenes */
-
 .servicio-imagen {
   display: block;
   width: 100%;
@@ -441,7 +399,7 @@
   object-fit: cover;
 }
 
-/* Contenido de las tarjetas */
+/* Contenido */
 
 .servicio-contenido {
   display: flex;
@@ -468,8 +426,6 @@
   line-height: 1.6;
 }
 
-/* Precios */
-
 .servicio-precio {
   margin-top: auto;
   color: #047857;
@@ -477,7 +433,7 @@
   font-weight: 700;
 }
 
-/* Enlaces para agendar */
+/* Enlace para agendar */
 
 .servicio-boton {
   display: inline-block;
@@ -499,8 +455,6 @@
    8. SECCIÓN BLOGS Y CONSEJOS
    ======================================== */
 
-/* Fondo y distribución de las tarjetas */
-
 .blogs-seccion {
   padding: 80px 24px;
   background-color: #fffaf4;
@@ -512,7 +466,7 @@
   gap: 24px;
 }
 
-/* Tarjetas de los artículos */
+/* Tarjetas */
 
 .blog-tarjeta {
   display: flex;
@@ -524,16 +478,12 @@
   background-color: white;
 }
 
-/* Imágenes */
-
 .blog-imagen {
   display: block;
   width: 100%;
   height: 260px;
   object-fit: cover;
 }
-
-/* Contenido de las tarjetas */
 
 .blog-contenido {
   display: flex;
@@ -561,7 +511,7 @@
   line-height: 1.7;
 }
 
-/* Enlaces para leer y volver */
+/* Enlaces */
 
 .blog-enlace {
   align-self: flex-start;
@@ -580,8 +530,6 @@
 /* ========================================
    9. PÁGINAS DE LOS ARTÍCULOS
    ======================================== */
-
-/* Fondo y contenedor principal */
 
 .blog-detalle-main {
   padding: 48px 24px 80px;
@@ -602,7 +550,7 @@
   background-color: white;
 }
 
-/* Título y datos del autor */
+/* Encabezado */
 
 .blog-detalle-titulo {
   margin: 12px 0 20px;
@@ -621,7 +569,7 @@
   font-size: 0.9rem;
 }
 
-/* Imagen principal y descripción */
+/* Imagen */
 
 .blog-detalle-figura {
   margin-bottom: 28px;
@@ -642,7 +590,7 @@
   text-align: center;
 }
 
-/* Introducción y secciones del artículo */
+/* Contenido */
 
 .blog-detalle-introduccion {
   color: #4b5563;
@@ -699,7 +647,7 @@
   line-height: 1.7;
 }
 
-/* Invitación para agendar */
+/* Acción final */
 
 .blog-detalle-accion {
   margin-top: 32px;
@@ -712,14 +660,10 @@
    10. SECCIÓN CONTACTO
    ======================================== */
 
-/* Fondo y espaciado */
-
 .contacto-seccion {
   padding: 80px 24px;
   background-color: #f0fdf4;
 }
-
-/* Descripción de la clínica */
 
 .contacto-descripcion {
   margin-bottom: 24px;
@@ -727,7 +671,7 @@
   line-height: 1.8;
 }
 
-/* Dirección, teléfono y correo */
+/* Datos de contacto */
 
 .contacto-lista {
   display: flex;
@@ -763,7 +707,7 @@
   text-decoration: underline;
 }
 
-/* Contenedor del formulario */
+/* Formulario */
 
 .contacto-formulario {
   padding: 32px;
@@ -771,8 +715,6 @@
   border-radius: 16px;
   background-color: white;
 }
-
-/* Etiquetas y campos */
 
 .contacto-formulario .form-label {
   color: #2f241f;
@@ -789,21 +731,17 @@
   box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.15);
 }
 
-/* Campos inválidos */
-
 .contacto-formulario .form-control.is-invalid:focus {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
 }
-
-/* Área del mensaje */
 
 .contacto-formulario textarea {
   min-height: 140px;
   resize: vertical;
 }
 
-/* Botón para enviar */
+/* Botón */
 
 .contacto-boton {
   padding: 12px 24px;
@@ -820,10 +758,467 @@
 }
 
 /* ========================================
-   11. PIE DE PÁGINA — FOOTER
+   11. PÁGINAS DE GESTIÓN
+   Registro, login, agenda y carrito
    ======================================== */
 
 /* Fondo y espaciado */
+
+.pagina-gestion {
+  width: 100%;
+  min-height: 60vh;
+  padding: 64px 0;
+  background-color: #f0fdf4;
+  font-family: "Roboto", sans-serif;
+}
+
+/* Tarjetas */
+
+.pagina-gestion .gestion-tarjeta {
+  min-width: 0;
+  border: 1px solid #d8c4b8;
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: none;
+}
+
+.gestion-tarjeta-cuerpo {
+  padding: 32px;
+}
+
+/* Textos */
+
+.gestion-subtitulo {
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: 1.45rem;
+  font-weight: 600;
+}
+
+.gestion-ayuda {
+  color: #6b7280;
+  line-height: 1.7;
+}
+
+.gestion-pie-formulario {
+  margin: 24px 0 0;
+  color: #6b7280;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.gestion-pie-formulario a {
+  color: #047857;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.gestion-pie-formulario a:hover,
+.gestion-pie-formulario a:focus-visible {
+  color: #036548;
+  text-decoration: underline;
+}
+
+/* Etiquetas y campos */
+
+.pagina-gestion .form-label {
+  color: #2f241f;
+  font-weight: 600;
+}
+
+.pagina-gestion .form-control,
+.pagina-gestion .form-select {
+  min-height: 46px;
+  border-color: #ced4da;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #2f241f;
+}
+
+.pagina-gestion .form-control {
+  padding: 12px;
+}
+
+.pagina-gestion .form-select {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-left: 12px;
+}
+
+/* Campo seleccionado */
+
+.pagina-gestion .form-control:focus,
+.pagina-gestion .form-select:focus {
+  border-color: #047857;
+  box-shadow: 0 0 0 0.2rem rgba(4, 120, 87, 0.15);
+}
+
+/* Campos deshabilitados */
+
+.pagina-gestion .form-control:disabled,
+.pagina-gestion .form-select:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Campos inválidos */
+
+.pagina-gestion .form-control.is-invalid,
+.pagina-gestion .form-select.is-invalid {
+  border-color: #dc3545;
+}
+
+.pagina-gestion .form-control.is-invalid:focus,
+.pagina-gestion .form-select.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15);
+}
+
+/* Ayudas y mensajes */
+
+.pagina-gestion .form-text {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.pagina-gestion .form-text,
+.pagina-gestion .invalid-feedback,
+.pagina-gestion .alert {
+  overflow-wrap: anywhere;
+}
+
+.pagina-gestion textarea.form-control {
+  min-height: 140px;
+  resize: vertical;
+}
+
+/* Botones principales */
+
+.pagina-gestion .btn-success {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #047857;
+  --bs-btn-border-color: #047857;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #036548;
+  --bs-btn-hover-border-color: #036548;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #036548;
+  --bs-btn-active-border-color: #036548;
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #047857;
+  --bs-btn-disabled-border-color: #047857;
+  --bs-btn-focus-shadow-rgb: 4, 120, 87;
+
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* Botones secundarios */
+
+.pagina-gestion .btn-outline-success {
+  --bs-btn-color: #047857;
+  --bs-btn-border-color: #047857;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #047857;
+  --bs-btn-hover-border-color: #047857;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #036548;
+  --bs-btn-active-border-color: #036548;
+  --bs-btn-focus-shadow-rgb: 4, 120, 87;
+
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+.pagina-gestion .btn-success.btn-sm,
+.pagina-gestion .btn-outline-success.btn-sm {
+  padding: 8px 14px;
+  font-size: 0.875rem;
+}
+
+/* Distribución de acciones */
+
+.gestion-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.gestion-botones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* ========================================
+   12. REGISTRO DE PACIENTES
+   ======================================== */
+
+/* Dos columnas para los campos cortos */
+
+.registro-formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 16px;
+}
+
+.registro-formulario > * {
+  min-width: 0;
+  grid-column: 1 / -1;
+}
+
+.registro-formulario > .registro-campo-mitad {
+  grid-column: span 1;
+}
+
+/* ========================================
+   13. AGENDAMIENTO
+   ======================================== */
+
+/* Resumen del plan seleccionado */
+
+.agenda-plan-resumen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #a7d7bd;
+  border-radius: 12px;
+  background-color: #f0fdf4;
+}
+
+.agenda-plan-informacion {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.agenda-plan-etiqueta {
+  color: #047857;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.agenda-plan-informacion p {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.agenda-plan-precio {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.agenda-plan-precio span {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.agenda-plan-precio strong {
+  color: #047857;
+  font-size: 1.25rem;
+  white-space: nowrap;
+}
+
+/* Evitar que el icono de error tape el calendario */
+
+.agendar-main input[type="date"].form-control.is-invalid {
+  background-image: none;
+  padding-right: 12px;
+}
+
+/* ========================================
+   14. CARRITO DE RESERVAS
+   ======================================== */
+
+/* Encabezado del listado */
+
+.carrito-tarjeta-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid #d8c4b8;
+  border-radius: 15px 15px 0 0;
+  background-color: #fff;
+  color: #2f241f;
+  font-weight: 600;
+}
+
+.carrito-vaciar {
+  padding: 0;
+  color: #b42318;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.carrito-vaciar:hover,
+.carrito-vaciar:focus-visible {
+  color: #8f1c13;
+  text-decoration: underline;
+}
+
+/* Tabla */
+
+.carrito-main .table-responsive {
+  border-radius: 0 0 15px 15px;
+}
+
+.carrito-main .table {
+  --bs-table-bg: #fff;
+  --bs-table-color: #4b5563;
+  --bs-table-border-color: #e9e1d9;
+  --bs-table-hover-bg: #f0fdf4;
+}
+
+.carrito-main .table-light {
+  --bs-table-bg: #f0fdf4;
+  --bs-table-color: #2f241f;
+  --bs-table-border-color: #d8c4b8;
+}
+
+.carrito-main .table th,
+.carrito-main .table td {
+  padding-top: 16px;
+  padding-bottom: 16px;
+  vertical-align: middle;
+}
+
+.carrito-main .table th {
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.carrito-fecha {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.carrito-precio {
+  color: #047857;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.boton-eliminar-reserva {
+  border-radius: 8px;
+}
+
+/* Información del paciente */
+
+.carrito-paciente {
+  margin-bottom: 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f0fdf4;
+  color: #065f46;
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+/* Total */
+
+.carrito-total {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #d8c4b8;
+}
+
+.carrito-total span {
+  color: #2f241f;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.carrito-total strong {
+  color: #047857;
+  font-size: 1.4rem;
+}
+
+/* Control de simulación */
+
+.carrito-simulacion {
+  margin-bottom: 20px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f8faf9;
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+/* Estados vacío y confirmado */
+
+.carrito-estado-icono {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: #047857;
+  font-size: 3.5rem;
+}
+
+/* Consultas confirmadas */
+
+.carrito-confirmaciones {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.carrito-confirmacion {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #d8c4b8;
+  border-radius: 12px;
+  background-color: #f0fdf4;
+  overflow-wrap: anywhere;
+}
+
+.carrito-servicio-titulo {
+  margin-bottom: 0;
+  color: #2f241f;
+  font-family: "Fraunces", serif;
+  font-size: 1.15rem;
+}
+
+.carrito-confirmacion p {
+  margin-bottom: 8px;
+  color: #4b5563;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.carrito-confirmacion .carrito-codigo {
+  margin-bottom: 0;
+  color: #6b7280;
+  font-size: 0.8rem;
+}
+
+.carrito-codigo code {
+  color: #065f46;
+  overflow-wrap: anywhere;
+}
+
+/* ========================================
+   15. PIE DE PÁGINA — FOOTER
+   ======================================== */
 
 .footer-nutrivida {
   padding: 32px 24px;
@@ -832,7 +1227,7 @@
   text-align: center;
 }
 
-/* Distribución de las redes sociales */
+/* Redes sociales */
 
 .footer-redes {
   display: flex;
@@ -841,8 +1236,6 @@
   gap: 16px;
   margin-bottom: 18px;
 }
-
-/* Enlaces e iconos de las redes */
 
 .footer-redes a {
   display: flex;
@@ -865,15 +1258,13 @@
   background-color: #d1fae5;
 }
 
-/* Texto de derechos reservados */
+/* Derechos y datos */
 
 .footer-derechos {
   margin-bottom: 12px;
   font-weight: 600;
   line-height: 1.7;
 }
-
-/* Dirección, teléfono y correo */
 
 .footer-datos {
   display: flex;
@@ -896,18 +1287,16 @@
   text-decoration: underline;
 }
 
-/* Indicador de foco al navegar con el teclado */
-
 .footer-nutrivida a:focus-visible {
   outline: 3px solid #fde68a;
   outline-offset: 4px;
 }
 
 /* ========================================
-   12. DISEÑO RESPONSIVE
+   16. DISEÑO RESPONSIVE
    ======================================== */
 
-/* Tablets y pantallas menores a 992px */
+/* Tablets: menos de 992px */
 
 @media (max-width: 991.98px) {
   .servicios-grid {
@@ -919,7 +1308,8 @@
 
 @media (max-width: 767.98px) {
   .nutricionistas-grid,
-  .servicios-grid {
+  .servicios-grid,
+  .blogs-grid {
     grid-template-columns: 1fr;
   }
 
@@ -928,14 +1318,14 @@
     align-items: flex-start;
   }
 
-    /* Blogs: una tarjeta por fila */
+  /* Registro: una columna en pantallas pequeñas */
 
-  .blogs-grid {
-    grid-template-columns: 1fr;
+  .registro-formulario {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
-/* Celulares: pantallas de hasta 575.98px */
+/* Celulares */
 
 @media (max-width: 575.98px) {
   /* Portada */
@@ -948,15 +1338,13 @@
     height: 280px;
   }
 
-  /* Nosotros */
+  /* Secciones */
 
-  .nosotros-seccion {
-    padding: 48px 12px;
-  }
-
-  /* Nutricionistas */
-
-  .nutricionistas-seccion {
+  .nosotros-seccion,
+  .nutricionistas-seccion,
+  .servicios-seccion,
+  .blogs-seccion,
+  .contacto-seccion {
     padding: 48px 12px;
   }
 
@@ -964,23 +1352,11 @@
     height: 280px;
   }
 
-  /* Servicios */
-
-  .servicios-seccion {
-    padding: 48px 12px;
-  }
-
-    /* Sección Blogs */
-
-  .blogs-seccion {
-    padding: 48px 12px;
-  }
-
   .blog-imagen {
     height: 220px;
   }
 
-  /* Artículos en celulares */
+  /* Artículos */
 
   .blog-detalle-main {
     padding: 32px 12px 48px;
@@ -998,11 +1374,7 @@
     padding: 18px;
   }
 
-    /* Contacto */
-
-  .contacto-seccion {
-    padding: 48px 12px;
-  }
+  /* Contacto */
 
   .contacto-formulario {
     padding: 20px;
@@ -1012,7 +1384,43 @@
     width: 100%;
   }
 
-    /* Footer */
+  /* Registro, login, agenda y carrito */
+
+  .pagina-gestion {
+    padding: 40px 0;
+  }
+
+  .gestion-tarjeta-cuerpo {
+    padding: 20px;
+  }
+
+  .registro-formulario {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .pagina-gestion .btn-success,
+  .pagina-gestion .btn-outline-success {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .gestion-botones > .btn {
+    width: 100%;
+  }
+
+  .agenda-plan-resumen {
+    padding: 16px;
+  }
+
+  .carrito-tarjeta-encabezado {
+    padding: 16px 20px;
+  }
+
+  .carrito-confirmacion {
+    padding: 16px;
+  }
+
+  /* Footer */
 
   .footer-nutrivida {
     padding: 28px 12px;

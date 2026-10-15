@@ -1,368 +1,690 @@
-import React, { useContext } from 'react';
-import { useForm } from 'react-hook-form';
-import { Form, Button, Card, Container, Row, Col } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
-import { regionesComunas } from '../data/regionesComunas';
+import { useContext } from 'react'
+import { useForm } from 'react-hook-form'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  Row,
+} from 'react-bootstrap'
+import { Link, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../context/AuthContext'
+import { regionesComunas } from '../data/regionesComunas'
+import { obtenerFechaMinima } from '../utils/validaciones'
 
-// Permite solo letras (con tildes, eñes) y espacios entre palabras
-const regexSoloLetras = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ]+(?:\s+[a-zA-ZáéíóúÁÉÍÓÚñÑ]+)*\$/;
+// ========================================
+// 1. VALIDACIONES Y FORMATO
+// ========================================
 
-// RegEx para correo electrónico válido
-const regexCorreo = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$/;
+const regexSoloLetras = /^\p{L}+(?:\s+\p{L}+)*$/u
 
-// Formatea el RUT automáticamente a XX.XXX.XXX-X
-const formatearRut = (rut) => {
-  const limpio = rut.replace(/[^0-9kK]/g, '').toUpperCase();
-  if (limpio.length === 0) return '';
-  if (limpio.length === 1) return limpio;
+const regexCorreo =
+  /^[^\s@]+@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/i
 
-  const cuerpo = limpio.slice(0, -1);
-  const dv = limpio.slice(-1);
+const regexTelefono = /^(?:\+56)?9\d{8}$/
 
-  const cuerpoFormateado = cuerpo.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return `${cuerpoFormateado}-${dv}`;
-};
+function limpiarRut(rut) {
+  return rut.replace(/[.\s-]/g, '').toUpperCase()
+}
 
-// Función para validar RUN chileno (Módulo 11 + Estructura y Longitud)
-const validarRutChileno = (rut) => {
-  if (!rut) return false;
+function formatearRut(rut) {
+  const limpio = limpiarRut(rut)
 
-  // Limpiamos dejando solo dígitos y K
-  const limpio = rut.replace(/[^0-9kK]/g, '').toUpperCase();
-
-  // 1. Validar longitud total (Mínimo 8 caracteres ej: 7.654.321-K, Máximo 9 ej: 20.123.456-7)
-  if (limpio.length < 8 || limpio.length > 9) return false;
-
-  const cuerpo = limpio.slice(0, -1);
-  const dvIngresado = limpio.slice(-1);
-
-  // 2. Validar que el cuerpo sea puramente numérico, no empiece con 0 y tenga entre 7 y 8 dígitos
-  if (!/^[1-9]\d{6,7}\$/.test(cuerpo)) return false;
-
-  // 3. Algoritmo Módulo 11 para el Dígito Verificador
-  let suma = 0;
-  let multiplicador = 2;
-
-  for (let i = cuerpo.length - 1; i >= 0; i--) {
-    suma += parseInt(cuerpo.charAt(i), 10) * multiplicador;
-    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  if (!/^\d{7,8}[\dK]$/.test(limpio)) {
+    return rut.trim()
   }
 
-  const resto = suma % 11;
-  let dvEsperado = 11 - resto;
+  const cuerpo = limpio.slice(0, -1)
+  const dv = limpio.slice(-1)
 
-  if (dvEsperado === 11) dvEsperado = '0';
-  else if (dvEsperado === 10) dvEsperado = 'K';
-  else dvEsperado = dvEsperado.toString();
+  const cuerpoFormateado = cuerpo.replace(
+    /\B(?=(\d{3})+(?!\d))/g,
+    '.',
+  )
 
-  return dvIngresado === dvEsperado;
-};
+  return `${cuerpoFormateado}-${dv}`
+}
 
-export default function Registro() {
-  const { registrarPaciente } = useContext(AuthContext);
-  const navigate = useNavigate();
+function validarRutChileno(rut) {
+  const limpio = limpiarRut(rut)
 
-  const listaRegiones = Array.isArray(regionesComunas)
-    ? regionesComunas
-    : Object.keys(regionesComunas || {}).map((reg) => ({
-        nombre: reg,
-        comunas: regionesComunas[reg]
-      }));
+  if (!/^[1-9]\d{6,7}[\dK]$/.test(limpio)) {
+    return false
+  }
+
+  const cuerpo = limpio.slice(0, -1)
+  const dvIngresado = limpio.slice(-1)
+
+  let suma = 0
+  let multiplicador = 2
+
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += Number(cuerpo[i]) * multiplicador
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1
+  }
+
+  const resultado = 11 - (suma % 11)
+
+  const dvEsperado =
+    resultado === 11
+      ? '0'
+      : resultado === 10
+        ? 'K'
+        : String(resultado)
+
+  return dvIngresado === dvEsperado
+}
+
+function validarNombre(valor) {
+  const texto = valor.trim()
+
+  if (texto.length < 2) {
+    return 'Ingresa al menos 2 caracteres.'
+  }
+
+  return (
+    regexSoloLetras.test(texto) ||
+    'Utiliza solo letras y espacios entre palabras.'
+  )
+}
+
+function validarFechaNacimiento(valor) {
+  if (!valor) return true
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(valor)) {
+    return 'Ingresa una fecha válida.'
+  }
+
+  const [anio, mes, dia] = valor.split('-').map(Number)
+  const fecha = new Date(anio, mes - 1, dia)
+
+  const fechaValida =
+    anio >= 1900 &&
+    fecha.getFullYear() === anio &&
+    fecha.getMonth() === mes - 1 &&
+    fecha.getDate() === dia
+
+  if (!fechaValida) {
+    return 'Ingresa una fecha válida desde el año 1900.'
+  }
+
+  return (
+    valor <= obtenerFechaMinima() ||
+    'La fecha de nacimiento no puede ser futura.'
+  )
+}
+
+// ========================================
+// 2. CONFIGURACIÓN DEL FORMULARIO
+// ========================================
+
+function Registro() {
+  const { registrarPaciente } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   const {
     register,
     handleSubmit,
     watch,
+    getValues,
     setValue,
     setError,
-    formState: { errors }
-  } = useForm();
+    clearErrors,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    mode: 'onTouched',
+    defaultValues: {
+      nombre: '',
+      apellidos: '',
+      rut: '',
+      correo: '',
+      telefono: '',
+      direccion: '',
+      fechaNacimiento: '',
+      region: '',
+      comuna: '',
+      password: '',
+      confirmPassword: '',
+    },
+  })
 
-  const regionSeleccionada = watch('region');
+  const regionSeleccionada = watch('region')
 
-  const onSubmit = (data) => {
-    if (data.password !== data.confirmPassword) {
-      setError('confirmPassword', { type: 'manual', message: 'Las contraseñas no coinciden' });
-      return;
-    }
+  const regionEncontrada = regionesComunas.find(
+    (region) => region.region === regionSeleccionada,
+  )
 
-    const rutLimpio = data.rut.replace(/[\.\-\s]/g, '').toUpperCase();
-    const correoLimpio = data.correo.replace(/\s+/g, '').toLowerCase();
+  const comunasDisponibles = regionEncontrada?.comunas || []
 
-    const resultado = registrarPaciente({
-      run: rutLimpio,         // Usar 'run' de la EV1
-      rut: rutLimpio,         // Mantener 'rut' por compatibilidad
-      nombre: data.nombre.trim(),
-      apellidos: data.apellidos.trim(),
-      correo: correoLimpio,
+  // ========================================
+  // 3. PROCESAR EL REGISTRO
+  // ========================================
+
+  function procesarRegistro(data) {
+    clearErrors('root')
+
+    const run = limpiarRut(data.rut)
+
+    const nuevoPaciente = {
+      nombre: data.nombre.trim().replace(/\s+/g, ' '),
+      apellidos: data.apellidos.trim().replace(/\s+/g, ' '),
+      run,
+      rut: run,
+      correo: data.correo.trim().toLowerCase(),
       telefono: data.telefono.trim(),
       direccion: data.direccion.trim(),
-      fechaNacimiento: data.fechaNacimiento || '',
+      fechaNacimiento: data.fechaNacimiento,
       region: data.region,
       comuna: data.comuna,
-      contrasena: data.password, // Usar 'contrasena' de la EV1
-      password: data.password,   // Mantener 'password' por compatibilidad
-      rol: 'paciente'
-    });
-
-    if (!resultado?.exito) {
-      setError(resultado?.campo || 'correo', {
-        type: 'manual',
-        message: resultado?.mensaje || 'Error al registrar'
-      });
-      return;
+      contrasena: data.password,
+      password: data.password,
+      rol: 'paciente',
     }
 
-    navigate('/login');
-  };
+    try {
+      const resultado = registrarPaciente(nuevoPaciente)
 
-  const regionEncontrada = listaRegiones.find(
-    (r) => (r.region || r.nombre) === regionSeleccionada
-  );
-  const comunasDisponibles = regionEncontrada?.comunas || [];
+      if (!resultado?.exito) {
+        let campo = 'root'
+
+        if (
+          resultado?.campo === 'run' ||
+          resultado?.campo === 'rut'
+        ) {
+          campo = 'rut'
+        } else if (resultado?.campo === 'correo') {
+          campo = 'correo'
+        }
+
+        setError(
+          campo,
+          {
+            type: 'manual',
+            message:
+              resultado?.mensaje ||
+              'No fue posible completar el registro.',
+          },
+          { shouldFocus: campo !== 'root' },
+        )
+
+        return
+      }
+
+      navigate('/login')
+    } catch {
+      setError('root', {
+        type: 'manual',
+        message:
+          'No fue posible guardar el registro. Inténtalo nuevamente.',
+      })
+    }
+  }
+
+  // ========================================
+  // 4. INTERFAZ
+  // ========================================
 
   return (
-    <Container className="py-5">
-      <Row className="justify-content-center">
-        <Col md={8} lg={6}>
-          <Card className="shadow-sm">
-            <Card.Body>
-              <h2 className="text-center mb-4">Registro de Paciente</h2>
-              <Form onSubmit={handleSubmit(onSubmit)}>
-                
-                {/* Campo Nombre */}
-                <Form.Group className="mb-3" controlId="controlIdNombre">
-                  <Form.Label>Nombre *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ej: Juan"
-                    {...register('nombre', {
-                      required: 'El nombre es obligatorio',
-                      validate: (val) =>
-                        regexSoloLetras.test(val.trim()) ||
-                        'El nombre solo debe contener letras (sin símbolos, números ni guiones)'
-                    })}
-                    isInvalid={!!errors.nombre}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.nombre?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+    <main className="registro-main pagina-gestion">
+      <Container>
+        <div className="seccion-encabezado">
+          <p className="seccion-etiqueta">Únete a NutriVida</p>
 
-                {/* Campo Apellidos */}
-                <Form.Group className="mb-3" controlId="controlIdApellidos">
-                  <Form.Label>Apellidos *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ej: González Pérez"
-                    {...register('apellidos', {
-                      required: 'Los apellidos son obligatorios',
-                      validate: {
-                        soloLetras: (val) =>
-                          regexSoloLetras.test(val.trim()) ||
-                          'Los apellidos solo deben contener letras (sin símbolos ni números)',
-                        dosApellidos: (val) => {
-                          const palabras = val.trim().split(/\s+/);
-                          return (
-                            (palabras.length >= 2 && palabras.every((p) => p.length >= 2)) ||
-                            'Debe ingresar ambos apellidos (ej. González Pérez)'
-                          );
-                        }
-                      }
-                    })}
-                    isInvalid={!!errors.apellidos}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.apellidos?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+          <h1 className="seccion-titulo">
+            Registro de Paciente
+          </h1>
 
-                {/* RUT */}
-                <Form.Group className="mb-3" controlId="controlIdRut">
-                  <Form.Label>RUT *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="12.345.678-K"
-                    maxLength={12}
-                    {...register('rut', {
-                      required: 'El RUT es obligatorio',
-                      validate: (val) =>
-                        validarRutChileno(val) || 'RUT inválido (formato o dígito verificador incorrecto)'
-                    })}
-                    onChange={(e) => {
-                      const rutFormateado = formatearRut(e.target.value);
-                      setValue('rut', rutFormateado, { shouldValidate: true });
-                    }}
-                    isInvalid={!!errors.rut}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.rut?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+          <p className="seccion-descripcion">
+            Crea tu cuenta para comenzar a gestionar tus consultas
+            nutricionales.
+          </p>
+        </div>
 
-                {/* Correo Electrónico */}
-                <Form.Group className="mb-3" controlId="controlIdCorreo">
-                  <Form.Label>Correo Electrónico *</Form.Label>
-                  <Form.Control
-                    type="email"
-                    placeholder="ejemplo@correo.com"
-                    {...register('correo', {
-                      required: 'El correo es obligatorio',
-                      validate: (val) =>
-                        regexCorreo.test(val.trim()) || 'Correo inválido (debe incluir @ y un dominio como .com o .cl)'
-                    })}
-                    isInvalid={!!errors.correo}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.correo?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+        <Row className="justify-content-center">
+          <Col xs={12} lg={10} xl={8}>
+            <Card className="gestion-tarjeta">
+              <Card.Body className="gestion-tarjeta-cuerpo">
+                <p className="gestion-ayuda mb-4">
+                  Completa tus datos. Los campos con * son obligatorios.
+                </p>
 
-                {/* Teléfono (Obligatorio) */}
-                <Form.Group className="mb-3" controlId="controlIdTelefono">
-                  <Form.Label>Teléfono *</Form.Label>
-                  <Form.Control
-                    type="tel"
-                    placeholder="Ej: 912345678 o +56912345678"
-                    {...register('telefono', {
-                      required: 'El teléfono es obligatorio',
-                      validate: (val) =>
-                        /^[0-9+ ]+\$/.test(val.trim()) || 'El teléfono solo debe contener números',
-                      minLength: {
-                        value: 8,
-                        message: 'El teléfono debe tener al menos 8 dígitos'
-                      },
-                      maxLength: {
-                        value: 12,
-                        message: 'El teléfono no debe superar los 12 caracteres'
-                      }
-                    })}
-                    isInvalid={!!errors.telefono}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.telefono?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                <Form
+                  className="registro-formulario"
+                  noValidate
+                  onSubmit={handleSubmit(procesarRegistro)}
+                  onChange={() => clearErrors('root')}
+                >
+                  {/* Nombre */}
+                  <Form.Group
+                    className="mb-3 registro-campo-mitad"
+                    controlId="controlIdNombre"
+                  >
+                    <Form.Label>Nombre *</Form.Label>
 
-                {/* Dirección (Obligatoria) */}
-                <Form.Group className="mb-3" controlId="controlIdDireccion">
-                  <Form.Label>Dirección *</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Ej: Av. Alemania 123"
-                    {...register('direccion', {
-                      required: 'La dirección es obligatoria',
-                      minLength: {
-                        value: 5,
-                        message: 'La dirección debe tener al menos 5 caracteres'
-                      }
-                    })}
-                    isInvalid={!!errors.direccion}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.direccion?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ej: Juan"
+                      autoComplete="given-name"
+                      maxLength={50}
+                      aria-required="true"
+                      aria-describedby="error-nombre"
+                      isInvalid={Boolean(errors.nombre)}
+                      {...register('nombre', {
+                        required: 'El nombre es obligatorio.',
+                        validate: validarNombre,
+                        maxLength: {
+                          value: 50,
+                          message: 'Máximo 50 caracteres.',
+                        },
+                      })}
+                    />
 
-                {/* Fecha de Nacimiento (Opcional) */}
-                <Form.Group className="mb-3" controlId="controlIdFechaNacimiento">
-                  <Form.Label>Fecha de Nacimiento (Opcional)</Form.Label>
-                  <Form.Control
-                    type="date"
-                    max={new Date().toISOString().split('T')[0]}
-                    {...register('fechaNacimiento')}
-                  />
-                </Form.Group>
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-nombre"
+                    >
+                      {errors.nombre?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
 
-                {/* Región y Comuna */}
-                <Row>
-                  <Col md={6} className="mb-3">
-                    <Form.Group controlId="controlIdRegion">
-                      <Form.Label>Región *</Form.Label>
-                      <Form.Select
-                        {...register('region', {
-                          required: 'Seleccione región',
-                          onChange: () => setValue('comuna', '')
-                        })}
-                        isInvalid={!!errors.region}
+                  {/* Apellidos */}
+                  <Form.Group
+                    className="mb-3 registro-campo-mitad"
+                    controlId="controlIdApellidos"
+                  >
+                    <Form.Label>Apellidos *</Form.Label>
+
+                    <Form.Control
+                      type="text"
+                      placeholder="Ej: González Pérez"
+                      autoComplete="family-name"
+                      maxLength={100}
+                      aria-required="true"
+                      aria-describedby="error-apellidos"
+                      isInvalid={Boolean(errors.apellidos)}
+                      {...register('apellidos', {
+                        required: 'Los apellidos son obligatorios.',
+                        validate: validarNombre,
+                        maxLength: {
+                          value: 100,
+                          message: 'Máximo 100 caracteres.',
+                        },
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-apellidos"
+                    >
+                      {errors.apellidos?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* RUN */}
+                  <Form.Group
+                    className="mb-3 registro-campo-mitad"
+                    controlId="controlIdRut"
+                  >
+                    <Form.Label>RUN *</Form.Label>
+
+                    <Form.Control
+                      type="text"
+                      placeholder="Ej: 12.345.678-5"
+                      autoComplete="off"
+                      maxLength={12}
+                      aria-required="true"
+                      aria-describedby="error-rut"
+                      isInvalid={Boolean(errors.rut)}
+                      {...register('rut', {
+                        required: 'El RUN es obligatorio.',
+                        validate: (valor) =>
+                          validarRutChileno(valor) ||
+                          'RUN inválido. Revisa el formato y el dígito verificador.',
+                        onBlur: (event) => {
+                          setValue(
+                            'rut',
+                            formatearRut(event.target.value),
+                            { shouldValidate: true },
+                          )
+                        },
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-rut"
+                    >
+                      {errors.rut?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Fecha de nacimiento */}
+                  <Form.Group
+                    className="mb-3 registro-campo-mitad"
+                    controlId="controlIdFechaNacimiento"
+                  >
+                    <Form.Label>
+                      Fecha de Nacimiento (Opcional)
+                    </Form.Label>
+
+                    <Form.Control
+                      type="date"
+                      min="1900-01-01"
+                      max={obtenerFechaMinima()}
+                      autoComplete="bday"
+                      aria-describedby="error-fecha-nacimiento"
+                      isInvalid={Boolean(errors.fechaNacimiento)}
+                      {...register('fechaNacimiento', {
+                        validate: validarFechaNacimiento,
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-fecha-nacimiento"
+                    >
+                      {errors.fechaNacimiento?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Correo */}
+                  <Form.Group
+                    className="mb-3"
+                    controlId="controlIdCorreo"
+                  >
+                    <Form.Label>Correo Electrónico *</Form.Label>
+
+                    <Form.Control
+                      type="email"
+                      placeholder="ejemplo@duoc.cl"
+                      autoComplete="email"
+                      maxLength={100}
+                      aria-required="true"
+                      aria-describedby="ayuda-correo error-correo"
+                      isInvalid={Boolean(errors.correo)}
+                      {...register('correo', {
+                        required: 'El correo es obligatorio.',
+                        validate: (valor) =>
+                          regexCorreo.test(valor.trim()) ||
+                          'Utiliza un correo @duoc.cl, @profesor.duoc.cl o @gmail.com.',
+                        maxLength: {
+                          value: 100,
+                          message: 'Máximo 100 caracteres.',
+                        },
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-correo"
+                    >
+                      {errors.correo?.message}
+                    </Form.Control.Feedback>
+
+                    <Form.Text id="ayuda-correo">
+                      Dominios permitidos: @duoc.cl,
+                      @profesor.duoc.cl y @gmail.com.
+                    </Form.Text>
+                  </Form.Group>
+
+                  {/* Teléfono */}
+                  <Form.Group
+                    className="mb-3"
+                    controlId="controlIdTelefono"
+                  >
+                    <Form.Label>Teléfono *</Form.Label>
+
+                    <Form.Control
+                      type="tel"
+                      placeholder="912345678 o +56912345678"
+                      autoComplete="tel"
+                      maxLength={12}
+                      aria-required="true"
+                      aria-describedby="error-telefono"
+                      isInvalid={Boolean(errors.telefono)}
+                      {...register('telefono', {
+                        required: 'El teléfono es obligatorio.',
+                        validate: (valor) =>
+                          regexTelefono.test(valor.trim()) ||
+                          'Ingresa un celular válido: 912345678 o +56912345678.',
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-telefono"
+                    >
+                      {errors.telefono?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Contraseña */}
+                  <Form.Group
+                    className="mb-3 registro-campo-mitad"
+                    controlId="controlIdPassword"
+                  >
+                    <Form.Label>Contraseña *</Form.Label>
+
+                    <Form.Control
+                      type="password"
+                      autoComplete="new-password"
+                      aria-required="true"
+                      aria-describedby="ayuda-password error-password"
+                      isInvalid={Boolean(errors.password)}
+                      {...register('password', {
+                        required: 'La contraseña es obligatoria.',
+                        minLength: {
+                          value: 6,
+                          message: 'Utiliza al menos 6 caracteres.',
+                        },
+                        validate: (valor) =>
+                          valor.trim().length > 0 ||
+                          'La contraseña no puede contener solo espacios.',
+                        deps: ['confirmPassword'],
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-password"
+                    >
+                      {errors.password?.message}
+                    </Form.Control.Feedback>
+
+                    <Form.Text id="ayuda-password">
+                      Mínimo 6 caracteres.
+                    </Form.Text>
+                  </Form.Group>
+
+                  {/* Confirmación de contraseña */}
+                  <Form.Group
+                    className="mb-4 registro-campo-mitad"
+                    controlId="controlIdConfirmPassword"
+                  >
+                    <Form.Label>Confirmar Contraseña *</Form.Label>
+
+                    <Form.Control
+                      type="password"
+                      autoComplete="new-password"
+                      aria-required="true"
+                      aria-describedby="error-confirm-password"
+                      isInvalid={Boolean(errors.confirmPassword)}
+                      {...register('confirmPassword', {
+                        required: 'Confirma tu contraseña.',
+                        validate: (valor) =>
+                          valor === getValues('password') ||
+                          'Las contraseñas no coinciden.',
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-confirm-password"
+                    >
+                      {errors.confirmPassword?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Región y comuna */}
+                  <Row>
+                    <Col xs={12} md={6}>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="controlIdRegion"
                       >
-                        <option value="">Seleccione...</option>
-                        {listaRegiones.map((reg, idx) => {
-                          const nombreRegion = reg.region || reg.nombre || reg;
-                          return (
-                            <option key={idx} value={nombreRegion}>
-                              {nombreRegion}
+                        <Form.Label>Región *</Form.Label>
+
+                        <Form.Select
+                          aria-required="true"
+                          aria-describedby="error-region"
+                          isInvalid={Boolean(errors.region)}
+                          {...register('region', {
+                            required: 'Selecciona una región.',
+                            validate: (valor) =>
+                              regionesComunas.some(
+                                (region) => region.region === valor,
+                              ) || 'Selecciona una región válida.',
+                            onChange: () => {
+                              setValue('comuna', '', {
+                                shouldDirty: true,
+                              })
+                              clearErrors('comuna')
+                            },
+                          })}
+                        >
+                          <option value="">Seleccione...</option>
+
+                          {regionesComunas.map((region) => (
+                            <option
+                              key={region.region}
+                              value={region.region}
+                            >
+                              {region.region}
                             </option>
-                          );
-                        })}
-                      </Form.Select>
-                      <Form.Control.Feedback type="invalid">
-                        {errors.region?.message}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
+                          ))}
+                        </Form.Select>
 
-                  <Col md={6} className="mb-3">
-                    <Form.Group controlId="controlIdComuna">
-                      <Form.Label>Comuna *</Form.Label>
-                      <Form.Select
-                        {...register('comuna', { required: 'Seleccione comuna' })}
-                        disabled={!regionSeleccionada}
-                        isInvalid={!!errors.comuna}
+                        <Form.Control.Feedback
+                          type="invalid"
+                          id="error-region"
+                        >
+                          {errors.region?.message}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+
+                    <Col xs={12} md={6}>
+                      <Form.Group
+                        className="mb-3"
+                        controlId="controlIdComuna"
                       >
-                        <option value="">Seleccione...</option>
-                        {comunasDisponibles.map((com, idx) => (
-                          <option key={idx} value={com}>
-                            {com}
-                          </option>
-                        ))}
-                      </Form.Select>
-                      <Form.Control.Feedback type="invalid">
-                        {errors.comuna?.message}
-                      </Form.Control.Feedback>
-                    </Form.Group>
-                  </Col>
-                </Row>
+                        <Form.Label>Comuna *</Form.Label>
 
-                {/* Contraseñas */}
-                <Form.Group className="mb-3" controlId="controlIdPassword">
-                  <Form.Label>Contraseña *</Form.Label>
-                  <Form.Control
-                    type="password"
-                    {...register('password', {
-                      required: 'La contraseña es obligatoria',
-                      minLength: { value: 6, message: 'Mínimo 6 caracteres' }
-                    })}
-                    isInvalid={!!errors.password}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.password?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                        <Form.Select
+                          disabled={!regionSeleccionada}
+                          aria-required="true"
+                          aria-describedby="error-comuna"
+                          isInvalid={Boolean(errors.comuna)}
+                          {...register('comuna', {
+                            required: 'Selecciona una comuna.',
+                            validate: (valor) =>
+                              comunasDisponibles.includes(valor) ||
+                              'Selecciona una comuna de la región elegida.',
+                          })}
+                        >
+                          <option value="">Seleccione...</option>
 
-                <Form.Group className="mb-3" controlId="controlIdConfirmPassword">
-                  <Form.Label>Confirmar Contraseña *</Form.Label>
-                  <Form.Control
-                    type="password"
-                    {...register('confirmPassword', {
-                      required: 'Confirme la contraseña'
-                    })}
-                    isInvalid={!!errors.confirmPassword}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.confirmPassword?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
+                          {comunasDisponibles.map((comuna) => (
+                            <option key={comuna} value={comuna}>
+                              {comuna}
+                            </option>
+                          ))}
+                        </Form.Select>
 
-                <Button variant="primary" type="submit" className="w-100 mt-2">
-                  Registrarse
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
-  );
+                        <Form.Control.Feedback
+                          type="invalid"
+                          id="error-comuna"
+                        >
+                          {errors.comuna?.message}
+                        </Form.Control.Feedback>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  {/* Dirección */}
+                  <Form.Group
+                    className="mb-3"
+                    controlId="controlIdDireccion"
+                  >
+                    <Form.Label>Dirección *</Form.Label>
+
+                    <Form.Control
+                      type="text"
+                      placeholder="Ej: Avenida Alemania 123"
+                      autoComplete="street-address"
+                      maxLength={300}
+                      aria-required="true"
+                      aria-describedby="error-direccion"
+                      isInvalid={Boolean(errors.direccion)}
+                      {...register('direccion', {
+                        required: 'La dirección es obligatoria.',
+                        validate: (valor) =>
+                          valor.trim().length >= 5 ||
+                          'La dirección debe tener al menos 5 caracteres.',
+                        maxLength: {
+                          value: 300,
+                          message: 'Máximo 300 caracteres.',
+                        },
+                      })}
+                    />
+
+                    <Form.Control.Feedback
+                      type="invalid"
+                      id="error-direccion"
+                    >
+                      {errors.direccion?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+
+                  {/* Errores generales */}
+                  <div aria-live="polite" aria-atomic="true">
+                    {errors.root && (
+                      <Alert variant="danger">
+                        {errors.root.message}
+                      </Alert>
+                    )}
+                  </div>
+
+                  <Button
+                    variant="success"
+                    type="submit"
+                    className="w-100"
+                    disabled={isSubmitting}
+                  >
+                    <i
+                      className="bi bi-person-plus me-2"
+                      aria-hidden="true"
+                    />
+
+                    {isSubmitting
+                      ? 'Registrando...'
+                      : 'Registrar paciente'}
+                  </Button>
+                </Form>
+
+                <p className="gestion-pie-formulario">
+                  ¿Ya tienes una cuenta?{' '}
+                  <Link to="/login">Inicia sesión aquí</Link>
+                </p>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </main>
+  )
 }
+
+export default Registro
