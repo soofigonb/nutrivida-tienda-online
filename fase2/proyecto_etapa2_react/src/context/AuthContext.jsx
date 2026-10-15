@@ -4,23 +4,16 @@ export const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   // ========================================
-  // 1. RECUPERAR LA SESIÓN GUARDADA
+  // 1. RECUPERAR LA SESIÓN
   // ========================================
 
   const [usuario, setUsuario] = useState(() => {
     try {
-      const sesionGuardada =
-        localStorage.getItem('sesionNutriVida')
+      const sesion = localStorage.getItem('sesionNutriVida')
 
-      return sesionGuardada
-        ? JSON.parse(sesionGuardada)
-        : null
+      return sesion ? JSON.parse(sesion) : null
     } catch (error) {
-      console.error(
-        'No se pudo recuperar la sesión:',
-        error,
-      )
-
+      console.error('No se pudo recuperar la sesión:', error)
       return null
     }
   })
@@ -42,27 +35,48 @@ export function AuthProvider({ children }) {
   }
 
   // ========================================
-  // 3. OBTENER LOS PACIENTES GUARDADOS
+  // 3. LEER LOS PACIENTES SIN PERDER DATOS
   // ========================================
 
   function obtenerPacientesGuardados() {
     try {
-      const datosGuardados =
-        localStorage.getItem('pacientesNutriVida')
+      const contenido = localStorage.getItem('pacientesNutriVida')
 
-      const pacientes = datosGuardados
-        ? JSON.parse(datosGuardados)
-        : []
+      // Solo una clave inexistente representa una lista inicial vacía.
+      const pacientes = contenido === null
+        ? []
+        : JSON.parse(contenido)
 
-      if (!Array.isArray(pacientes)) {
-        return []
+      const camposTexto = [
+        'run',
+        'rut',
+        'correo',
+        'contrasena',
+        'password',
+        'clave',
+      ]
+
+      const formatoInvalido =
+        !Array.isArray(pacientes) ||
+        pacientes.some(
+          (paciente) =>
+            !paciente ||
+            typeof paciente !== 'object' ||
+            Array.isArray(paciente) ||
+            camposTexto.some(
+              (campo) =>
+                paciente[campo] != null &&
+                typeof paciente[campo] !== 'string',
+            ),
+        )
+
+      if (formatoInvalido) {
+        throw new Error('Formato de pacientes inválido.')
       }
 
-      // Compatibilidad con los nombres usados en la primera etapa.
-      return pacientes.map((paciente) => {
-        const run = limpiarRut(
-          paciente.run || paciente.rut,
-        )
+      // Compatibilidad con los nombres utilizados en la primera etapa.
+      const normalizados = pacientes.map((paciente) => {
+        const run = limpiarRut(paciente.run || paciente.rut)
 
         const password =
           paciente.contrasena ||
@@ -78,30 +92,39 @@ export function AuthProvider({ children }) {
           password,
         }
       })
-    } catch (error) {
-      console.error(
-        'No se pudieron recuperar los pacientes:',
-        error,
-      )
 
-      return []
+      return {
+        exito: true,
+        pacientes: normalizados,
+      }
+    } catch (error) {
+      console.error('No se pudieron recuperar los pacientes:', error)
+
+      // No devolver []: permitiría sobrescribir los datos originales.
+      return {
+        exito: false,
+        mensaje:
+          'No se pudieron leer los pacientes guardados. Los datos originales se conservaron. No se realizó la operación.',
+      }
     }
   }
 
   // ========================================
-  // 4. REGISTRAR UNA CUENTA DE PACIENTE
+  // 4. REGISTRAR PACIENTES
   // ========================================
 
   function registrarPaciente(nuevoPaciente) {
-    const pacientes = obtenerPacientesGuardados()
+    const lectura = obtenerPacientesGuardados()
+
+    if (!lectura.exito) return lectura
+
+    const { pacientes } = lectura
 
     const runNuevo = limpiarRut(
       nuevoPaciente.run || nuevoPaciente.rut,
     )
 
-    const correoNuevo = limpiarCorreo(
-      nuevoPaciente.correo,
-    )
+    const correoNuevo = limpiarCorreo(nuevoPaciente.correo)
 
     const passwordNueva =
       nuevoPaciente.contrasena ||
@@ -110,8 +133,7 @@ export function AuthProvider({ children }) {
 
     const runRegistrado = pacientes.some(
       (paciente) =>
-        limpiarRut(paciente.run || paciente.rut) ===
-        runNuevo,
+        limpiarRut(paciente.run || paciente.rut) === runNuevo,
     )
 
     if (runRegistrado) {
@@ -124,8 +146,7 @@ export function AuthProvider({ children }) {
 
     const correoRegistrado = pacientes.some(
       (paciente) =>
-        limpiarCorreo(paciente.correo) ===
-        correoNuevo,
+        limpiarCorreo(paciente.correo) === correoNuevo,
     )
 
     if (correoRegistrado) {
@@ -144,38 +165,24 @@ export function AuthProvider({ children }) {
       correo: correoNuevo,
       contrasena: passwordNueva,
       password: passwordNueva,
-
-      // El registro público solo crea cuentas de paciente.
       rol: 'paciente',
     }
-
-    const pacientesActualizados = [
-      ...pacientes,
-      pacienteAInsertar,
-    ]
 
     try {
       localStorage.setItem(
         'pacientesNutriVida',
-        JSON.stringify(pacientesActualizados),
+        JSON.stringify([...pacientes, pacienteAInsertar]),
       )
     } catch (error) {
-      console.error(
-        'No se pudo guardar el paciente:',
-        error,
-      )
+      console.error('No se pudo guardar el paciente:', error)
 
       return {
         exito: false,
-        mensaje:
-          'No se pudo guardar el registro en el navegador.',
+        mensaje: 'No se pudo guardar el registro en el navegador.',
       }
     }
 
-    // Actualizar los listados que consumen DatosContext.
-    window.dispatchEvent(
-      new Event('nutrivida:datos'),
-    )
+    window.dispatchEvent(new Event('nutrivida:datos'))
 
     return { exito: true }
   }
@@ -191,10 +198,7 @@ export function AuthProvider({ children }) {
         JSON.stringify(datosUsuario),
       )
     } catch (error) {
-      console.error(
-        'No se pudo guardar la sesión:',
-        error,
-      )
+      console.error('No se pudo guardar la sesión:', error)
 
       return {
         exito: false,
@@ -220,41 +224,37 @@ export function AuthProvider({ children }) {
     password,
     soloAdministrador = false,
   ) {
-    const correoBuscado =
-      limpiarCorreo(identificador)
+    const correoBuscado = limpiarCorreo(identificador)
+    const runBuscado = limpiarRut(identificador)
 
-    const runBuscado =
-      limpiarRut(identificador)
-
-    // Cuenta administrativa del prototipo.
+    // Cuenta administrativa de demostración.
     if (
       correoBuscado === 'admin@nutrivida.cl' &&
       password === 'admin123'
     ) {
-      const administrador = {
+      return guardarSesion({
         id: 'admin',
         nombre: 'Administrador',
         correo: 'admin@nutrivida.cl',
         rol: 'admin',
-      }
-
-      return guardarSesion(administrador)
+      })
     }
 
-    const pacientes = obtenerPacientesGuardados()
+    const lectura = obtenerPacientesGuardados()
+
+    if (!lectura.exito) return lectura
+
+    const { pacientes } = lectura
 
     const paciente = pacientes.find((registro) => {
       const coincideCorreo =
-        limpiarCorreo(registro.correo) ===
-        correoBuscado
+        limpiarCorreo(registro.correo) === correoBuscado
 
       const coincideRun =
-        limpiarRut(registro.run || registro.rut) ===
-        runBuscado
+        limpiarRut(registro.run || registro.rut) === runBuscado
 
       const coincidePassword =
-        (registro.contrasena || registro.password) ===
-        password
+        (registro.contrasena || registro.password) === password
 
       return (
         (coincideCorreo || coincideRun) &&
@@ -269,7 +269,6 @@ export function AuthProvider({ children }) {
       }
     }
 
-    // Validar el tipo de acceso antes de crear la sesión.
     if (soloAdministrador) {
       return {
         exito: false,
@@ -278,16 +277,14 @@ export function AuthProvider({ children }) {
       }
     }
 
-    const usuarioPaciente = {
+    return guardarSesion({
       id: paciente.id,
       nombre: paciente.nombre,
       correo: paciente.correo,
       run: paciente.run || paciente.rut,
       rut: paciente.rut || paciente.run,
       rol: 'paciente',
-    }
-
-    return guardarSesion(usuarioPaciente)
+    })
   }
 
   // ========================================
@@ -300,15 +297,12 @@ export function AuthProvider({ children }) {
     try {
       localStorage.removeItem('sesionNutriVida')
     } catch (error) {
-      console.error(
-        'No se pudo eliminar la sesión guardada:',
-        error,
-      )
+      console.error('No se pudo eliminar la sesión guardada:', error)
     }
   }
 
   // ========================================
-  // 8. COMPARTIR EL CONTEXTO
+  // 8. COMPARTIR LAS OPERACIONES
   // ========================================
 
   return (
