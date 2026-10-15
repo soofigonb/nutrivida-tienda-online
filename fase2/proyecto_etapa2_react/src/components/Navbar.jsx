@@ -1,39 +1,39 @@
-import { useContext, useState } from 'react'
+import { useContext, useState } from "react";
 import {
   Button,
   Container,
   Nav,
   Navbar as NavbarBootstrap,
-} from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
-import { CarritoContext } from '../context/CarritoContext'
-import { AuthContext } from '../context/AuthContext'
+} from "react-bootstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { CarritoContext } from "../context/CarritoContext";
+import { AuthContext } from "../context/AuthContext";
 
 function Navbar({ cantidadCarrito }) {
   // ========================================
   // 1. ESTADOS Y CONTEXTOS
   // ========================================
 
-  const [expandido, setExpandido] = useState(false)
+  const [expandido, setExpandido] = useState(false);
 
-  const carritoContext = useContext(CarritoContext)
-  const { usuario, cerrarSesion } = useContext(AuthContext)
+  const carritoContext = useContext(CarritoContext);
+  const { usuario, cerrarSesion } = useContext(AuthContext);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const cantidadMostrar =
     cantidadCarrito !== undefined
       ? cantidadCarrito
-      : carritoContext?.cantidad || 0
+      : carritoContext?.cantidad || 0;
 
   // ========================================
   // 2. CERRAR SESIÓN
   // ========================================
 
   function handleCerrarSesion() {
-    cerrarSesion()
-    setExpandido(false)
-    navigate('/login')
+    cerrarSesion();
+    setExpandido(false);
+    navigate("/login");
   }
 
   // ========================================
@@ -71,63 +71,43 @@ function Navbar({ cantidadCarrito }) {
               onSelect={() => setExpandido(false)}
             >
               {/* Inicio */}
-              <Nav.Link
-                as={Link}
-                to="/"
-                eventKey="inicio"
-              >
+              <Nav.Link as={Link} to="/" eventKey="inicio">
                 Home
               </Nav.Link>
 
               {/* Secciones de la página de inicio */}
-              <Nav.Link
-                as={Link}
-                to="/#nosotros"
-                eventKey="nosotros"
-              >
+              <Nav.Link as={Link} to="/#nosotros" eventKey="nosotros">
                 Nosotros
               </Nav.Link>
 
-              <Nav.Link
-                as={Link}
-                to="/#servicios"
-                eventKey="servicios"
-              >
+              <Nav.Link as={Link} to="/#servicios" eventKey="servicios">
                 Servicios
               </Nav.Link>
 
-              <Nav.Link
-                as={Link}
-                to="/#blogs"
-                eventKey="blogs"
-              >
+              <Nav.Link as={Link} to="/#blogs" eventKey="blogs">
                 Blogs
               </Nav.Link>
 
               {/* Agendamiento */}
-              <Nav.Link
-                as={Link}
-                to="/agendar"
-                eventKey="agendar"
-              >
+              <Nav.Link as={Link} to="/agendar" eventKey="agendar">
                 Agendar
               </Nav.Link>
 
               {/* Sección de contacto */}
-              <Nav.Link
-                as={Link}
-                to="/#contacto"
-                eventKey="contacto"
-              >
+              <Nav.Link as={Link} to="/#contacto" eventKey="contacto">
                 Contacto
               </Nav.Link>
+              {/* Entrada al panel para administradores */}
+              {usuario?.rol === "admin" && (
+                <Nav.Link as={Link} to="/admin" eventKey="admin">
+                  Administración
+                </Nav.Link>
+              )}
 
               {/* Opciones según la sesión */}
               {usuario ? (
                 <>
-                  <NavbarBootstrap.Text
-                    className="me-3 fw-bold text-light px-2"
-                  >
+                  <NavbarBootstrap.Text className="me-3 fw-bold text-light px-2">
                     Hola, {usuario.nombre}
                   </NavbarBootstrap.Text>
 
@@ -143,37 +123,20 @@ function Navbar({ cantidadCarrito }) {
                 </>
               ) : (
                 <>
-                  <Nav.Link
-                    as={Link}
-                    to="/login"
-                    eventKey="login"
-                  >
+                  <Nav.Link as={Link} to="/login" eventKey="login">
                     Iniciar sesión
                   </Nav.Link>
 
-                  <Nav.Link
-                    as={Link}
-                    to="/registro"
-                    eventKey="registro"
-                  >
+                  <Nav.Link as={Link} to="/registro" eventKey="registro">
                     Registrarse
                   </Nav.Link>
                 </>
               )}
 
               {/* Carrito */}
-              <Nav.Link
-                as={Link}
-                to="/carrito"
-                eventKey="carrito"
-              >
-                <i
-                  className="bi bi-cart3 me-1"
-                  aria-hidden="true"
-                />
-
+              <Nav.Link as={Link} to="/carrito" eventKey="carrito">
+                <i className="bi bi-cart3 me-1" aria-hidden="true" />
                 Carrito
-
                 <span
                   className="badge rounded-pill bg-warning text-dark ms-2"
                   id="contador-carrito"
@@ -186,7 +149,7 @@ function Navbar({ cantidadCarrito }) {
         </Container>
       </NavbarBootstrap>
     </header>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;
