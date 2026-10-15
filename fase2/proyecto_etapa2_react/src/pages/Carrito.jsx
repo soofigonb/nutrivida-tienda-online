@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState } from "react";
 import {
   Alert,
   Badge,
@@ -9,11 +9,11 @@ import {
   Form,
   Row,
   Table,
-} from 'react-bootstrap'
-import { Link } from 'react-router-dom'
-import { AuthContext } from '../context/AuthContext'
-import { useCarrito } from '../context/CarritoContext'
-import formatearPrecio from '../utils/formatearPrecio'
+} from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
+import { useCarrito } from "../context/CarritoContext";
+import formatearPrecio from "../utils/formatearPrecio";
 
 function Carrito() {
   // ========================================
@@ -22,39 +22,37 @@ function Carrito() {
 
   const {
     reservas,
+    errorCarrito,
     eliminarReserva,
     vaciarCarrito,
     confirmarReservas,
     cantidad,
     total,
-  } = useCarrito()
+  } = useCarrito();
 
-  const { usuario } = useContext(AuthContext) || {}
+  const { usuario } = useContext(AuthContext) || {};
 
-  const [simularFallo, setSimularFallo] = useState(false)
-  const [errorConfirmacion, setErrorConfirmacion] = useState(null)
-  const [confirmacionExitosa, setConfirmacionExitosa] = useState(null)
-  const [procesando, setProcesando] = useState(false)
+  const [simularFallo, setSimularFallo] = useState(false);
+  const [errorConfirmacion, setErrorConfirmacion] = useState(null);
+  const [confirmacionExitosa, setConfirmacionExitosa] = useState(null);
+  const [procesando, setProcesando] = useState(false);
 
   // ========================================
   // 2. CONFIRMAR RESERVAS
   // ========================================
 
   function handleConfirmar() {
-    setErrorConfirmacion(null)
-    setProcesando(true)
+    setErrorConfirmacion(null);
+    setProcesando(true);
 
-    const resultado = confirmarReservas(
-      usuario || null,
-      simularFallo,
-    )
+    const resultado = confirmarReservas(usuario || null, simularFallo);
 
-    setProcesando(false)
+    setProcesando(false);
 
     if (resultado.exito) {
-      setConfirmacionExitosa(resultado.citasCreadas)
+      setConfirmacionExitosa(resultado.citasCreadas);
     } else {
-      setErrorConfirmacion(resultado.mensaje)
+      setErrorConfirmacion(resultado.mensaje);
     }
   }
 
@@ -67,17 +65,13 @@ function Carrito() {
       <main className="carrito-main pagina-gestion">
         <Container>
           <div className="seccion-encabezado">
-            <p className="seccion-etiqueta">
-              Tu atención está reservada
-            </p>
+            <p className="seccion-etiqueta">Tu atención está reservada</p>
 
-            <h1 className="seccion-titulo">
-              ¡Agendamiento Confirmado!
-            </h1>
+            <h1 className="seccion-titulo">¡Agendamiento Confirmado!</h1>
 
             <p className="seccion-descripcion">
-              Tus citas han sido reservadas y guardadas exitosamente
-              en tu historial.
+              Tus citas han sido reservadas y guardadas exitosamente en tu
+              historial.
             </p>
           </div>
 
@@ -86,10 +80,7 @@ function Carrito() {
               <Card className="gestion-tarjeta">
                 <Card.Body className="gestion-tarjeta-cuerpo">
                   <div className="carrito-estado-icono">
-                    <i
-                      className="bi bi-check-circle"
-                      aria-hidden="true"
-                    />
+                    <i className="bi bi-check-circle" aria-hidden="true" />
                   </div>
 
                   <h2 className="gestion-subtitulo text-center mb-4">
@@ -113,13 +104,13 @@ function Carrito() {
                         </div>
 
                         <p>
-                          <strong>Profesional:</strong>{' '}
+                          <strong>Profesional:</strong>{" "}
                           {cita.nutricionistaNombre}
                         </p>
 
                         <p>
-                          <strong>Fecha y hora:</strong>{' '}
-                          {cita.fecha} a las {cita.hora} hrs.
+                          <strong>Fecha y hora:</strong> {cita.fecha} a las{" "}
+                          {cita.hora} hrs.
                         </p>
 
                         <p>
@@ -127,18 +118,14 @@ function Carrito() {
                         </p>
 
                         <p className="carrito-codigo">
-                          Código de reserva:{' '}
-                          <code>{cita.idCita}</code>
+                          Código de reserva: <code>{cita.idCita}</code>
                         </p>
                       </article>
                     ))}
                   </div>
 
                   <div className="gestion-botones mt-4">
-                    <Link
-                      to="/agendar"
-                      className="btn btn-outline-success"
-                    >
+                    <Link to="/agendar" className="btn btn-outline-success">
                       <i
                         className="bi bi-calendar-plus me-2"
                         aria-hidden="true"
@@ -146,14 +133,8 @@ function Carrito() {
                       Agendar otra consulta
                     </Link>
 
-                    <Link
-                      to="/"
-                      className="btn btn-success"
-                    >
-                      <i
-                        className="bi bi-house me-2"
-                        aria-hidden="true"
-                      />
+                    <Link to="/" className="btn btn-success">
+                      <i className="bi bi-house me-2" aria-hidden="true" />
                       Volver al inicio
                     </Link>
                   </div>
@@ -163,7 +144,7 @@ function Carrito() {
           </Row>
         </Container>
       </main>
-    )
+    );
   }
 
   // ========================================
@@ -173,18 +154,19 @@ function Carrito() {
   return (
     <main className="carrito-main pagina-gestion">
       <Container>
+        {errorCarrito && !errorConfirmacion && (
+          <Alert variant="danger" role="alert">
+            {errorCarrito}
+          </Alert>
+        )}
         <div className="seccion-encabezado">
-          <p className="seccion-etiqueta">
-            Resumen de compra
-          </p>
+          <p className="seccion-etiqueta">Resumen de compra</p>
 
-          <h1 className="seccion-titulo">
-            Mi Carrito de Reservas
-          </h1>
+          <h1 className="seccion-titulo">Mi Carrito de Reservas</h1>
 
           <p className="seccion-descripcion">
-            Revisa los detalles de tus consultas nutricionales
-            antes de confirmar el agendamiento.
+            Revisa los detalles de tus consultas nutricionales antes de
+            confirmar el agendamiento.
           </p>
         </div>
 
@@ -202,9 +184,7 @@ function Carrito() {
                 No se pudo completar la confirmación
               </Alert.Heading>
 
-              <p className="mb-0">
-                {errorConfirmacion}
-              </p>
+              <p className="mb-0">{errorConfirmacion}</p>
             </Alert>
           )}
         </div>
@@ -216,28 +196,17 @@ function Carrito() {
               <Card className="gestion-tarjeta">
                 <Card.Body className="gestion-tarjeta-cuerpo text-center">
                   <div className="carrito-estado-icono">
-                    <i
-                      className="bi bi-cart-x"
-                      aria-hidden="true"
-                    />
+                    <i className="bi bi-cart-x" aria-hidden="true" />
                   </div>
 
-                  <h2 className="gestion-subtitulo">
-                    Tu carrito está vacío
-                  </h2>
+                  <h2 className="gestion-subtitulo">Tu carrito está vacío</h2>
 
-                  <p
-                    id="carrito-vacio"
-                    className="gestion-ayuda mb-4"
-                  >
+                  <p id="carrito-vacio" className="gestion-ayuda mb-4">
                     Todavía no has agregado una consulta.
                   </p>
 
                   <div className="gestion-botones">
-                    <Link
-                      to="/agendar"
-                      className="btn btn-success"
-                    >
+                    <Link to="/agendar" className="btn btn-success">
                       <i
                         className="bi bi-calendar-plus me-2"
                         aria-hidden="true"
@@ -245,10 +214,7 @@ function Carrito() {
                       Agendar una cita
                     </Link>
 
-                    <Link
-                      to="/#servicios"
-                      className="btn btn-outline-success"
-                    >
+                    <Link to="/#servicios" className="btn btn-outline-success">
                       Ver planes
                     </Link>
                   </div>
@@ -264,10 +230,7 @@ function Carrito() {
                 <Card.Header className="carrito-tarjeta-encabezado">
                   <span>
                     Consultas seleccionadas (
-                    <span id="cantidad-carrito">
-                      {cantidad}
-                    </span>
-                    )
+                    <span id="cantidad-carrito">{cantidad}</span>)
                   </span>
 
                   <Button
@@ -275,10 +238,7 @@ function Carrito() {
                     className="carrito-vaciar"
                     onClick={vaciarCarrito}
                   >
-                    <i
-                      className="bi bi-trash3 me-1"
-                      aria-hidden="true"
-                    />
+                    <i className="bi bi-trash3 me-1" aria-hidden="true" />
                     Vaciar todo
                   </Button>
                 </Card.Header>
@@ -296,9 +256,7 @@ function Carrito() {
                           <th>Nutricionista</th>
                           <th>Fecha y Hora</th>
                           <th>Precio</th>
-                          <th className="text-end pe-4">
-                            Acción
-                          </th>
+                          <th className="text-end pe-4">Acción</th>
                         </tr>
                       </thead>
 
@@ -341,17 +299,12 @@ function Carrito() {
                               <Button
                                 variant="outline-danger"
                                 size="sm"
-                                onClick={() =>
-                                  eliminarReserva(item.id)
-                                }
+                                onClick={() => eliminarReserva(item.id)}
                                 title="Eliminar consulta"
                                 aria-label={`Eliminar ${item.servicio}`}
                                 className="boton-eliminar-reserva"
                               >
-                                <i
-                                  className="bi bi-trash"
-                                  aria-hidden="true"
-                                />
+                                <i className="bi bi-trash" aria-hidden="true" />
                               </Button>
                             </td>
                           </tr>
@@ -362,14 +315,8 @@ function Carrito() {
                 </Card.Body>
               </Card>
 
-              <Link
-                to="/agendar"
-                className="btn btn-outline-success"
-              >
-                <i
-                  className="bi bi-arrow-left me-2"
-                  aria-hidden="true"
-                />
+              <Link to="/agendar" className="btn btn-outline-success">
+                <i className="bi bi-arrow-left me-2" aria-hidden="true" />
                 Seguir agendando
               </Link>
             </Col>
@@ -393,17 +340,14 @@ function Carrito() {
                         className="bi bi-person-check me-2"
                         aria-hidden="true"
                       />
-                      Paciente:{' '}
-                      <strong>{usuario.nombre}</strong>
+                      Paciente: <strong>{usuario.nombre}</strong>
                     </div>
                   )}
 
                   <div className="carrito-total">
                     <span>Total:</span>
 
-                    <strong id="total-carrito">
-                      {formatearPrecio(total)}
-                    </strong>
+                    <strong id="total-carrito">{formatearPrecio(total)}</strong>
                   </div>
 
                   {/* Control de simulación existente */}
@@ -426,14 +370,9 @@ function Carrito() {
                     onClick={handleConfirmar}
                     disabled={procesando || cantidad === 0}
                   >
-                    <i
-                      className="bi bi-check-circle me-2"
-                      aria-hidden="true"
-                    />
+                    <i className="bi bi-check-circle me-2" aria-hidden="true" />
 
-                    {procesando
-                      ? 'Procesando...'
-                      : 'Confirmar agendamiento'}
+                    {procesando ? "Procesando..." : "Confirmar agendamiento"}
                   </Button>
 
                   <p className="gestion-ayuda small text-center mt-3 mb-0">
@@ -446,7 +385,7 @@ function Carrito() {
         )}
       </Container>
     </main>
-  )
+  );
 }
 
-export default Carrito
+export default Carrito;
