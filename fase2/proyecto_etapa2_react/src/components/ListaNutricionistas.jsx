@@ -1,8 +1,15 @@
 import { useState } from 'react'
-import nutricionistas from '../data/nutricionistas.js'
+import { Button, Modal } from 'react-bootstrap'
+import { useDatos } from '../context/DatosContext'
 
-// Tarjeta reutilizable: recibe los datos mediante props.
-function TarjetaNutricionista({ nutricionista, onVerDetalle }) {
+// ========================================
+// 1. TARJETA REUTILIZABLE
+// ========================================
+
+function TarjetaNutricionista({
+  nutricionista,
+  onVerDetalle,
+}) {
   return (
     <article className="nutricionista-tarjeta">
       <img
@@ -30,7 +37,8 @@ function TarjetaNutricionista({ nutricionista, onVerDetalle }) {
         type="button"
         className="nutricionista-boton"
         onClick={() => onVerDetalle(nutricionista)}
-        aria-controls="detalle-nutricionista"
+        aria-haspopup="dialog"
+        aria-label={`Ver detalle de ${nutricionista.nombre}`}
       >
         Ver detalle
       </button>
@@ -38,24 +46,43 @@ function TarjetaNutricionista({ nutricionista, onVerDetalle }) {
   )
 }
 
-// Sección que muestra las tarjetas y el detalle seleccionado.
+// ========================================
+// 2. LISTADO Y NUTRICIONISTA SELECCIONADO
+// ========================================
+
 function ListaNutricionistas() {
-  const [seleccionado, setSeleccionado] = useState(null)
+  const { nutricionistas } = useDatos()
+
+  const [seleccionado, setSeleccionado] =
+    useState(null)
+
+  function cerrarDetalle() {
+    setSeleccionado(null)
+  }
 
   return (
-    <section id="nutricionistas" className="nutricionistas-seccion">
+    <section
+      id="nutricionistas"
+      className="nutricionistas-seccion"
+    >
       <div className="container">
+        {/* Encabezado */}
         <div className="seccion-encabezado">
-          <p className="seccion-etiqueta">Nuestro equipo</p>
+          <p className="seccion-etiqueta">
+            Nuestro equipo
+          </p>
 
-          <h2 className="seccion-titulo">Nuestros nutricionistas</h2>
+          <h2 className="seccion-titulo">
+            Nuestros nutricionistas
+          </h2>
 
           <p className="seccion-descripcion">
-            Encuentra al profesional adecuado según tus objetivos y
-            necesidades nutricionales.
+            Encuentra al profesional adecuado según tus
+            objetivos y necesidades nutricionales.
           </p>
         </div>
 
+        {/* Tarjetas */}
         <div className="nutricionistas-grid">
           {nutricionistas.map((nutricionista) => (
             <TarjetaNutricionista
@@ -65,26 +92,35 @@ function ListaNutricionistas() {
             />
           ))}
         </div>
+      </div>
 
-        <div
-          id="detalle-nutricionista"
-          className="nutricionista-detalle"
-          aria-live="polite"
-          aria-atomic="true"
+      {/* ========================================
+          3. DETALLE EN VENTANA MODAL
+          ======================================== */}
+
+      <Modal
+        show={Boolean(seleccionado)}
+        onHide={cerrarDetalle}
+        centered
+        scrollable
+        aria-labelledby="titulo-detalle-nutricionista"
+        aria-describedby="descripcion-detalle-nutricionista"
+      >
+        <Modal.Header
+          closeButton
+          closeLabel="Cerrar detalle"
         >
+          <Modal.Title
+            id="titulo-detalle-nutricionista"
+            className="nutricionista-modal-titulo"
+          >
+            {seleccionado?.nombre}
+          </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
           {seleccionado && (
-            <div className="alert alert-success position-relative">
-              <button
-                type="button"
-                className="btn-close position-absolute top-0 end-0 m-3"
-                aria-label="Cerrar detalle"
-                onClick={() => setSeleccionado(null)}
-              />
-
-              <h3 className="h4 alert-heading pe-4">
-                {seleccionado.nombre}
-              </h3>
-
+            <>
               <p>
                 <strong>Especialidad:</strong>{' '}
                 {seleccionado.especialidad}
@@ -97,11 +133,25 @@ function ListaNutricionistas() {
 
               <hr />
 
-              <p className="mb-0">{seleccionado.experiencia}</p>
-            </div>
+              <p
+                id="descripcion-detalle-nutricionista"
+                className="mb-0"
+              >
+                {seleccionado.experiencia}
+              </p>
+            </>
           )}
-        </div>
-      </div>
+        </Modal.Body>
+
+        <Modal.Footer>
+          <Button
+            variant="outline-success"
+            onClick={cerrarDetalle}
+          >
+            Cerrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   )
 }

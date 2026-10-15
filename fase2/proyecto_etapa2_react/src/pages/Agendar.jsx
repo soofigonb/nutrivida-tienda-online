@@ -10,7 +10,7 @@ import {
 } from 'react-bootstrap'
 import { Link, useLocation } from 'react-router-dom'
 import { useCarrito } from '../context/CarritoContext'
-import nutricionistas from '../data/nutricionistas'
+import { useDatos } from '../context/DatosContext'
 import planes from '../data/planes'
 import formatearPrecio from '../utils/formatearPrecio'
 import {
@@ -19,6 +19,7 @@ import {
 } from '../utils/validaciones'
 
 function Agendar() {
+  const { nutricionistas } = useDatos()
   // ========================================
   // 1. ESTADOS Y CONTEXTO
   // ========================================
