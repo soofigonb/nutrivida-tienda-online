@@ -223,6 +223,55 @@
 }
 
 /* ========================================
+   VIDEO EDUCATIVO — NOSOTROS
+   ======================================== */
+
+.nosotros-video {
+  height: auto;
+  text-align: center;
+}
+
+.nosotros-video-descripcion {
+  max-width: 640px;
+  margin: 0 auto 24px;
+}
+
+.nosotros-video-reproductor {
+  overflow: hidden;
+  border-radius: 12px;
+  background-color: #115e59;
+}
+
+.nosotros-video-reproductor iframe {
+  border: 0;
+}
+
+.nosotros-video .nosotros-video-fuente {
+  margin: 20px 0 10px;
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.nosotros-video-enlace {
+  display: inline-flex;
+  align-items: center;
+  color: #047857;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nosotros-video-enlace:hover {
+  color: #036548;
+  text-decoration: underline;
+}
+
+.nosotros-video-enlace:focus-visible {
+  outline: 2px solid #047857;
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+
+/* ========================================
    6. SECCIÓN NUTRICIONISTAS
    ======================================== */
 
