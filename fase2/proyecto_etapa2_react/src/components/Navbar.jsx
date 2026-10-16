@@ -62,7 +62,8 @@ function Navbar({ cantidadCarrito }) {
           {/* Menú para pantallas pequeñas */}
           <NavbarBootstrap.Toggle
             aria-controls="menu-nutrivida"
-            aria-label="Abrir o cerrar menú"
+            label="Abrir o cerrar menú"
+            aria-expanded={expandido}
           />
 
           <NavbarBootstrap.Collapse id="menu-nutrivida">
