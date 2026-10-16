@@ -446,13 +446,13 @@ Las carpetas locales `node_modules/`, `dist/` y `coverage/` están excluidas del
 
 La aplicación se publicó en **AWS EC2**, utilizando **Ubuntu Server 24.04 LTS** y **Nginx**.
 
-**URL registrada:** [http://3.95.61.26](http://3.95.61.26)
+**URL registrada:** [http://54.160.216.249](http://54.160.216.249)
 
 Nginx sirve los archivos de producción y utiliza `try_files` para permitir el acceso a las rutas de React Router.
 
 La disponibilidad depende de la instancia y del laboratorio AWS Academy. La IP pública puede cambiar al detener e iniciar la instancia.
 
-Consulta la [configuración, evidencias y procedimiento de actualización](../../docs/ev2/despliegue/README.md).
+Consulta la [configuración, evidencias y procedimiento de actualización](../../docs/ev2/despliegue_aws/README.md).
 
 ---
 
@@ -469,8 +469,9 @@ Los mensajes de commit identifican al integrante y describen el cambio. Antes de
 - [README general](../../README.md).
 - [Primera etapa](../../fase1/proyecto_etapa1_html/).
 - [Documentación de la segunda entrega](../../docs/ev2/).
+- [ERS de NutriVida versión 2](../../docs/ev2/DSY1104_EV2_Anexo4_ERS_NutriVida_v2.docx).
 - [Informe de pruebas](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
-- [Despliegue en AWS](../../docs/ev2/despliegue/README.md).
+- [Despliegue en AWS](../../docs/ev2/despliegue_aws/README.md).
 
 ---
 
