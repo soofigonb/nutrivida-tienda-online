@@ -27,6 +27,7 @@ El proyecto incorpora formularios con validaciones, operaciones CRUD, persistenc
 ### Sitio público
 
 - Presentación de la clínica e información institucional.
+- Video educativo de la OPS/OMS sobre alimentación saludable, con fuente y enlace al contenido original.
 - Listado de nutricionistas conectado con los datos administrados.
 - Visualización del detalle de cada profesional mediante una ventana modal.
 - Planes y servicios con precios en pesos chilenos.
@@ -48,6 +49,7 @@ El proyecto incorpora formularios con validaciones, operaciones CRUD, persistenc
 - Acceso diferenciado para pacientes y administrador.
 - Actualización del menú según la sesión.
 - Persistencia local de la sesión.
+- Conservación de los datos originales ante errores de lectura del almacenamiento.
 
 ### Agendamiento
 
@@ -106,6 +108,7 @@ El precio de la atención corresponde al plan seleccionado. La elección del nut
 | user-event | Simulación de interacciones de usuario. |
 | jest-dom | Verificaciones sobre el DOM. |
 | jsdom | Entorno de navegador para las pruebas. |
+| @vitest/coverage-v8 | Medición y reportes de cobertura de código. |
 | Oxlint | Análisis estático del código. |
 | Git y GitHub | Control de versiones y colaboración. |
 
@@ -166,6 +169,7 @@ Para detener el servidor, presiona **Ctrl + C**.
 | `npm run dev` | Inicia el servidor de desarrollo. |
 | `npm run test` | Ejecuta Vitest en modo de observación. |
 | `npm run test -- --run` | Ejecuta todas las pruebas una vez. |
+| `npm run test:coverage` | Ejecuta las pruebas y genera el reporte de cobertura. |
 | `npm run lint` | Analiza el código con Oxlint. |
 | `npm run build` | Genera la compilación de producción. |
 | `npm run preview` | Sirve la compilación para revisarla localmente. |
@@ -190,11 +194,11 @@ Para detener el servidor, presiona **Ctrl + C**.
 | `src/setupTests.js` | Configuración compartida de las pruebas. |
 | `public/` | Recursos estáticos públicos. |
 | `index.html` | Documento principal utilizado por Vite. |
-| `vite.config.js` | Configuración de Vite y Vitest. |
+| `vite.config.js` | Configuración de Vite, Vitest y cobertura. |
 | `package.json` | Dependencias y scripts. |
 | `package-lock.json` | Versiones registradas de las dependencias. |
 
-Los archivos de pruebas utilizan la extensión `.test.jsx` y se encuentran junto a las páginas o contextos correspondientes.
+Los archivos de pruebas utilizan las extensiones `.test.jsx` y `.test.js` y se encuentran junto a los componentes, páginas, contextos y utilidades correspondientes.
 
 ---
 
@@ -205,6 +209,7 @@ La aplicación distribuye las responsabilidades entre componentes, páginas y co
 | Elemento | Responsabilidad |
 |---|---|
 | `Navbar` y `Footer` | Navegación y pie de página del sitio público. |
+| `Nosotros` | Información institucional y video educativo. |
 | `ListaNutricionistas` | Listado de profesionales y selección del detalle. |
 | `PlanesServicios` | Presentación de servicios y control de la promoción. |
 | `ArticuloBlog` | Presentación reutilizable del contenido de los artículos. |
@@ -294,6 +299,8 @@ Las operaciones CRUD permiten crear, consultar, actualizar y eliminar registros.
 
 La persistencia pertenece al navegador y al origen desde el que se ejecuta la aplicación. Los datos no se comparten automáticamente entre equipos o navegadores.
 
+Las operaciones informan los errores de almacenamiento y comprueban los datos antes de modificarlos.
+
 ---
 
 ## 📱 Diseño responsive
@@ -309,6 +316,8 @@ El diseño adapta la navegación, tarjetas, formularios, tablas y panel administ
 | Escritorio | 1280 px |
 
 Las fuentes utilizadas son **Roboto** para los textos y **Fraunces** para los títulos.
+
+El video educativo utiliza una relación de aspecto de 16:9 y un contenedor adaptable al ancho disponible.
 
 ---
 
@@ -336,30 +345,61 @@ npm run test -- --run src/pages/Admin.test.jsx
 
 ### Organización de las pruebas
 
-| Archivo | Casos |
-|---|---:|
-| `src/pages/Admin.test.jsx` | 11 |
-| `src/context/CarritoContext.test.jsx` | 10 |
-| `src/pages/Carrito.test.jsx` | 4 |
-| `src/pages/Agendar.test.jsx` | 3 |
-| `src/pages/Registro.test.jsx` | 1 |
-| **Total** | **29** |
+La suite contiene **14 archivos**. La ejecución de referencia del **15 de octubre de 2026 a las 23:25:52, hora de Chile**, informó **139 pruebas aprobadas y ninguna fallida**.
 
-### Comportamientos verificados
+| Archivo | Comportamientos comprobados |
+|---|---|
+| `src/App.test.jsx` | Rutas públicas, layouts y acceso administrativo. |
+| `src/components/Navbar.test.jsx` | Opciones por sesión, contador y navegación del menú. |
+| `src/components/ScrollNavegacion.test.jsx` | Desplazamiento por ruta o sección y cancelación de animaciones. |
+| `src/components/FormularioContacto.test.jsx` | Validaciones, mensajes y limpieza del formulario. |
+| `src/components/ListaNutricionistas.test.jsx` | Listado de profesionales y apertura y cierre del detalle. |
+| `src/components/PlanesServicios.test.jsx` | Planes, promoción y selección del servicio mediante la URL. |
+| `src/context/AuthContext.test.jsx` | Registro, duplicados, sesión y conservación de datos. |
+| `src/context/CarritoContext.test.jsx` | Validación, persistencia, errores y reintentos de confirmación. |
+| `src/pages/Admin.test.jsx` | Acceso por rol, búsquedas y operaciones administrativas. |
+| `src/pages/Agendar.test.jsx` | Preselección del plan, fechas pasadas y reservas duplicadas. |
+| `src/pages/Carrito.test.jsx` | Cálculo del total, eliminación y confirmación de reservas. |
+| `src/pages/Login.test.jsx` | Credenciales, tipos de acceso, navegación y errores. |
+| `src/pages/Registro.test.jsx` | Datos personales, dominios admitidos, comunas y envío. |
+| `src/utils/utils.test.js` | Almacenamiento, fechas, RUN y formato de precios. |
 
-- Acceso administrativo según la sesión y el rol.
-- Búsqueda y operaciones administrativas.
-- Validación y persistencia de registros.
-- Preselección del plan desde la URL.
-- Rechazo de fechas pasadas y reservas duplicadas.
-- Cálculo del total y eliminación de elementos del carrito.
-- Confirmación de reservas y conservación de datos ante fallos.
-- Manejo de errores de almacenamiento y reintentos.
-- Renderizado del título de Registro.
+### Mocks e independencia
 
-Las pruebas simulan eventos de usuario y utilizan mocks cuando es necesario provocar errores de almacenamiento o aislar dependencias.
+Las pruebas utilizan `vi.fn` y `vi.spyOn` para controlar respuestas de contextos, observar operaciones y simular errores de almacenamiento. Los casos de fechas fijan el reloj con temporizadores de Vitest.
 
-El almacenamiento se limpia entre los casos correspondientes y los mocks se restauran para mantener la independencia de las pruebas.
+El entorno de cada archivo prepara sus datos y limpia el almacenamiento cuando corresponde. Los componentes se desmontan y los mocks se restauran para mantener la independencia de los casos.
+
+### Generar y consultar la cobertura
+
+```bash
+npm run test:coverage
+```
+
+Vitest utiliza el proveedor **v8** y genera un resumen en la terminal, un reporte HTML y un archivo `coverage-summary.json`.
+
+| Métrica | Cobertura | Elementos ejecutados |
+|---|---:|---:|
+| Sentencias | 90,00 % | 729 de 810 |
+| Ramas | 80,74 % | 583 de 722 |
+| Funciones | 93,36 % | 211 de 226 |
+| Líneas | 89,82 % | 706 de 786 |
+
+Los valores corresponden a la ejecución de referencia. Abre **`coverage/index.html`** en un navegador para consultar los resultados generados localmente.
+
+La configuración incluye los archivos JavaScript y JSX de `src/`, incluso los que no tienen pruebas directas. Excluye los archivos de pruebas, `setupTests.js` y el punto de montaje `main.jsx`.
+
+La cobertura indica qué código se ejecutó; no demuestra por sí sola que todos los escenarios estén comprobados. La revisión del diseño responsive, la reproducción de videos y el comportamiento del sitio desplegado se verifican en un navegador real.
+
+### Informe y evidencias
+
+- [Informe de pruebas y análisis de cobertura](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
+- [Reporte HTML y recursos de cobertura](../../docs/ev2/pruebas_unitarias/cobertura/).
+- [Resumen de cobertura](../../docs/ev2/pruebas_unitarias/cobertura/coverage-summary.json).
+- [Captura de cobertura](../../docs/ev2/pruebas_unitarias/evidencias/cobertura-final.png).
+- [Resultado de ejecución de las pruebas](../../docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
+
+GitHub muestra los archivos HTML como código. Para navegar por el reporte conservado, abre `docs/ev2/pruebas_unitarias/cobertura/index.html` desde la copia local del repositorio.
 
 ---
 
@@ -381,7 +421,9 @@ npm run preview
 
 Abre la dirección indicada en la terminal.
 
-Las carpetas `node_modules/` y `dist/` se generan localmente y están excluidas del control de versiones.
+Las carpetas `node_modules/`, `dist/` y `coverage/` se generan localmente y están excluidas del control de versiones de la aplicación React.
+
+La copia del reporte en `docs/ev2/pruebas_unitarias/cobertura/` se conserva como documentación.
 
 ---
 
@@ -397,9 +439,11 @@ La revisión de cambios incluye la ejecución de las pruebas y la compilación d
 
 ## 📘 Enlaces del proyecto
 
-- [Presentación general del repositorio](../../README.md)
-- [Primera etapa: HTML, CSS y JavaScript](../../fase1/proyecto_etapa1_html/)
-- [Documentación del proyecto](../../docs/)
+- [Presentación general del repositorio](../../README.md).
+- [Primera etapa: HTML, CSS y JavaScript](../../fase1/proyecto_etapa1_html/).
+- [Documentación del proyecto](../../docs/).
+- [Documentación de la segunda entrega](../../docs/ev2/).
+- [Informe de pruebas](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
 
 ---
 
