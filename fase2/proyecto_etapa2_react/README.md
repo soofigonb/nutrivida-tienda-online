@@ -12,13 +12,13 @@
 
 ## 🌿 Descripción
 
-**NutriVida** es una aplicación web para consultar servicios nutricionales, registrar pacientes, agendar atenciones y administrar la información de pacientes y profesionales.
+**NutriVida** permite consultar servicios nutricionales, registrar pacientes, agendar atenciones y administrar pacientes y profesionales.
 
-Esta segunda etapa migra el sitio original de HTML, CSS y JavaScript hacia una aplicación React. La interfaz utiliza componentes reutilizables, propiedades, estado, contextos y navegación entre páginas.
+La segunda etapa migra la versión original de HTML, CSS y JavaScript hacia React, utilizando componentes reutilizables, propiedades, estados, contextos y navegación entre páginas.
 
-El proyecto incorpora formularios con validaciones, operaciones CRUD, persistencia local y pruebas automatizadas con Vitest.
+Incluye un catálogo por categorías, ofertas, formularios con validaciones, revisión y confirmación de reservas, operaciones CRUD y persistencia local. Sus comportamientos se verifican mediante pruebas automatizadas con Vitest.
 
-> NutriVida es un prototipo frontend con datos de demostración. La autenticación, la confirmación de reservas y el envío del formulario de contacto son simulados. No procesa pagos reales ni utiliza un backend.
+> Es un prototipo frontend con datos de demostración. La autenticación, la confirmación de reservas y el envío de contacto son simulados. No procesa pagos reales ni utiliza un backend.
 
 ---
 
@@ -27,90 +27,113 @@ El proyecto incorpora formularios con validaciones, operaciones CRUD, persistenc
 ### Sitio público
 
 - Presentación de la clínica e información institucional.
-- Video educativo de la OPS/OMS sobre alimentación saludable, con fuente y enlace al contenido original.
+- Video educativo de la OPS/OMS, con fuente y enlace original.
 - Listado de nutricionistas conectado con los datos administrados.
-- Visualización del detalle de cada profesional mediante una ventana modal.
+- Detalle de cada profesional mediante una ventana modal.
 - Planes y servicios con precios en pesos chilenos.
-- Visualización de una promoción mediante un botón interactivo.
-- Listado de blogs y páginas de artículos.
-- Formulario de contacto con validaciones.
-- Navegación entre páginas y secciones.
-- Menú responsive y pie de página compartido.
+- Catálogo con filtro por categoría.
+- Categoría seleccionada conservada mediante parámetros de la URL.
+- Página de ofertas con condiciones del beneficio.
+- Promoción interactiva en el inicio.
+- Blogs y páginas de artículos.
+- Formulario de contacto validado.
+- Navegación responsive y footer compartido.
 
-### Registro e inicio de sesión
+### Registro y sesión
 
 - Registro de cuentas de pacientes.
-- Validación del RUN/RUT y su dígito verificador.
-- Validación de nombres, apellidos, correo, teléfono y dirección.
+- Validación de RUN/RUT y dígito verificador.
+- Validación de datos personales y confirmación de contraseña.
 - Selección relacionada de región y comuna.
-- Confirmación de contraseña.
-- Detección de RUN/RUT y correos previamente registrados.
+- Detección de RUN/RUT y correos duplicados.
 - Inicio y cierre de sesión simulados.
 - Acceso diferenciado para pacientes y administrador.
 - Actualización del menú según la sesión.
-- Persistencia local de la sesión.
-- Conservación de los datos originales ante errores de lectura del almacenamiento.
+- Persistencia de sesión y manejo de errores del almacenamiento.
 
 ### Agendamiento
 
-- Selección de un plan o servicio y un nutricionista.
-- Preselección del plan desde la página de servicios.
+- Selección del plan y del nutricionista.
+- Preselección del plan desde servicios y ofertas.
 - Ingreso del motivo de consulta.
 - Selección de fecha y horario.
-- Validación para impedir atenciones en fechas y horarios pasados.
-- Detección de reservas para el mismo profesional, fecha y hora.
-- Incorporación de la atención al carrito.
+- Validación de fechas y horarios futuros.
+- Detección de reservas duplicadas para un profesional.
+- Incorporación de consultas al carrito.
 
-El precio de la atención corresponde al plan seleccionado. La elección del nutricionista no agrega un cobro adicional.
+El precio corresponde al plan seleccionado. La elección de un nutricionista no agrega un cobro adicional.
 
-### Carrito de reservas
+### Carrito y revisión de reservas
 
-- Visualización de las atenciones seleccionadas.
-- Cálculo del total.
+El proceso se organiza en tres pasos:
+
+1. Revisar las consultas del carrito y su total.
+2. Comprobar los servicios e ingresar los datos del paciente.
+3. Confirmar y consultar el resumen de las citas creadas.
+
+Incluye:
+
 - Eliminación individual y vaciado del carrito.
-- Conservación de las reservas al actualizar la página.
-- Validación de disponibilidad y precio antes de confirmar.
-- Confirmación simulada y generación de un resumen.
-- Conservación del carrito cuando ocurre un fallo de confirmación.
-- Manejo de errores de almacenamiento.
-- Prevención de duplicados al reintentar una confirmación.
+- Persistencia de las consultas al actualizar la página.
+- Nombre y correo completados desde la sesión cuando está disponible.
+- Validación de datos del paciente.
+- Regreso al carrito antes de confirmar.
+- Comprobación de disponibilidad y precio al confirmar.
+- Resumen con paciente, profesional, servicio, fecha, hora y código.
+- Conservación del carrito ante errores de confirmación.
+- Prevención de duplicados al reintentar.
+- Control de simulación de fallo para demostrar el manejo de errores.
+
+Los datos ingresados durante la revisión se guardan en la cita y no modifican el perfil ni la sesión.
+
+### Categorías y ofertas
+
+El catálogo organiza los servicios en:
+
+- Evaluación inicial.
+- Atención integral.
+- Nutrición deportiva.
+
+La página de ofertas presenta el beneficio de una medición de composición corporal sin costo adicional, sus condiciones y el enlace al plan correspondiente.
+
+La promoción añade un beneficio al servicio; no modifica su precio ni aplica un descuento monetario. La medición se realiza presencialmente en la clínica.
 
 ### Panel administrativo
 
-- Acceso restringido en la interfaz según el rol de la sesión.
-- Menú y distribución propios del panel.
-- Dashboard con cantidades de pacientes, nutricionistas y citas del día.
-- Creación, listado, edición y eliminación de pacientes y nutricionistas.
-- Búsqueda en los listados.
+- Control de acceso en la interfaz según el rol.
+- Layout y menú propios.
+- Dashboard con pacientes, profesionales y citas del día.
+- Creación, listado, edición y eliminación de registros.
+- Búsquedas en los listados.
 - Formularios reutilizables con validaciones.
-- Confirmación antes de eliminar registros.
-- Bloqueo de eliminación de registros con citas o reservas asociadas.
-- Actualización de los datos utilizados por las páginas públicas.
+- Confirmación antes de eliminar.
+- Comprobación de relaciones con citas y reservas.
+- Actualización de profesionales en las páginas públicas.
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🛠️ Tecnologías
 
 | Tecnología | Uso |
 |---|---|
-| React | Componentes, propiedades, estado y contextos. |
-| Vite | Servidor de desarrollo y compilación. |
-| JavaScript y JSX | Lógica y construcción de la interfaz. |
-| React Router | Rutas, navegación y layouts. |
+| React y JSX | Componentes, propiedades, estado y contextos. |
+| Vite | Desarrollo y compilación. |
+| React Router | Rutas, layouts y parámetros de navegación. |
 | React Bootstrap | Componentes de interfaz. |
 | Bootstrap | Grillas y utilidades responsive. |
 | Bootstrap Icons | Iconografía. |
 | React Hook Form | Gestión y validación de formularios. |
 | CSS | Estilos personalizados. |
 | `localStorage` y JSON | Persistencia local. |
-| Vitest | Ejecución de pruebas automatizadas. |
-| React Testing Library | Renderizado y consultas sobre los componentes en pruebas. |
-| user-event | Simulación de interacciones de usuario. |
-| jest-dom | Verificaciones sobre el DOM. |
-| jsdom | Entorno de navegador para las pruebas. |
-| @vitest/coverage-v8 | Medición y reportes de cobertura de código. |
-| Oxlint | Análisis estático del código. |
-| Git y GitHub | Control de versiones y colaboración. |
+| Vitest | Ejecución de pruebas. |
+| React Testing Library | Renderizado y consultas de componentes. |
+| user-event | Interacciones de usuario en pruebas. |
+| jest-dom | Aserciones sobre el DOM. |
+| jsdom | Entorno DOM para las pruebas. |
+| @vitest/coverage-v8 | Medición de cobertura. |
+| Oxlint | Análisis estático. |
+| AWS EC2 y Nginx | Publicación de la compilación. |
+| Git y GitHub | Control de versiones. |
 
 ---
 
@@ -123,112 +146,100 @@ El precio de la atención corresponde al plan seleccionado. La elección del nut
 - Git.
 - Un navegador web actualizado.
 
-### 1. Clonar el repositorio
+### Clonar e instalar
 
 ```bash
 git clone https://github.com/soofigonb/nutrivida-tienda-online.git
-```
-
-### 2. Entrar en la aplicación React
-
-```bash
 cd nutrivida-tienda-online/fase2/proyecto_etapa2_react
-```
-
-### 3. Instalar las dependencias
-
-```bash
 npm ci
 ```
 
-Este comando instala las dependencias utilizando las versiones registradas en `package-lock.json`.
+`npm ci` utiliza las versiones registradas en `package-lock.json`.
 
-### 4. Iniciar el servidor de desarrollo
+### Iniciar el servidor
 
 ```bash
 npm run dev
 ```
 
-Abre la dirección indicada en la terminal. Habitualmente será:
+Abre la dirección indicada en la terminal, normalmente [http://localhost:5173/](http://localhost:5173/).
 
-**http://localhost:5173/**
+Vite puede utilizar otro puerto si el habitual está ocupado. Para detener el servidor, presiona **Ctrl + C**.
 
-Si el puerto está ocupado, Vite puede utilizar otro.
-
-Para detener el servidor, presiona **Ctrl + C**.
-
-> Ejecuta los comandos de npm dentro de `fase2/proyecto_etapa2_react`, donde se encuentra `package.json`.
+> Ejecuta los comandos de npm dentro de `fase2/proyecto_etapa2_react`, donde está `package.json`.
 
 ---
 
-## 📋 Comandos disponibles
+## 📋 Comandos
 
 | Comando | Descripción |
 |---|---|
-| `npm ci` | Instala las dependencias desde el archivo de bloqueo. |
+| `npm ci` | Instala dependencias desde el archivo de bloqueo. |
 | `npm run dev` | Inicia el servidor de desarrollo. |
 | `npm run test` | Ejecuta Vitest en modo de observación. |
-| `npm run test -- --run` | Ejecuta todas las pruebas una vez. |
-| `npm run test:coverage` | Ejecuta las pruebas y genera el reporte de cobertura. |
+| `npm run test -- --run` | Ejecuta toda la suite una vez. |
+| `npm run test:coverage` | Ejecuta las pruebas y genera la cobertura. |
 | `npm run lint` | Analiza el código con Oxlint. |
-| `npm run build` | Genera la compilación de producción. |
-| `npm run preview` | Sirve la compilación para revisarla localmente. |
+| `npm run build` | Genera la compilación en `dist/`. |
+| `npm run preview` | Sirve la compilación para revisión local. |
 
 ---
 
-## 📁 Organización del proyecto
+## 📁 Organización
 
 | Ubicación | Responsabilidad |
 |---|---|
 | `src/assets/` | Imágenes importadas por los componentes. |
 | `src/components/` | Componentes reutilizables, secciones y layouts. |
 | `src/pages/` | Páginas asociadas a las rutas. |
-| `src/context/` | Gestión compartida de sesión, datos y carrito. |
-| `src/data/` | Datos iniciales de profesionales, planes, blogs, regiones y comunas. |
-| `src/utils/` | Funciones de almacenamiento, formato y validación. |
-| `src/styles/Admin.css` | Estilos del panel administrativo. |
-| `src/App.jsx` | Composición de layouts y definición de rutas. |
-| `src/App.css` | Estilos de las páginas y componentes. |
+| `src/context/` | Sesión, datos y carrito compartidos. |
+| `src/data/` | Datos iniciales, planes, promoción, blogs, regiones y comunas. |
+| `src/utils/` | Almacenamiento, formatos y validaciones. |
+| `src/styles/Admin.css` | Estilos administrativos. |
+| `src/App.jsx` | Layouts y definición de rutas. |
+| `src/App.css` | Estilos de páginas y componentes. |
 | `src/index.css` | Estilos globales. |
-| `src/main.jsx` | Punto de entrada y configuración inicial de React. |
-| `src/setupTests.js` | Configuración compartida de las pruebas. |
+| `src/main.jsx` | Punto de entrada de React. |
+| `src/setupTests.js` | Configuración compartida de pruebas. |
 | `public/` | Recursos estáticos públicos. |
-| `index.html` | Documento principal utilizado por Vite. |
+| `index.html` | Documento principal de Vite. |
 | `vite.config.js` | Configuración de Vite, Vitest y cobertura. |
 | `package.json` | Dependencias y scripts. |
-| `package-lock.json` | Versiones registradas de las dependencias. |
+| `package-lock.json` | Versiones registradas de dependencias. |
 
-Los archivos de pruebas utilizan las extensiones `.test.jsx` y `.test.js` y se encuentran junto a los componentes, páginas, contextos y utilidades correspondientes.
+Los archivos de pruebas utilizan las extensiones `.test.jsx` y `.test.js`.
 
 ---
 
-## 🧩 Componentes y gestión del estado
-
-La aplicación distribuye las responsabilidades entre componentes, páginas y contextos.
+## 🧩 Componentes y estado
 
 | Elemento | Responsabilidad |
 |---|---|
-| `Navbar` y `Footer` | Navegación y pie de página del sitio público. |
-| `Nosotros` | Información institucional y video educativo. |
-| `ListaNutricionistas` | Listado de profesionales y selección del detalle. |
-| `PlanesServicios` | Presentación de servicios y control de la promoción. |
-| `ArticuloBlog` | Presentación reutilizable del contenido de los artículos. |
+| `Navbar` y `Footer` | Navegación y pie del sitio público. |
+| `Nosotros` | Información institucional y video. |
+| `ListaNutricionistas` | Listado y detalle de profesionales. |
+| `PlanesServicios` | Servicios y promoción en el inicio. |
+| `TarjetaServicio` | Tarjeta reutilizada en el inicio y el catálogo. |
+| `Servicios` | Catálogo y filtro de categorías mediante la URL. |
+| `Ofertas` | Beneficio, condiciones y acceso al agendamiento. |
+| `ArticuloBlog` | Presentación reutilizable de artículos. |
 | `FormularioContacto` | Validación y resultado del contacto simulado. |
-| `AdminLayout` | Menú y distribución del panel administrativo. |
-| `AdminListado` | Listados, búsqueda y acciones administrativas. |
-| `AdminFormulario` | Formularios de pacientes y nutricionistas. |
-| `RutaAdmin` | Control de acceso administrativo en la interfaz. |
+| `Carrito` | Listado, revisión de datos y resultado de confirmación. |
+| `AdminLayout` | Distribución del panel. |
+| `AdminListado` | Búsqueda y acciones administrativas. |
+| `AdminFormulario` | Formularios de pacientes y profesionales. |
+| `RutaAdmin` | Control del acceso administrativo en la interfaz. |
 | `ScrollNavegacion` | Desplazamiento al cambiar de página o sección. |
 
-Las propiedades permiten proporcionar datos y funciones a los componentes reutilizables. El estado controla interacciones como abrir un detalle, mostrar una promoción y actualizar formularios.
+Las propiedades proporcionan datos y funciones a los componentes. El estado controla formularios, promoción, detalle de profesionales y pasos del carrito.
 
 ### Contextos
 
-| Contexto | Información y operaciones |
+| Contexto | Operaciones |
 |---|---|
-| `AuthContext` | Registro, inicio de sesión, usuario actual y cierre de sesión. |
-| `DatosContext` | Lectura y operaciones CRUD de pacientes y nutricionistas. |
-| `CarritoContext` | Reservas, cantidades, total y confirmación. |
+| `AuthContext` | Registro, inicio de sesión, usuario y cierre de sesión. |
+| `DatosContext` | Lectura y CRUD de pacientes y nutricionistas. |
+| `CarritoContext` | Consultas, disponibilidad, cantidad, total y confirmación. |
 
 ---
 
@@ -239,211 +250,227 @@ Las propiedades permiten proporcionar datos y funciones a los componentes reutil
 | Ruta | Página |
 |---|---|
 | `/` | Inicio. |
+| `/servicios` | Catálogo por categorías. |
+| `/servicios?categoria=...` | Catálogo con categoría seleccionada. |
+| `/ofertas` | Ofertas y condiciones de los beneficios. |
 | `/registro` | Registro de pacientes. |
 | `/login` | Inicio de sesión. |
 | `/login?acceso=admin` | Acceso administrativo. |
-| `/agendar` | Agendamiento de atención. |
-| `/carrito` | Carrito y confirmación de reservas. |
-| `/blogs/alimentacion-antiinflamatoria` | Artículo sobre alimentación antiinflamatoria. |
-| `/blogs/hidratacion-deportiva` | Artículo sobre hidratación deportiva. |
+| `/agendar` | Agendamiento. |
+| `/agendar?plan=consulta-inicial` | Agendamiento con un plan preseleccionado. |
+| `/carrito` | Carrito, revisión y confirmación de reservas. |
+| `/blogs/alimentacion-antiinflamatoria` | Artículo de alimentación antiinflamatoria. |
+| `/blogs/hidratacion-deportiva` | Artículo de hidratación deportiva. |
 
-El inicio contiene enlaces a las secciones Nosotros, Servicios, Blogs y Contacto.
+El inicio incluye las secciones Nosotros, Servicios, Blogs y Contacto. El menú también permite abrir el catálogo y la página de ofertas.
 
-### Panel administrativo
+Los pasos de revisión y confirmación se presentan dentro de `/carrito`.
+
+### Administración
 
 | Ruta | Página |
 |---|---|
 | `/admin` | Dashboard. |
-| `/admin/pacientes` | Listado de pacientes. |
+| `/admin/pacientes` | Pacientes. |
 | `/admin/pacientes/nuevo` | Creación de pacientes. |
-| `/admin/pacientes/:id/editar` | Edición de un paciente. |
-| `/admin/nutricionistas` | Listado de nutricionistas. |
-| `/admin/nutricionistas/nuevo` | Creación de nutricionistas. |
-| `/admin/nutricionistas/:id/editar` | Edición de un nutricionista. |
+| `/admin/pacientes/:id/editar` | Edición de pacientes. |
+| `/admin/nutricionistas` | Nutricionistas. |
+| `/admin/nutricionistas/nuevo` | Creación de profesionales. |
+| `/admin/nutricionistas/:id/editar` | Edición de profesionales. |
 
-El sitio público comparte navbar y footer. El panel administrativo utiliza un layout independiente.
+El panel utiliza su propio layout. Las rutas inexistentes muestran una página de error con acceso al inicio.
 
 ---
 
 ## 📝 Formularios y validaciones
 
-Los formularios muestran mensajes asociados a los datos ingresados y evitan continuar cuando existen errores.
-
 | Formulario | Validaciones principales |
 |---|---|
-| Registro | Campos obligatorios, RUN/RUT, correo permitido, teléfono, región y comuna, contraseña y duplicados. |
+| Registro | Campos obligatorios, RUN/RUT, correo, teléfono, región, comuna, contraseña y duplicados. |
 | Login | Campos obligatorios, credenciales y tipo de acceso. |
-| Agendamiento | Plan, profesional, motivo, fecha futura y disponibilidad del horario. |
+| Agendamiento | Plan, profesional, motivo, fecha futura y disponibilidad. |
+| Revisión de reserva | Nombre y correo del paciente antes de confirmar. |
 | Contacto | Nombre, formato del correo y longitud del mensaje. |
-| Administración | Datos del registro, formatos, duplicados y reglas de edición. |
+| Administración | Datos obligatorios, formatos, duplicados y reglas de edición. |
 
 El registro admite correos de los dominios `duoc.cl`, `profesor.duoc.cl` y `gmail.com`.
 
-El formulario de contacto valida los datos y muestra el resultado de un envío simulado; no envía correos electrónicos reales.
+El formulario de contacto muestra el resultado de una validación y envío simulado; no envía correos reales.
 
 ---
 
 ## 💾 Datos y persistencia
 
-Los archivos de `src/data/` proporcionan los datos iniciales. Los contextos conectan esa información con las páginas y gestionan las actualizaciones.
+Los archivos de `src/data/` proporcionan los datos iniciales. Los contextos gestionan las operaciones y conectan las actualizaciones con la interfaz.
 
-| Clave de almacenamiento | Contenido |
+| Clave | Contenido |
 |---|---|
 | `pacientesNutriVida` | Pacientes registrados. |
 | `nutricionistasNutriVida` | Profesionales administrados. |
 | `sesionNutriVida` | Sesión simulada. |
-| `carritoNutriVida` | Atenciones seleccionadas. |
+| `carritoNutriVida` | Consultas seleccionadas. |
 | `citasNutriVida` | Citas confirmadas. |
 
-Las operaciones CRUD permiten crear, consultar, actualizar y eliminar registros. Las modificaciones de profesionales se reflejan en el listado público y en el agendamiento.
+Las modificaciones de profesionales se reflejan en el listado público y en el agendamiento.
 
-La persistencia pertenece al navegador y al origen desde el que se ejecuta la aplicación. Los datos no se comparten automáticamente entre equipos o navegadores.
+Las operaciones comprueban los datos e informan los errores de almacenamiento en los escenarios implementados.
 
-Las operaciones informan los errores de almacenamiento y comprueban los datos antes de modificarlos.
+La persistencia pertenece al navegador y al origen utilizado. Los datos no se comparten entre dispositivos, navegadores o entre localhost y AWS.
 
 ---
 
 ## 📱 Diseño responsive
 
-La interfaz combina grillas y utilidades de Bootstrap, componentes de React Bootstrap y media queries personalizadas.
+La interfaz utiliza grillas y utilidades de Bootstrap, componentes de React Bootstrap y media queries personalizadas.
 
-El diseño adapta la navegación, tarjetas, formularios, tablas y panel administrativo a distintos tamaños de pantalla.
+La revisión manual comprende navegación, tarjetas, formularios, tablas, catálogo, ofertas y panel administrativo.
 
-| Dispositivo de referencia | Ancho |
-|---|---|
+| Referencia | Ancho |
+|---|---:|
 | Celular | 360 px |
 | Tablet | 768 px |
 | Escritorio | 1280 px |
 
-Las fuentes utilizadas son **Roboto** para los textos y **Fraunces** para los títulos.
-
-El video educativo utiliza una relación de aspecto de 16:9 y un contenedor adaptable al ancho disponible.
+Las fuentes utilizadas son **Roboto** para textos y **Fraunces** para títulos. El video educativo utiliza un contenedor adaptable con relación de aspecto 16:9.
 
 ---
 
 ## 🧪 Pruebas automatizadas
 
-Las pruebas utilizan **Vitest**, **React Testing Library**, **user-event** y **jsdom** para comprobar comportamientos de la aplicación.
+Las pruebas utilizan Vitest, React Testing Library, user-event y jsdom.
 
-### Ejecutar todas las pruebas
+### Ejecución
 
 ```bash
 npm run test -- --run
 ```
 
-### Ejecutar en modo de observación
+Para observar cambios durante el desarrollo:
 
 ```bash
 npm run test
 ```
 
-### Ejecutar un archivo específico
+Para ejecutar un archivo:
 
 ```bash
-npm run test -- --run src/pages/Admin.test.jsx
+npm run test -- --run src/pages/Catalogo.test.jsx
 ```
 
-### Organización de las pruebas
+### Resultado de referencia
 
-La suite contiene **14 archivos**. La ejecución de referencia del **15 de octubre de 2026 a las 23:25:52, hora de Chile**, informó **139 pruebas aprobadas y ninguna fallida**.
+La ejecución con cobertura del **16 de octubre de 2026 a las 02:20:55, hora de Chile**, aprobó **151 pruebas en 15 archivos**, sin pruebas fallidas. Su duración fue de **34,07 segundos**.
 
 | Archivo | Comportamientos comprobados |
 |---|---|
 | `src/App.test.jsx` | Rutas públicas, layouts y acceso administrativo. |
-| `src/components/Navbar.test.jsx` | Opciones por sesión, contador y navegación del menú. |
-| `src/components/ScrollNavegacion.test.jsx` | Desplazamiento por ruta o sección y cancelación de animaciones. |
-| `src/components/FormularioContacto.test.jsx` | Validaciones, mensajes y limpieza del formulario. |
-| `src/components/ListaNutricionistas.test.jsx` | Listado de profesionales y apertura y cierre del detalle. |
-| `src/components/PlanesServicios.test.jsx` | Planes, promoción y selección del servicio mediante la URL. |
+| `src/components/Navbar.test.jsx` | Sesión, contador y navegación. |
+| `src/components/ScrollNavegacion.test.jsx` | Desplazamiento por ruta y sección. |
+| `src/components/FormularioContacto.test.jsx` | Validaciones, mensajes y limpieza. |
+| `src/components/ListaNutricionistas.test.jsx` | Listado y detalle de profesionales. |
+| `src/components/PlanesServicios.test.jsx` | Planes, promoción y enlace al agendamiento. |
 | `src/context/AuthContext.test.jsx` | Registro, duplicados, sesión y conservación de datos. |
-| `src/context/CarritoContext.test.jsx` | Validación, persistencia, errores y reintentos de confirmación. |
-| `src/pages/Admin.test.jsx` | Acceso por rol, búsquedas y operaciones administrativas. |
-| `src/pages/Agendar.test.jsx` | Preselección del plan, fechas pasadas y reservas duplicadas. |
-| `src/pages/Carrito.test.jsx` | Cálculo del total, eliminación y confirmación de reservas. |
-| `src/pages/Login.test.jsx` | Credenciales, tipos de acceso, navegación y errores. |
-| `src/pages/Registro.test.jsx` | Datos personales, dominios admitidos, comunas y envío. |
-| `src/utils/utils.test.js` | Almacenamiento, fechas, RUN y formato de precios. |
+| `src/context/CarritoContext.test.jsx` | Persistencia, validaciones, fallos y reintentos. |
+| `src/pages/Admin.test.jsx` | Acceso, búsquedas y operaciones administrativas. |
+| `src/pages/Agendar.test.jsx` | Plan preseleccionado, fechas y duplicados. |
+| `src/pages/Carrito.test.jsx` | Total, revisión, datos del paciente y confirmación. |
+| `src/pages/Catalogo.test.jsx` | Categorías, URL, ofertas y navegación. |
+| `src/pages/Login.test.jsx` | Credenciales, tipos de acceso y errores. |
+| `src/pages/Registro.test.jsx` | Datos personales, dominios, comunas y envío. |
+| `src/utils/utils.test.js` | Almacenamiento, fechas, RUN y precios. |
 
 ### Mocks e independencia
 
-Las pruebas utilizan `vi.fn` y `vi.spyOn` para controlar respuestas de contextos, observar operaciones y simular errores de almacenamiento. Los casos de fechas fijan el reloj con temporizadores de Vitest.
+Se utilizan `vi.fn` y `vi.spyOn` para controlar respuestas de contextos, observar llamadas y simular errores del almacenamiento.
 
-El entorno de cada archivo prepara sus datos y limpia el almacenamiento cuando corresponde. Los componentes se desmontan y los mocks se restauran para mantener la independencia de los casos.
+Las pruebas de fechas controlan el reloj mediante temporizadores de Vitest. Los casos preparan sus datos, desmontan los componentes y restauran los mocks según el entorno de cada archivo.
 
-### Generar y consultar la cobertura
+### Cobertura
 
 ```bash
 npm run test:coverage
 ```
 
-Vitest utiliza el proveedor **v8** y genera un resumen en la terminal, un reporte HTML y un archivo `coverage-summary.json`.
+El proveedor **v8** genera un resumen en terminal, un reporte HTML y `coverage-summary.json`.
 
 | Métrica | Cobertura | Elementos ejecutados |
 |---|---:|---:|
-| Sentencias | 90,00 % | 729 de 810 |
-| Ramas | 80,74 % | 583 de 722 |
-| Funciones | 93,36 % | 211 de 226 |
-| Líneas | 89,82 % | 706 de 786 |
+| Sentencias | 90,29 % | 791 de 876 |
+| Ramas | 81,89 % | 638 de 779 |
+| Funciones | 93,44 % | 228 de 244 |
+| Líneas | 90,20 % | 764 de 847 |
 
-Los valores corresponden a la ejecución de referencia. Abre **`coverage/index.html`** en un navegador para consultar los resultados generados localmente.
+Abre `coverage/index.html` en el navegador para consultar el reporte local.
 
-La configuración incluye los archivos JavaScript y JSX de `src/`, incluso los que no tienen pruebas directas. Excluye los archivos de pruebas, `setupTests.js` y el punto de montaje `main.jsx`.
+La medición incluye los archivos JavaScript y JSX de `src/`, incluso los que no tienen pruebas directas. Excluye las pruebas, `setupTests.js` y `main.jsx`.
 
-La cobertura indica qué código se ejecutó; no demuestra por sí sola que todos los escenarios estén comprobados. La revisión del diseño responsive, la reproducción de videos y el comportamiento del sitio desplegado se verifican en un navegador real.
+La cobertura indica qué código se ejecutó; no demuestra por sí sola que todos los escenarios estén comprobados. El diseño responsive, el video y el despliegue se revisan en un navegador real.
 
 ### Informe y evidencias
 
-- [Informe de pruebas y análisis de cobertura](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
-- [Reporte HTML y recursos de cobertura](../../docs/ev2/pruebas_unitarias/cobertura/).
+- [Informe de pruebas](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
+- [Reporte HTML y recursos](../../docs/ev2/pruebas_unitarias/cobertura/).
 - [Resumen de cobertura](../../docs/ev2/pruebas_unitarias/cobertura/coverage-summary.json).
 - [Captura de cobertura](../../docs/ev2/pruebas_unitarias/evidencias/cobertura-final.png).
-- [Resultado de ejecución de las pruebas](../../docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
+- [Resultado de las pruebas](../../docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
 
-GitHub muestra los archivos HTML como código. Para navegar por el reporte conservado, abre `docs/ev2/pruebas_unitarias/cobertura/index.html` desde la copia local del repositorio.
+Para actualizar la copia documental después de generar la cobertura, ejecutar desde esta carpeta:
+
+```bash
+cp -R coverage/. ../../docs/ev2/pruebas_unitarias/cobertura/
+```
+
+GitHub muestra el HTML como código. El reporte conservado se consulta abriendo su `index.html` desde la copia local del repositorio.
 
 ---
 
-## 📦 Compilación de producción
-
-Genera los archivos de producción con:
+## 📦 Compilación
 
 ```bash
 npm run build
 ```
 
-El resultado se guarda en `dist/`.
+La compilación se genera en `dist/`.
 
-Para revisar esa compilación localmente:
+Para revisarla localmente:
 
 ```bash
 npm run preview
 ```
 
-Abre la dirección indicada en la terminal.
+Las carpetas locales `node_modules/`, `dist/` y `coverage/` están excluidas del control de versiones. La copia de cobertura en `docs/ev2/pruebas_unitarias/cobertura/` se conserva como documentación.
 
-Las carpetas `node_modules/`, `dist/` y `coverage/` se generan localmente y están excluidas del control de versiones de la aplicación React.
+---
 
-La copia del reporte en `docs/ev2/pruebas_unitarias/cobertura/` se conserva como documentación.
+## ☁️ Despliegue en AWS
+
+La aplicación se publicó en **AWS EC2**, utilizando **Ubuntu Server 24.04 LTS** y **Nginx**.
+
+**URL registrada:** [http://3.95.61.26](http://3.95.61.26)
+
+Nginx sirve los archivos de producción y utiliza `try_files` para permitir el acceso a las rutas de React Router.
+
+La disponibilidad depende de la instancia y del laboratorio AWS Academy. La IP pública puede cambiar al detener e iniciar la instancia.
+
+Consulta la [configuración, evidencias y procedimiento de actualización](../../docs/ev2/despliegue/README.md).
 
 ---
 
 ## 🤝 Trabajo colaborativo
 
-El equipo utiliza Git y GitHub para mantener el historial del proyecto y trabajar mediante ramas.
+El proyecto utiliza ramas de trabajo y Pull Requests para integrar cambios en `main`.
 
-Los cambios se integran a `main` mediante Pull Requests. Los mensajes de commit identifican al integrante y describen el aporte realizado.
-
-La revisión de cambios incluye la ejecución de las pruebas y la compilación de la aplicación.
+Los mensajes de commit identifican al integrante y describen el cambio. Antes de publicar, se incorporan las actualizaciones de `main` y se verifican las pruebas y la compilación cuando corresponde.
 
 ---
 
-## 📘 Enlaces del proyecto
+## 📘 Documentación
 
-- [Presentación general del repositorio](../../README.md).
-- [Primera etapa: HTML, CSS y JavaScript](../../fase1/proyecto_etapa1_html/).
-- [Documentación del proyecto](../../docs/).
+- [README general](../../README.md).
+- [Primera etapa](../../fase1/proyecto_etapa1_html/).
 - [Documentación de la segunda entrega](../../docs/ev2/).
 - [Informe de pruebas](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
+- [Despliegue en AWS](../../docs/ev2/despliegue/README.md).
 
 ---
 
