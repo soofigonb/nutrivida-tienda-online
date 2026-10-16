@@ -11,6 +11,8 @@ import Footer from './components/Footer.jsx'
 import ScrollNavegacion from './components/ScrollNavegacion.jsx'
 
 import Inicio from './pages/Inicio.jsx'
+import Servicios from './pages/Servicios.jsx'
+import Ofertas from './pages/Ofertas.jsx'
 import Agendar from './pages/Agendar.jsx'
 import Carrito from './pages/Carrito.jsx'
 import Registro from './pages/Registro.jsx'
@@ -76,17 +78,38 @@ function App() {
           <ScrollNavegacion />
 
           <Routes>
-            {/* Páginas con navbar y footer públicos */}
             <Route element={<SitioPublico />}>
               <Route path="/" element={<Inicio />} />
 
-              <Route path="/agendar" element={<Agendar />} />
+              <Route
+                path="/servicios"
+                element={<Servicios />}
+              />
 
-              <Route path="/carrito" element={<Carrito />} />
+              <Route
+                path="/ofertas"
+                element={<Ofertas />}
+              />
 
-              <Route path="/login" element={<Login />} />
+              <Route
+                path="/agendar"
+                element={<Agendar />}
+              />
 
-              <Route path="/registro" element={<Registro />} />
+              <Route
+                path="/carrito"
+                element={<Carrito />}
+              />
+
+              <Route
+                path="/login"
+                element={<Login />}
+              />
+
+              <Route
+                path="/registro"
+                element={<Registro />}
+              />
 
               <Route
                 path="/blogs/alimentacion-antiinflamatoria"
@@ -104,9 +127,11 @@ function App() {
               />
             </Route>
 
-            {/* Panel protegido con menú propio */}
             <Route element={<RutaAdmin />}>
-              <Route path="/admin" element={<AdminLayout />}>
+              <Route
+                path="/admin"
+                element={<AdminLayout />}
+              >
                 <Route index element={<AdminHome />} />
 
                 <Route
