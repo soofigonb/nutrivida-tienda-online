@@ -122,7 +122,7 @@ El precio corresponde al plan seleccionado. No se agrega un cobro adicional por 
 | [`fase2/proyecto_etapa2_react/`](./fase2/proyecto_etapa2_react/) | Aplicación React, configuración y pruebas. |
 | [`docs/ev1/`](./docs/ev1/) | Documentación de la primera entrega. |
 | [`docs/ev2/`](./docs/ev2/) | Documentación de la segunda entrega. |
-| [ERS de NutriVida versión 2](./docs/ev2/DSY1104_EV2_Anexo4_ERS_NutriVida_v2.docx) | Requisitos y criterios de aceptación de la aplicación React. |
+| [ERS de NutriVida versión 2](./docs/ev2/DSY1104%20Evaluaci%C3%B3n%20Parcial%202%20-%20Anexo%204%20ERS-Especificacion%20de%20Requisitos%20del%20software.docx.pdf) | Requisitos y criterios de aceptación de la aplicación React. |
 | [`docs/ev2/pruebas_unitarias/`](./docs/ev2/pruebas_unitarias/) | Informe, cobertura y evidencias de pruebas. |
 | [`docs/ev2/despliegue_aws/`](./docs/ev2/despliegue_aws/) | Procedimiento y evidencias del despliegue en AWS. |
 | `README.md` | Presentación e instrucciones generales. |
