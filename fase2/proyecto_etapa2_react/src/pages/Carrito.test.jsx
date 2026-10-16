@@ -1,153 +1,430 @@
-import { render, screen } from '@testing-library/react'
+import {
+  cleanup,
+  render,
+  screen,
+} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { beforeEach, describe, expect, test } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  test,
+} from 'vitest'
+
+import { AuthContext } from '../context/AuthContext'
 import { CarritoProvider } from '../context/CarritoContext'
 import Carrito from './Carrito'
 
-function renderCarrito() {
-  return render(
+// ========================================
+// 1. DATOS Y CONFIGURACIÓN
+// ========================================
+
+function crearReserva(cambios = {}) {
+  const fecha = new Date()
+
+  fecha.setDate(fecha.getDate() + 30)
+
+  const fechaFutura = [
+    fecha.getFullYear(),
+    String(fecha.getMonth() + 1).padStart(2, '0'),
+    String(fecha.getDate()).padStart(2, '0'),
+  ].join('-')
+
+  return {
+    id: 'reserva-1',
+    servicio: 'Plan nutricional integral',
+    precio: 60000,
+    nutricionistaId: '3',
+    nutricionistaNombre: 'Dra. Valeria Rojas',
+    fecha: fechaFutura,
+    hora: '15:00',
+    motivo: 'Evaluación anual',
+    ...cambios,
+  }
+}
+
+function mostrar(reservas = [], usuario = null) {
+  localStorage.setItem(
+    'carritoNutriVida',
+    JSON.stringify(reservas),
+  )
+
+  render(
     <MemoryRouter>
-      <CarritoProvider>
-        <Carrito />
-      </CarritoProvider>
-    </MemoryRouter>
+      <AuthContext.Provider value={{ usuario }}>
+        <CarritoProvider>
+          <Carrito />
+        </CarritoProvider>
+      </AuthContext.Provider>
+    </MemoryRouter>,
+  )
+
+  return userEvent.setup()
+}
+
+function leerCarrito() {
+  return JSON.parse(
+    localStorage.getItem('carritoNutriVida') || '[]',
   )
 }
 
-describe('Módulo de Carrito de Reservas - Carrito.jsx (Nitsi)', () => {
-  beforeEach(() => {
-    localStorage.clear()
+function leerCitas() {
+  return JSON.parse(
+    localStorage.getItem('citasNutriVida') || '[]',
+  )
+}
+
+async function abrirRevision(user) {
+  await user.click(
+    screen.getByRole('button', {
+      name: /Continuar con la reserva/i,
+    }),
+  )
+}
+
+async function completarPaciente(user) {
+  await user.type(
+    screen.getByLabelText('Nombre del paciente'),
+    'Ana Muñoz',
+  )
+
+  await user.type(
+    screen.getByLabelText('Correo del paciente'),
+    'ana@gmail.com',
+  )
+}
+
+async function confirmar(user) {
+  await user.click(
+    screen.getByRole('button', {
+      name: /Confirmar agendamiento/i,
+    }),
+  )
+}
+
+beforeEach(() => {
+  localStorage.clear()
+})
+
+afterEach(() => {
+  cleanup()
+  localStorage.clear()
+})
+
+// ========================================
+// 2. ESTADO VACÍO Y TOTAL
+// ========================================
+
+describe('Carrito y revisión de reservas', () => {
+  test('muestra el estado vacío cuando no hay consultas', () => {
+    mostrar()
+
+    expect(
+      screen.getByText(
+        /Todavía no has agregado una consulta/i,
+      ),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.queryByRole('button', {
+        name: /Continuar con la reserva/i,
+      }),
+    ).not.toBeInTheDocument()
   })
 
-  test('muestra el mensaje de estado vacío cuando no hay reservas agregadas', () => {
-    renderCarrito()
-    expect(screen.getByText(/todavía no has agregado una consulta/i)).toBeInTheDocument()
-  })
-
-  /**
-   * Criterio 2: el carrito calcula y actualiza el total al eliminar.
-   */
-  test('calcula el total de las consultas y lo actualiza inmediatamente al eliminar un ítem', async () => {
-    const user = userEvent.setup()
-
-    // Sembrar dos reservas en localStorage: una de $35.000 y otra de $60.000 (Total inicial = $95.000)
-    const reservasIniciales = [
-      {
-        id: 'reserva-1',
+  test('calcula el total y lo actualiza al eliminar una consulta', async () => {
+    const user = mostrar([
+      crearReserva({
+        id: 'reserva-inicial',
         servicio: 'Evaluación y consulta inicial',
         precio: 35000,
         nutricionistaId: '1',
-        nutricionistaNombre: 'Dra. Camila Torres',
-        fecha: '2028-10-15',
         hora: '09:00',
-        motivo: 'Control de rutina',
-      },
-      {
-        id: 'reserva-2',
-        servicio: 'Plan nutricional integral',
-        precio: 60000,
-        nutricionistaId: '2',
-        nutricionistaNombre: 'Lic. Mateo Silva',
-        fecha: '2028-10-16',
-        hora: '11:00',
-        motivo: 'Plan de alimentación deportiva',
-      },
-    ]
+      }),
+      crearReserva(),
+    ])
 
-    localStorage.setItem('carritoNutriVida', JSON.stringify(reservasIniciales))
+    expect(
+      screen.getByText('$95.000 CLP'),
+    ).toBeInTheDocument()
 
-    renderCarrito()
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Eliminar Evaluación y consulta inicial',
+      }),
+    )
 
-    // Verificar que ambas reservas se muestren
-    expect(screen.getByText('Evaluación y consulta inicial')).toBeInTheDocument()
-    expect(screen.getByText('Plan nutricional integral')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Evaluación y consulta inicial'),
+    ).not.toBeInTheDocument()
 
-    // Total inicial esperado: $95.000 CLP
-    expect(screen.getByText(/\$95\.000/i)).toBeInTheDocument()
+    expect(
+      document.getElementById('total-carrito'),
+    ).toHaveTextContent('$60.000 CLP')
 
-    // Eliminar la primera reserva ($35.000)
-    const botonesEliminar = screen.getAllByRole('button', { name: /eliminar/i })
-    await user.click(botonesEliminar[0])
+    expect(leerCarrito()).toHaveLength(1)
 
-    // El nuevo total debe reflejar únicamente los $60.000 del plan integral
-    expect(screen.getAllByText(/\$60\.000/i)[0]).toBeInTheDocument()
-    expect(screen.queryByText('Evaluación y consulta inicial')).not.toBeInTheDocument()
+    expect(leerCarrito()[0]).toMatchObject({
+      servicio: 'Plan nutricional integral',
+      precio: 60000,
+    })
   })
 
-  /**
-   * Criterio 3: Una confirmación exitosa crea citas y limpia el carrito; una fallida lo conserva.
-   */
-  test('una confirmación exitosa crea citas en citasNutriVida y limpia el carrito', async () => {
-    const user = userEvent.setup()
+  // ========================================
+  // 3. REVISIÓN PREVIA A LA CONFIRMACIÓN
+  // ========================================
 
-    const reservaPrueba = [
-      {
-        id: 'reserva-exito',
-        servicio: 'Plan nutricional integral',
-        precio: 60000,
-        nutricionistaId: '3',
-        nutricionistaNombre: 'Dra. Valeria Rojas',
-        fecha: '2028-12-01',
-        hora: '15:00',
-        motivo: 'Evaluación anual',
-      },
-    ]
+  test('abrir la revisión muestra las consultas sin confirmar ni vaciar el carrito', async () => {
+    const reserva = crearReserva()
+    const user = mostrar([reserva])
 
-    localStorage.setItem('carritoNutriVida', JSON.stringify(reservaPrueba))
+    await abrirRevision(user)
 
-    renderCarrito()
+    expect(
+      screen.getByRole('heading', {
+        name: 'Revisa y confirma tu reserva',
+      }),
+    ).toBeInTheDocument()
 
-    const botonConfirmar = screen.getByRole('button', { name: /confirmar agendamiento/i })
-    await user.click(botonConfirmar)
+    expect(
+      screen.getByText(reserva.servicio),
+    ).toBeInTheDocument()
 
-    // Debe mostrar la vista de confirmación exitosa
-    expect(screen.getByText(/¡agendamiento confirmado!/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(reserva.nutricionistaNombre),
+    ).toBeInTheDocument()
 
-    // Comprobar que se guardó en citasNutriVida
-    const citas = JSON.parse(localStorage.getItem('citasNutriVida') || '[]')
-    expect(citas.length).toBeGreaterThan(0)
-    expect(citas[0].servicio).toBe('Plan nutricional integral')
+    expect(
+      screen.getByText(`Motivo: ${reserva.motivo}`),
+    ).toBeInTheDocument()
 
-    // Comprobar que el carrito quedó vacío en localStorage
-    const carritoActual = JSON.parse(localStorage.getItem('carritoNutriVida') || '[]')
-    expect(carritoActual).toHaveLength(0)
+    expect(
+      document.getElementById('lista-carrito'),
+    ).toHaveTextContent(reserva.fecha)
+
+    expect(
+      document.getElementById('lista-carrito'),
+    ).toHaveTextContent(reserva.hora)
+
+    expect(
+      document.getElementById('total-carrito'),
+    ).toHaveTextContent('$60.000 CLP')
+
+    expect(
+      screen.getByLabelText('Nombre del paciente'),
+    ).toHaveValue('')
+
+    expect(
+      screen.getByLabelText('Correo del paciente'),
+    ).toHaveValue('')
+
+    expect(leerCitas()).toEqual([])
+    expect(leerCarrito()).toEqual([reserva])
   })
 
-  test('una confirmación fallida muestra el error y conserva las reservas en el carrito', async () => {
-    const user = userEvent.setup()
-
-    const reservaPrueba = [
+  test('completa nombre y correo con los datos de la sesión', async () => {
+    const user = mostrar(
+      [crearReserva()],
       {
-        id: 'reserva-fallo',
-        servicio: 'Plan de nutrición deportiva',
-        precio: 50000,
-        nutricionistaId: '2',
-        nutricionistaNombre: 'Lic. Mateo Silva',
-        fecha: '2028-12-05',
-        hora: '17:00',
-        motivo: 'Preparación maratón',
+        id: 'paciente-1',
+        nombre: 'Sofía González',
+        correo: 'sofia@duoc.cl',
+        rol: 'paciente',
       },
-    ]
+    )
 
-    localStorage.setItem('carritoNutriVida', JSON.stringify(reservaPrueba))
+    await abrirRevision(user)
 
-    renderCarrito()
+    expect(
+      screen.getByLabelText('Nombre del paciente'),
+    ).toHaveValue('Sofía González')
 
-    // Activar simulación de fallo controlada
-    const switchFallo = screen.getByRole('checkbox', { name: /simular fallo/i })
-    await user.click(switchFallo)
+    expect(
+      screen.getByLabelText('Correo del paciente'),
+    ).toHaveValue('sofia@duoc.cl')
 
-    // Presionar confirmar
-    const botonConfirmar = screen.getByRole('button', { name: /confirmar agendamiento/i })
-    await user.click(botonConfirmar)
+    expect(leerCitas()).toEqual([])
+  })
 
-    // Debe mostrar el mensaje de error controlado
-    expect(screen.getByText(/simulación de fallo/i)).toBeInTheDocument()
+  test('permite volver al carrito sin perder consultas ni crear citas', async () => {
+    const reserva = crearReserva()
+    const user = mostrar([reserva])
 
-    // El carrito debe seguir conservando la reserva
-    expect(screen.getByText('Plan de nutrición deportiva')).toBeInTheDocument()
-    const carritoGuardado = JSON.parse(localStorage.getItem('carritoNutriVida') || '[]')
-    expect(carritoGuardado).toHaveLength(1)
+    await abrirRevision(user)
+
+    await user.click(
+      screen.getByRole('button', {
+        name: 'Volver al carrito',
+      }),
+    )
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Mi Carrito de Reservas',
+      }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Eliminar Plan nutricional integral',
+      }),
+    ).toBeInTheDocument()
+
+    expect(leerCitas()).toEqual([])
+    expect(leerCarrito()).toEqual([reserva])
+  })
+
+  test('rechaza datos vacíos y correo inválido sin confirmar', async () => {
+    const reserva = crearReserva()
+    const user = mostrar([reserva])
+
+    await abrirRevision(user)
+    await confirmar(user)
+
+    expect(
+      await screen.findByText(
+        'Ingresa un nombre de entre 2 y 100 caracteres.',
+      ),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText(
+        'Ingresa un correo electrónico válido.',
+      ),
+    ).toBeInTheDocument()
+
+    await user.type(
+      screen.getByLabelText('Nombre del paciente'),
+      'Ana',
+    )
+
+    await user.type(
+      screen.getByLabelText('Correo del paciente'),
+      'correo-invalido',
+    )
+
+    await confirmar(user)
+
+    expect(
+      screen.getByLabelText('Correo del paciente'),
+    ).toHaveClass('is-invalid')
+
+    expect(
+      screen.getByLabelText('Nombre del paciente'),
+    ).toHaveValue('Ana')
+
+    expect(leerCitas()).toEqual([])
+    expect(leerCarrito()).toEqual([reserva])
+  })
+
+  // ========================================
+  // 4. CONFIRMACIÓN Y PERSISTENCIA
+  // ========================================
+
+  test('confirma, conserva el precio del plan y guarda los datos del paciente', async () => {
+    const reserva = crearReserva()
+    const user = mostrar([reserva])
+
+    await abrirRevision(user)
+    await completarPaciente(user)
+    await confirmar(user)
+
+    expect(
+      await screen.findByRole('heading', {
+        name: '¡Agendamiento Confirmado!',
+      }),
+    ).toBeInTheDocument()
+
+    const citas = leerCitas()
+
+    expect(citas).toHaveLength(1)
+
+    expect(citas[0]).toMatchObject({
+      reservaId: reserva.id,
+      servicio: reserva.servicio,
+      precio: 60000,
+      nutricionistaId: reserva.nutricionistaId,
+      fecha: reserva.fecha,
+      hora: reserva.hora,
+      motivo: reserva.motivo,
+      pacienteNombre: 'Ana Muñoz',
+      pacienteCorreo: 'ana@gmail.com',
+      estado: 'confirmada',
+    })
+
+    expect(
+      screen.getByText('Ana Muñoz'),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText('ana@gmail.com'),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByText(citas[0].idCita),
+    ).toBeInTheDocument()
+
+    expect(leerCarrito()).toEqual([])
+  })
+
+  test('un fallo conserva el carrito y permite reintentar sin duplicar citas', async () => {
+    const reserva = crearReserva()
+    const user = mostrar([reserva])
+
+    await abrirRevision(user)
+    await completarPaciente(user)
+
+    // React Bootstrap lo presenta visualmente como
+    // interruptor, pero su rol accesible es checkbox.
+    const simulacion = screen.getByRole('checkbox', {
+      name: /Simular fallo al confirmar/i,
+    })
+
+    await user.click(simulacion)
+
+    expect(simulacion).toBeChecked()
+
+    await confirmar(user)
+
+    expect(
+      await screen.findByText(/Simulación de fallo:/i),
+    ).toBeInTheDocument()
+
+    expect(leerCarrito()).toEqual([reserva])
+    expect(leerCitas()).toEqual([])
+
+    expect(
+      screen.getByLabelText('Nombre del paciente'),
+    ).toHaveValue('Ana Muñoz')
+
+    expect(
+      screen.getByLabelText('Correo del paciente'),
+    ).toHaveValue('ana@gmail.com')
+
+    await user.click(simulacion)
+
+    expect(simulacion).not.toBeChecked()
+
+    await confirmar(user)
+
+    expect(
+      await screen.findByRole('heading', {
+        name: '¡Agendamiento Confirmado!',
+      }),
+    ).toBeInTheDocument()
+
+    expect(leerCitas()).toHaveLength(1)
+
+    expect(leerCitas()[0]).toMatchObject({
+      reservaId: reserva.id,
+      precio: reserva.precio,
+      pacienteNombre: 'Ana Muñoz',
+      pacienteCorreo: 'ana@gmail.com',
+      estado: 'confirmada',
+    })
+
+    expect(leerCarrito()).toEqual([])
   })
 })
