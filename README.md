@@ -46,6 +46,7 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 ### Sitio público
 
 - Presentación de la clínica e información institucional.
+- Video educativo sobre alimentación saludable, con su fuente.
 - Listado de nutricionistas y visualización de sus detalles.
 - Planes y servicios con precios en pesos chilenos.
 - Promoción interactiva.
@@ -100,6 +101,7 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 | Persistencia | `localStorage` y JSON |
 | Pruebas | Vitest, React Testing Library, user-event y jest-dom |
 | Entorno de pruebas | jsdom |
+| Cobertura | v8 mediante `@vitest/coverage-v8` |
 | Análisis estático | Oxlint |
 | Entorno de desarrollo | Node.js y npm |
 | Control de versiones | Git y GitHub |
@@ -112,8 +114,9 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 |---|---|
 | [`fase1/proyecto_etapa1_html/`](./fase1/proyecto_etapa1_html/) | Primera versión del sitio y su README. |
 | [`fase2/proyecto_etapa2_react/`](./fase2/proyecto_etapa2_react/) | Aplicación React, configuración, pruebas y README técnico. |
-| [`docs/`](./docs/) | Documentación del proyecto. |
 | [`docs/ev1/`](./docs/ev1/) | Documentación de la primera etapa. |
+| [`docs/ev2/`](./docs/ev2/) | Documentación de la segunda entrega. |
+| [`docs/ev2/pruebas_unitarias/`](./docs/ev2/pruebas_unitarias/) | Informe de pruebas, reporte de cobertura y evidencias. |
 | `README.md` | Presentación e instrucciones generales. |
 
 La aplicación React organiza sus archivos en componentes, páginas, contextos, datos, utilidades, estilos y recursos.
@@ -177,7 +180,7 @@ Consulta las instrucciones completas en el [README de la fase 1](./fase1/proyect
 
 ---
 
-## 🧪 Pruebas y verificación
+## 🧪 Pruebas y cobertura
 
 La aplicación React utiliza **Vitest** para ejecutar pruebas de componentes, interacciones, reglas de negocio y persistencia local.
 
@@ -188,6 +191,41 @@ Desde `fase2/proyecto_etapa2_react/`:
 ```bash
 npm run test -- --run
 ```
+
+### Generar el reporte de cobertura
+
+```bash
+npm run test:coverage
+```
+
+La ejecución de referencia del **15 de octubre de 2026** aprobó **139 pruebas en 14 archivos**, sin pruebas fallidas.
+
+| Métrica | Cobertura |
+|---|---:|
+| Sentencias | 90,00 % |
+| Ramas | 80,74 % |
+| Funciones | 93,36 % |
+| Líneas | 89,82 % |
+
+El reporte local se genera en `coverage/index.html` y puede abrirse con un navegador.
+
+La cobertura indica qué código se ejecutó durante las pruebas. Su interpretación, alcance y limitaciones se explican en el informe.
+
+### Documentación de pruebas
+
+- [Informe de pruebas y análisis de cobertura](./docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
+- [Reporte de cobertura y recursos HTML](./docs/ev2/pruebas_unitarias/cobertura/).
+- [Resumen de cobertura en JSON](./docs/ev2/pruebas_unitarias/cobertura/coverage-summary.json).
+- [Captura de cobertura](./docs/ev2/pruebas_unitarias/evidencias/cobertura-final.png).
+- [Resultado de ejecución de las pruebas](./docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
+
+GitHub muestra los archivos HTML como código. Para navegar por el reporte conservado, abre `docs/ev2/pruebas_unitarias/cobertura/index.html` desde la copia local del repositorio.
+
+---
+
+## 📦 Verificación y compilación
+
+Desde la carpeta de la aplicación React:
 
 ### Analizar el código
 
@@ -207,9 +245,9 @@ npm run build
 npm run preview
 ```
 
-La compilación se genera en `dist/`. Las carpetas `node_modules/` y `dist/` se generan localmente y están excluidas del control de versiones.
+La compilación se genera en `dist/`. Las carpetas `node_modules/`, `dist/` y `coverage/` de la aplicación React se generan localmente y están excluidas del control de versiones.
 
-Los casos de prueba y su organización se describen en el [README de la fase 2](./fase2/proyecto_etapa2_react/README.md#-pruebas-automatizadas).
+La copia del reporte conservada en `docs/ev2/pruebas_unitarias/cobertura/` forma parte de la documentación.
 
 ---
 
