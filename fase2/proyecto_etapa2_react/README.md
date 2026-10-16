@@ -469,7 +469,7 @@ Los mensajes de commit identifican al integrante y describen el cambio. Antes de
 - [README general](../../README.md).
 - [Primera etapa](../../fase1/proyecto_etapa1_html/).
 - [Documentación de la segunda entrega](../../docs/ev2/).
-- [ERS de NutriVida versión 2](../../docs/ev2/DSY1104_EV2_Anexo4_ERS_NutriVida_v2.docx).
+- [ERS de NutriVida versión 2](../../docs/ev2/DSY1104%20Evaluaci%C3%B3n%20Parcial%202%20-%20Anexo%204%20ERS-Especificacion%20de%20Requisitos%20del%20software.docx.pdf).
 - [Informe de pruebas](../../docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
 - [Despliegue en AWS](../../docs/ev2/despliegue_aws/README.md).
 
