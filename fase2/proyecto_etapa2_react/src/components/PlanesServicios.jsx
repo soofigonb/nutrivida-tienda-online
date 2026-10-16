@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import planes from '../data/planes.js'
+
+import planes, {
+  promocionPrimeraConsulta,
+} from '../data/planes.js'
 import formatearPrecio from '../utils/formatearPrecio.js'
 
-// Tarjeta reutilizable de un servicio.
-function TarjetaServicio({ plan }) {
+// Tarjeta compartida entre el inicio y el catálogo.
+export function TarjetaServicio({ plan }) {
   return (
     <article className="servicio-tarjeta">
       <img
@@ -40,7 +43,6 @@ function TarjetaServicio({ plan }) {
   )
 }
 
-// Sección de servicios y promoción.
 function PlanesServicios() {
   const [mostrarPromocion, setMostrarPromocion] = useState(false)
 
@@ -49,15 +51,21 @@ function PlanesServicios() {
       <div className="container">
         <div className="servicios-encabezado">
           <div>
-            <p className="seccion-etiqueta">Elige tu atención</p>
+            <p className="seccion-etiqueta">
+              Elige tu atención
+            </p>
 
-            <h2 className="seccion-titulo">Planes y servicios</h2>
+            <h2 className="seccion-titulo">
+              Planes y servicios
+            </h2>
           </div>
 
           <button
             type="button"
             className="promocion-boton"
-            onClick={() => setMostrarPromocion((actual) => !actual)}
+            onClick={() =>
+              setMostrarPromocion((actual) => !actual)
+            }
             aria-expanded={mostrarPromocion}
             aria-controls="promocion-servicios"
           >
@@ -69,12 +77,21 @@ function PlanesServicios() {
 
         <div id="promocion-servicios" aria-live="polite">
           {mostrarPromocion && (
-            <p className="promocion-mensaje">
-              <strong>Beneficio en tu primera consulta:</strong>{' '}
-              Durante este mes, al agendar tu primera consulta online,
-              recibirás una medición de composición corporal sin costo
-              adicional.
-            </p>
+            <div className="promocion-mensaje">
+              <p>
+                <strong>
+                  Beneficio en tu primera consulta:
+                </strong>{' '}
+                {promocionPrimeraConsulta.descripcion}
+              </p>
+
+              <Link
+                to="/ofertas"
+                className="fw-semibold text-success"
+              >
+                Ver condiciones del beneficio
+              </Link>
+            </div>
           )}
         </div>
 
@@ -82,6 +99,22 @@ function PlanesServicios() {
           {planes.map((plan) => (
             <TarjetaServicio key={plan.id} plan={plan} />
           ))}
+        </div>
+
+        <div className="gestion-botones mt-4">
+          <Link
+            to="/servicios"
+            className="btn btn-outline-success"
+          >
+            Explorar categorías
+          </Link>
+
+          <Link
+            to="/ofertas"
+            className="btn btn-success"
+          >
+            Ver ofertas
+          </Link>
         </div>
       </div>
     </section>
