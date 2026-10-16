@@ -77,6 +77,10 @@ function mostrar(respuesta = { exito: true }) {
   }
 }
 
+// ========================================
+// 2. INTERACCIONES DEL FORMULARIO
+// ========================================
+
 async function completar(user, cambios = {}) {
   const datos = {
     ...datosValidos,
@@ -84,11 +88,19 @@ async function completar(user, cambios = {}) {
   }
 
   for (const [campo, valor] of Object.entries(datos)) {
-    if (valor) {
-      await user.type(
-        screen.getByLabelText(etiquetas[campo]),
-        valor,
-      )
+    if (!valor) continue
+
+    const control = screen.getByLabelText(
+      etiquetas[campo],
+    )
+
+    if (campo === 'fechaNacimiento') {
+      await user.type(control, valor)
+    } else {
+      // Pegar evita escribir todos los datos carácter por carácter,
+      // manteniendo los eventos y las validaciones del formulario.
+      await user.click(control)
+      await user.paste(valor)
     }
   }
 
@@ -117,7 +129,7 @@ afterEach(() => {
 })
 
 // ========================================
-// 2. VALIDACIÓN DE CAMPOS
+// 3. VALIDACIÓN DE CAMPOS
 // ========================================
 
 describe('Interacción del formulario de Registro', () => {
@@ -212,6 +224,10 @@ describe('Interacción del formulario de Registro', () => {
     },
   )
 
+  // ========================================
+  // 4. SELECCIÓN DE REGIÓN Y COMUNA
+  // ========================================
+
   test('habilita comunas según región y limpia la comuna al cambiarla', async () => {
     const { user } = mostrar()
 
@@ -250,7 +266,7 @@ describe('Interacción del formulario de Registro', () => {
   })
 
   // ========================================
-  // 3. ENVÍO Y NAVEGACIÓN
+  // 5. ENVÍO Y NAVEGACIÓN
   // ========================================
 
   test.each([
@@ -291,7 +307,7 @@ describe('Interacción del formulario de Registro', () => {
   )
 
   // ========================================
-  // 4. ERRORES DEL CONTEXTO
+  // 6. ERRORES DEL CONTEXTO
   // ========================================
 
   test.each([
