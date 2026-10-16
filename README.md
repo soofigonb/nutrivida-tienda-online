@@ -122,8 +122,9 @@ El precio corresponde al plan seleccionado. No se agrega un cobro adicional por 
 | [`fase2/proyecto_etapa2_react/`](./fase2/proyecto_etapa2_react/) | Aplicación React, configuración y pruebas. |
 | [`docs/ev1/`](./docs/ev1/) | Documentación de la primera entrega. |
 | [`docs/ev2/`](./docs/ev2/) | Documentación de la segunda entrega. |
+| [ERS de NutriVida versión 2](./docs/ev2/DSY1104_EV2_Anexo4_ERS_NutriVida_v2.docx) | Requisitos y criterios de aceptación de la aplicación React. |
 | [`docs/ev2/pruebas_unitarias/`](./docs/ev2/pruebas_unitarias/) | Informe, cobertura y evidencias de pruebas. |
-| [`docs/ev2/despliegue/`](./docs/ev2/despliegue/) | Procedimiento y evidencias del despliegue en AWS. |
+| [`docs/ev2/despliegue_aws/`](./docs/ev2/despliegue_aws/) | Procedimiento y evidencias del despliegue en AWS. |
 | `README.md` | Presentación e instrucciones generales. |
 
 ---
@@ -232,13 +233,13 @@ La copia de cobertura ubicada en `docs/ev2/pruebas_unitarias/cobertura/` se cons
 
 La aplicación se publicó en una instancia **AWS EC2**, con **Ubuntu Server 24.04 LTS** y **Nginx**.
 
-**URL registrada del despliegue:** [http://3.95.61.26](http://3.95.61.26)
+**URL registrada del despliegue:** [http://54.160.216.249](http://54.160.216.249)
 
 Nginx utiliza una configuración compatible con React Router para servir las rutas de la aplicación.
 
 El entorno pertenece a AWS Academy. Su disponibilidad depende de que la instancia y el laboratorio permanezcan activos. La IP pública puede cambiar al detener e iniciar la instancia.
 
-Consulta el [procedimiento de despliegue y actualización](./docs/ev2/despliegue/README.md).
+Consulta el [procedimiento de despliegue y actualización](./docs/ev2/despliegue_aws/README.md).
 
 ---
 
