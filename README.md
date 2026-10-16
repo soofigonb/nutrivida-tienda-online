@@ -13,20 +13,20 @@
   ·
   <a href="./fase2/proyecto_etapa2_react/">Fase 2 · React</a>
   ·
-  <a href="./docs/">Documentación</a>
+  <a href="./docs/ev2/">Documentación EV2</a>
 </p>
 
 ---
 
 ## 🌿 Acerca del proyecto
 
-**NutriVida** es un proyecto web para una clínica nutricional. Su propósito es facilitar el acceso a información sobre la clínica, sus profesionales, planes de atención y contenidos sobre alimentación saludable.
+**NutriVida** es un proyecto web para una clínica nutricional. Facilita el acceso a información sobre sus profesionales, planes de atención y contenidos sobre alimentación saludable.
 
-La aplicación permite registrar pacientes, iniciar sesión, seleccionar un servicio, agendar una consulta y confirmar reservas mediante un carrito. También incorpora un panel administrativo para gestionar pacientes y nutricionistas.
+La aplicación permite registrar pacientes, iniciar sesión, explorar servicios por categoría, consultar ofertas, agendar atenciones y revisar los datos de una reserva antes de confirmarla. También incorpora un panel administrativo para gestionar pacientes y nutricionistas.
 
-El repositorio conserva la evolución del proyecto en dos etapas: una primera versión construida con HTML, CSS y JavaScript, y una segunda versión desarrollada con React y Vite.
+El repositorio conserva dos etapas: la versión original desarrollada con HTML, CSS y JavaScript, y su migración a React con Vite.
 
-> El sistema es un prototipo frontend con datos de demostración. Utiliza persistencia local en el navegador y simula la autenticación, la confirmación de reservas y el envío del formulario de contacto. No procesa pagos reales ni utiliza un backend.
+> El sistema es un prototipo frontend con datos de demostración. La autenticación, la confirmación de reservas y el envío de contacto son simulados. Los datos se almacenan localmente en el navegador. No utiliza un backend ni procesa pagos reales.
 
 ---
 
@@ -34,10 +34,8 @@ El repositorio conserva la evolución del proyecto en dos etapas: una primera ve
 
 | Etapa | Descripción | Documentación |
 |---|---|---|
-| **Fase 1** | Sitio desarrollado con HTML, CSS, JavaScript y Bootstrap. | [Consultar README](./fase1/proyecto_etapa1_html/README.md) |
-| **Fase 2** | Migración a React con componentes reutilizables, navegación, contextos, persistencia y pruebas automatizadas. | [Consultar README](./fase2/proyecto_etapa2_react/README.md) |
-
-Cada etapa incluye sus propias instrucciones de ejecución y organización de archivos.
+| Fase 1 | Sitio desarrollado con HTML, CSS, JavaScript y Bootstrap. | [README de fase 1](./fase1/proyecto_etapa1_html/README.md) |
+| Fase 2 | Aplicación React con componentes reutilizables, navegación, contextos, CRUD, persistencia y pruebas automatizadas. | [README de fase 2](./fase2/proyecto_etapa2_react/README.md) |
 
 ---
 
@@ -47,32 +45,40 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 
 - Presentación de la clínica e información institucional.
 - Video educativo sobre alimentación saludable, con su fuente.
-- Listado de nutricionistas y visualización de sus detalles.
+- Listado de nutricionistas y detalle de cada profesional.
 - Planes y servicios con precios en pesos chilenos.
-- Promoción interactiva.
+- Catálogo con filtro por categoría y selección conservada en la URL.
+- Página de ofertas con condiciones del beneficio.
+- Promoción interactiva en el inicio.
 - Blogs y artículos sobre nutrición.
 - Formulario de contacto con validaciones.
-- Navegación responsive.
+- Navegación y diseño responsive.
 
 ### Cuentas de usuario
 
-- Registro de pacientes.
-- Validación de RUN/RUT y datos personales.
+- Registro de pacientes con validaciones.
+- Comprobación del RUN/RUT y su dígito verificador.
 - Selección relacionada de región y comuna.
+- Detección de RUN/RUT y correos duplicados.
 - Inicio y cierre de sesión simulados.
 - Acceso diferenciado para pacientes y administrador.
 - Actualización del menú según la sesión.
 
 ### Agendamiento y carrito
 
-- Selección de un plan y un nutricionista.
-- Ingreso del motivo, fecha y horario de atención.
+- Selección de un plan, profesional, motivo, fecha y horario.
+- Preselección del plan desde servicios y ofertas.
 - Validación de fechas y horarios futuros.
 - Detección de reservas duplicadas.
-- Incorporación y eliminación de atenciones en el carrito.
+- Incorporación, eliminación y vaciado de consultas.
 - Cálculo del total según los planes seleccionados.
-- Confirmación simulada y resumen de reservas.
-- Persistencia y manejo de errores de almacenamiento.
+- Revisión de consultas y datos del paciente antes de confirmar.
+- Nombre y correo completados desde la sesión cuando está disponible.
+- Confirmación simulada con resumen y código de reserva.
+- Manejo de errores y conservación de reservas ante fallos.
+- Prevención de duplicados al reintentar la confirmación.
+
+El precio corresponde al plan seleccionado. No se agrega un cobro adicional por elegir un nutricionista.
 
 ### Panel administrativo
 
@@ -80,9 +86,9 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 - Listados y búsquedas de pacientes y nutricionistas.
 - Creación, edición y eliminación de registros.
 - Formularios reutilizables con validaciones.
-- Confirmación de eliminación.
-- Validación de relaciones con citas y reservas.
-- Actualización de los profesionales utilizados en el sitio público.
+- Confirmación antes de eliminar.
+- Comprobación de relaciones con citas y reservas.
+- Actualización de los profesionales utilizados por el sitio público.
 
 ---
 
@@ -91,7 +97,7 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 | Área | Tecnologías |
 |---|---|
 | Primera etapa | HTML5, CSS y JavaScript |
-| Aplicación React | React y JSX |
+| Aplicación | React y JSX |
 | Desarrollo y compilación | Vite |
 | Navegación | React Router |
 | Diseño e interfaz | Bootstrap, React Bootstrap y CSS |
@@ -103,7 +109,7 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 | Entorno de pruebas | jsdom |
 | Cobertura | v8 mediante `@vitest/coverage-v8` |
 | Análisis estático | Oxlint |
-| Entorno de desarrollo | Node.js y npm |
+| Publicación | AWS EC2, Ubuntu y Nginx |
 | Control de versiones | Git y GitHub |
 
 ---
@@ -112,14 +118,13 @@ Cada etapa incluye sus propias instrucciones de ejecución y organización de ar
 
 | Ubicación | Contenido |
 |---|---|
-| [`fase1/proyecto_etapa1_html/`](./fase1/proyecto_etapa1_html/) | Primera versión del sitio y su README. |
-| [`fase2/proyecto_etapa2_react/`](./fase2/proyecto_etapa2_react/) | Aplicación React, configuración, pruebas y README técnico. |
-| [`docs/ev1/`](./docs/ev1/) | Documentación de la primera etapa. |
+| [`fase1/proyecto_etapa1_html/`](./fase1/proyecto_etapa1_html/) | Versión original y su README. |
+| [`fase2/proyecto_etapa2_react/`](./fase2/proyecto_etapa2_react/) | Aplicación React, configuración y pruebas. |
+| [`docs/ev1/`](./docs/ev1/) | Documentación de la primera entrega. |
 | [`docs/ev2/`](./docs/ev2/) | Documentación de la segunda entrega. |
-| [`docs/ev2/pruebas_unitarias/`](./docs/ev2/pruebas_unitarias/) | Informe de pruebas, reporte de cobertura y evidencias. |
+| [`docs/ev2/pruebas_unitarias/`](./docs/ev2/pruebas_unitarias/) | Informe, cobertura y evidencias de pruebas. |
+| [`docs/ev2/despliegue/`](./docs/ev2/despliegue/) | Procedimiento y evidencias del despliegue en AWS. |
 | `README.md` | Presentación e instrucciones generales. |
-
-La aplicación React organiza sus archivos en componentes, páginas, contextos, datos, utilidades, estilos y recursos.
 
 ---
 
@@ -132,140 +137,126 @@ La aplicación React organiza sus archivos en componentes, páginas, contextos, 
 - Git.
 - Un navegador web actualizado.
 
-### 1. Clonar el repositorio
+### Instalación
 
 ```bash
 git clone https://github.com/soofigonb/nutrivida-tienda-online.git
-```
-
-### 2. Entrar en la aplicación
-
-```bash
 cd nutrivida-tienda-online/fase2/proyecto_etapa2_react
-```
-
-### 3. Instalar las dependencias
-
-```bash
 npm ci
 ```
 
-### 4. Iniciar el servidor de desarrollo
+### Iniciar el servidor
 
 ```bash
 npm run dev
 ```
 
-Abre la dirección indicada en la terminal, normalmente:
+Abre la dirección indicada en la terminal, normalmente [http://localhost:5173/](http://localhost:5173/).
 
-**http://localhost:5173/**
+Si el puerto está ocupado, Vite puede utilizar otro. Para detener el servidor, presiona **Ctrl + C**.
 
-Si el puerto está ocupado, Vite puede utilizar otro.
-
-Para detener el servidor, presiona **Ctrl + C**.
-
-> Los comandos de npm deben ejecutarse dentro de `fase2/proyecto_etapa2_react`, donde se encuentra `package.json`.
+> Los comandos de npm se ejecutan dentro de `fase2/proyecto_etapa2_react`, donde se encuentra `package.json`.
 
 ---
 
-## 🖥️ Ejecutar la versión HTML
+## 🖥️ Ejecutar la primera etapa
 
-1. Abre la carpeta `fase1/proyecto_etapa1_html/` en Visual Studio Code.
-2. Abre `index.html`.
-3. Selecciona **Open with Live Server**.
+Abre `fase1/proyecto_etapa1_html/index.html` mediante un servidor estático, como la extensión **Live Server** de Visual Studio Code.
 
-Esta versión utiliza un servidor estático y no requiere instalar dependencias con npm.
+Esta etapa no requiere instalar dependencias con npm.
 
-Consulta las instrucciones completas en el [README de la fase 1](./fase1/proyecto_etapa1_html/README.md).
+Consulta el [README de fase 1](./fase1/proyecto_etapa1_html/README.md).
 
 ---
 
 ## 🧪 Pruebas y cobertura
 
-La aplicación React utiliza **Vitest** para ejecutar pruebas de componentes, interacciones, reglas de negocio y persistencia local.
-
-Desde `fase2/proyecto_etapa2_react/`:
-
-### Ejecutar todas las pruebas
+Desde la carpeta React:
 
 ```bash
 npm run test -- --run
 ```
 
-### Generar el reporte de cobertura
+Para ejecutar las pruebas y generar la cobertura:
 
 ```bash
 npm run test:coverage
 ```
 
-La ejecución de referencia del **15 de octubre de 2026** aprobó **139 pruebas en 14 archivos**, sin pruebas fallidas.
+La ejecución de referencia del **16 de octubre de 2026 a las 02:20:55, hora de Chile**, aprobó **151 pruebas en 15 archivos**, sin pruebas fallidas. La duración registrada fue de **34,07 segundos**.
 
-| Métrica | Cobertura |
-|---|---:|
-| Sentencias | 90,00 % |
-| Ramas | 80,74 % |
-| Funciones | 93,36 % |
-| Líneas | 89,82 % |
+| Métrica | Cobertura | Elementos ejecutados |
+|---|---:|---:|
+| Sentencias | 90,29 % | 791 de 876 |
+| Ramas | 81,89 % | 638 de 779 |
+| Funciones | 93,44 % | 228 de 244 |
+| Líneas | 90,20 % | 764 de 847 |
 
-El reporte local se genera en `coverage/index.html` y puede abrirse con un navegador.
+Las pruebas verifican formularios, navegación, acceso por rol, categorías, ofertas, administración, reservas, persistencia y manejo de errores.
 
-La cobertura indica qué código se ejecutó durante las pruebas. Su interpretación, alcance y limitaciones se explican en el informe.
+El reporte local se genera en `coverage/index.html`. La cobertura indica qué código se ejecutó; su alcance y limitaciones se analizan en el informe.
 
-### Documentación de pruebas
+### Informe y evidencias
 
 - [Informe de pruebas y análisis de cobertura](./docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
-- [Reporte de cobertura y recursos HTML](./docs/ev2/pruebas_unitarias/cobertura/).
+- [Reporte HTML y recursos](./docs/ev2/pruebas_unitarias/cobertura/).
 - [Resumen de cobertura en JSON](./docs/ev2/pruebas_unitarias/cobertura/coverage-summary.json).
 - [Captura de cobertura](./docs/ev2/pruebas_unitarias/evidencias/cobertura-final.png).
-- [Resultado de ejecución de las pruebas](./docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
+- [Resultado de las pruebas](./docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
 
-GitHub muestra los archivos HTML como código. Para navegar por el reporte conservado, abre `docs/ev2/pruebas_unitarias/cobertura/index.html` desde la copia local del repositorio.
+GitHub muestra el HTML como código. Para navegar por el reporte, abre `docs/ev2/pruebas_unitarias/cobertura/index.html` desde la copia local del repositorio.
 
 ---
 
-## 📦 Verificación y compilación
+## 📦 Análisis y compilación
 
-Desde la carpeta de la aplicación React:
-
-### Analizar el código
+Desde la carpeta React:
 
 ```bash
 npm run lint
-```
-
-### Generar la compilación de producción
-
-```bash
 npm run build
-```
-
-### Revisar la compilación localmente
-
-```bash
 npm run preview
 ```
 
-La compilación se genera en `dist/`. Las carpetas `node_modules/`, `dist/` y `coverage/` de la aplicación React se generan localmente y están excluidas del control de versiones.
+- `lint` analiza el código con Oxlint.
+- `build` genera la compilación en `dist/`.
+- `preview` permite revisar esa compilación localmente.
 
-La copia del reporte conservada en `docs/ev2/pruebas_unitarias/cobertura/` forma parte de la documentación.
+Las carpetas `node_modules/`, `dist/` y `coverage/` de la aplicación se generan localmente y están excluidas del control de versiones.
+
+La copia de cobertura ubicada en `docs/ev2/pruebas_unitarias/cobertura/` se conserva como documentación.
+
+---
+
+## ☁️ Despliegue en AWS
+
+La aplicación se publicó en una instancia **AWS EC2**, con **Ubuntu Server 24.04 LTS** y **Nginx**.
+
+**URL registrada del despliegue:** [http://3.95.61.26](http://3.95.61.26)
+
+Nginx utiliza una configuración compatible con React Router para servir las rutas de la aplicación.
+
+El entorno pertenece a AWS Academy. Su disponibilidad depende de que la instancia y el laboratorio permanezcan activos. La IP pública puede cambiar al detener e iniciar la instancia.
+
+Consulta el [procedimiento de despliegue y actualización](./docs/ev2/despliegue/README.md).
 
 ---
 
 ## 💾 Persistencia local
 
-La aplicación conserva pacientes, nutricionistas, sesión, reservas y citas mediante `localStorage`.
+La aplicación conserva pacientes, profesionales, sesión, reservas y citas mediante `localStorage`.
 
-Los datos pertenecen al navegador y al origen desde el que se ejecuta la aplicación. No se comparten automáticamente entre dispositivos o navegadores.
+Los datos pertenecen al navegador y al origen utilizado. No se comparten automáticamente entre dispositivos, navegadores o entre localhost y AWS.
 
-Para las demostraciones deben utilizarse datos ficticios.
+En las demostraciones se utilizan datos ficticios.
 
 ---
 
 ## 🤝 Trabajo colaborativo
 
-El equipo utiliza ramas de trabajo y **Pull Requests** para revisar e integrar los cambios en `main`.
+Los cambios se desarrollan mediante ramas y se integran a `main` utilizando Pull Requests.
 
-### Comenzar una tarea
+### Crear una rama
 
 Con el directorio de trabajo limpio:
 
@@ -275,7 +266,7 @@ git pull --ff-only origin main
 git switch -c nombre/descripcion-tarea
 ```
 
-### Guardar los cambios
+### Guardar cambios
 
 Desde la raíz del repositorio:
 
@@ -285,24 +276,22 @@ git add .
 git commit -m "nombre: describir el cambio"
 ```
 
-### Integrar las actualizaciones de main
-
-Desde la rama de trabajo:
+### Actualizar la rama antes de publicar
 
 ```bash
 git fetch origin
 git merge origin/main
 ```
 
-Si la integración modifica la aplicación React, ejecuta sus pruebas y compilación antes de publicar.
+Si la integración modifica la aplicación, se comprueban las pruebas y la compilación antes de publicar.
 
-### Publicar la rama
+### Publicar
 
 ```bash
 git push -u origin nombre/descripcion-tarea
 ```
 
-Después, crea un Pull Request con `main` como destino e incluye una descripción del cambio y las verificaciones realizadas.
+Después se crea un Pull Request con `main` como destino, describiendo los cambios y las verificaciones realizadas.
 
 ---
 
