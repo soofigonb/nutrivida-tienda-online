@@ -1,0 +1,534 @@
+/* ========================================
+   1. ESTRUCTURA Y FUENTES DEL PANEL
+   ======================================== */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  color: #2f241f;
+  background-color: #f8f5ef;
+  font-family: "Roboto", sans-serif;
+}
+
+.admin-layout h1,
+.admin-layout h2,
+.admin-layout h3 {
+  font-family: "Fraunces", serif;
+}
+
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  padding: 40px;
+}
+
+/* ========================================
+   2. MENÚ LATERAL
+   ======================================== */
+
+.admin-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  width: 260px;
+  padding: 24px 0;
+  color: white;
+  background-color: #115e59;
+}
+
+/* Nombre de la clínica */
+
+.admin-sidebar-brand {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgb(255 255 255 / 18%);
+}
+
+.admin-sidebar-brand a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  font-family: "Fraunces", serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-decoration: none;
+}
+
+.admin-sidebar-brand span {
+  display: block;
+  margin-top: 6px;
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+/* Enlaces del menú */
+
+.admin-nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px 14px;
+}
+
+.admin-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 8px;
+  color: rgb(255 255 255 / 82%);
+  background: transparent;
+  text-align: left;
+  text-decoration: none;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link:focus-visible,
+.admin-nav-link.active {
+  color: white;
+  background-color: rgb(255 255 255 / 14%);
+}
+
+.admin-nav-link.active {
+  font-weight: 700;
+}
+
+/* Usuario y cierre de sesión */
+
+.admin-sidebar-footer {
+  margin: 0 14px;
+  padding-top: 18px;
+  border-top: 1px solid rgb(255 255 255 / 18%);
+}
+
+.admin-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px 18px;
+}
+
+.admin-user-icono {
+  font-size: 1.8rem;
+}
+
+.admin-user strong,
+.admin-user span {
+  display: block;
+}
+
+.admin-user strong {
+  font-size: 0.9rem;
+}
+
+.admin-user span {
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.75rem;
+}
+
+.admin-salir {
+  width: 100%;
+}
+
+/* ========================================
+   3. ENCABEZADOS Y BOTÓN NUEVO
+   ======================================== */
+
+.admin-topbar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #dfd5cb;
+}
+
+.admin-bienvenida {
+  margin: 0 0 6px;
+  color: #047857;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.admin-topbar h1 {
+  margin: 0;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 600;
+}
+
+.admin-descripcion {
+  margin: 8px 0 0;
+  color: #6b7280;
+}
+
+.admin-btn-nuevo {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 1px solid #047857;
+  border-radius: 8px;
+  color: white;
+  background-color: #047857;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-btn-nuevo:hover {
+  color: white;
+  background-color: #036548;
+}
+
+/* ========================================
+   4. TARJETAS DEL DASHBOARD
+   ======================================== */
+
+.admin-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  height: 100%;
+  padding: 24px;
+  border: 1px solid #e1d5ca;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 6px 18px rgb(47 36 31 / 6%);
+}
+
+.admin-stat-icono,
+.admin-listado-icono,
+.admin-acceso-icono {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  font-size: 1.4rem;
+}
+
+.admin-stat-icono {
+  width: 58px;
+  height: 58px;
+}
+
+.admin-icono-pacientes,
+.admin-listado-icono {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.admin-icono-nutricionistas {
+  color: #9a3412;
+  background: #ffedd5;
+}
+
+.admin-icono-citas {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.admin-layout .admin-stat-label {
+  margin: 0 0 5px;
+  color: #6b7280;
+  font-family: "Roboto", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 400;
+}
+
+.admin-stat-number {
+  margin: 0;
+  font-family: "Fraunces", serif;
+  font-size: 2.1rem;
+  font-weight: 700;
+}
+
+/* ========================================
+   5. ACCESOS RÁPIDOS
+   ======================================== */
+
+.admin-accesos {
+  margin-top: 36px;
+  padding: 28px;
+  border: 1px solid #e1d5ca;
+  border-radius: 14px;
+  background: white;
+}
+
+.admin-seccion-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-seccion-encabezado h2 {
+  margin: 0;
+  font-size: 1.7rem;
+}
+
+.admin-seccion-encabezado > i {
+  color: #047857;
+  font-size: 1.6rem;
+}
+
+.admin-acceso-card {
+  display: flex;
+  gap: 18px;
+  height: 100%;
+  padding: 22px;
+  border: 1px solid #e1d5ca;
+  border-radius: 12px;
+  background: #fffaf4;
+}
+
+.admin-acceso-icono {
+  color: white;
+  background: #047857;
+}
+
+.admin-acceso-card h3 {
+  font-size: 1.25rem;
+}
+
+.admin-acceso-card p {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.admin-acceso-boton {
+  color: #047857;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.admin-acceso-boton:hover {
+  color: #036548;
+  text-decoration: underline;
+}
+
+/* ========================================
+   6. TARJETA DEL LISTADO Y BUSCADOR
+   ======================================== */
+
+.admin-listado-card {
+  overflow: hidden;
+  border: 1px solid #e1d5ca;
+  border-radius: 14px;
+  background: white;
+  box-shadow: 0 6px 18px rgb(47 36 31 / 6%);
+}
+
+.admin-listado-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px 28px;
+  border-bottom: 1px solid #e1d5ca;
+}
+
+.admin-listado-encabezado h2 {
+  margin: 0 0 6px;
+  font-size: 1.5rem;
+}
+
+.admin-listado-encabezado p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.admin-buscador {
+  padding: 20px 28px;
+  border-bottom: 1px solid #e1d5ca;
+}
+
+/* ========================================
+   7. TABLAS
+   ======================================== */
+
+.admin-table {
+  width: 100%;
+}
+
+.admin-table thead th {
+  padding: 16px 20px;
+  border-bottom-color: #d8c4b8;
+  color: #2f241f;
+  background: #f5efe6;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding: 16px 20px;
+  border-bottom-color: #eee8e1;
+  color: #4b5563;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table tbody tr:hover td {
+  background: #faf8f4;
+}
+
+.admin-table td:first-child {
+  min-width: 160px;
+  color: #2f241f;
+  font-weight: 600;
+}
+
+/* Etiquetas de comuna y modalidad */
+
+.admin-badge-tipo {
+  display: inline-block;
+  padding: 7px 11px;
+  border-radius: 20px;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 0.8rem;
+}
+
+/* Botones de editar y eliminar */
+
+.admin-table .btn-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 6px;
+  border-radius: 7px;
+}
+
+/* ========================================
+   8. FORMULARIOS EXISTENTES
+   ======================================== */
+
+.admin-content .admin-formulario-contenedor {
+  margin: 0;
+}
+
+.admin-content .gestion-tarjeta {
+  border-color: #e1d5ca;
+  box-shadow: 0 6px 18px rgb(47 36 31 / 6%);
+}
+
+.admin-content .gestion-subtitulo {
+  color: #2f241f;
+}
+
+/* ========================================
+   9. DISEÑO RESPONSIVE
+   ======================================== */
+
+/* Menú lateral en computadores */
+
+@media (min-width: 992px) {
+  .admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+}
+
+/* Tarjetas en pantallas intermedias */
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .admin-stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Menú superior en tabletas y celulares */
+
+@media (max-width: 991.98px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+  }
+
+  .admin-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 16px;
+  }
+
+  .admin-sidebar-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .admin-user {
+    padding: 8px 16px;
+  }
+
+  .admin-salir {
+    width: auto;
+  }
+
+  .admin-content {
+    padding: 24px 18px;
+  }
+
+  .admin-topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+/* Celulares */
+
+@media (max-width: 575.98px) {
+  .admin-content {
+    padding: 24px 12px;
+  }
+
+  .admin-nav {
+    flex-direction: column;
+  }
+
+  .admin-accesos,
+  .admin-listado-encabezado,
+  .admin-buscador {
+    padding: 18px 16px;
+  }
+
+  .admin-acceso-card {
+    flex-direction: column;
+  }
+
+  .admin-listado-encabezado {
+    align-items: flex-start;
+  }
+}
+
+/* ========================================
+   10. FORMULARIOS CENTRADOS EN ESCRITORIO
+   ======================================== */
+
+@media (min-width: 1200px) {
+  .admin-content .admin-formulario-contenedor {
+    margin-inline: auto;
+  }
+}
