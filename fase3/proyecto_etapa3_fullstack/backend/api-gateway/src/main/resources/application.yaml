@@ -1,0 +1,79 @@
+# Puerto de entrada para las solicitudes del frontend
+server:
+  port: 8080
+
+spring:
+  # Colores en la consola
+  output:
+    ansi:
+      enabled: ALWAYS
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+
+          # Rutas hacia los seis microservicios
+          # Cada dirección puede cambiarse mediante una variable de entorno
+          routes:
+
+            # Autenticación
+            - id: autenticacion-service
+              uri: ${AUTENTICACION_SERVICE_URL:http://localhost:8081}
+              predicates:
+                - Path=/api/v1/autenticacion/**
+
+            # Pacientes
+            - id: pacientes-service
+              uri: ${PACIENTES_SERVICE_URL:http://localhost:8082}
+              predicates:
+                - Path=/api/v1/pacientes/**
+
+            # Catálogo
+            - id: catalogo-service
+              uri: ${CATALOGO_SERVICE_URL:http://localhost:8083}
+              predicates:
+                - Path=/api/v1/catalogo/**
+
+            # Profesionales
+            - id: profesionales-service
+              uri: ${PROFESIONALES_SERVICE_URL:http://localhost:8084}
+              predicates:
+                - Path=/api/v1/profesionales/**
+
+            # Agendamiento
+            - id: agendamiento-service
+              uri: ${AGENDAMIENTO_SERVICE_URL:http://localhost:8085}
+              predicates:
+                - Path=/api/v1/agendamiento/**
+
+            # Órdenes
+            - id: ordenes-service
+              uri: ${ORDENES_SERVICE_URL:http://localhost:8086}
+              predicates:
+                - Path=/api/v1/ordenes/**
+
+          # Permite las solicitudes desde el frontend de Vite
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOrigins:
+                  - "${FRONTEND_URL:http://localhost:5173}"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - PATCH
+                  - DELETE
+                  - OPTIONS
+                allowedHeaders:
+                  - Authorization
+                  - Content-Type
+                  - Accept
+
+# Información que se muestra en consola
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.gateway: INFO
