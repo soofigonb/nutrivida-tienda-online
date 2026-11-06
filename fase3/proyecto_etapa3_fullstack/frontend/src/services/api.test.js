@@ -1,0 +1,100 @@
+// Verifica sesiones reales de API usando respuestas controladas, sin tokens en almacenamiento.
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { crearClienteApi } from './api'
+
+const respuesta = (status, data) => ({ status, ok: status >= 200 && status < 300, text: async () => data == null ? '' : JSON.stringify(data) })
+const sesion = (token = 'acceso', rol = 'CLIENTE') => ({ accessToken: token, expiresIn: 900, usuario: { id: 'cuenta-1', correo: 'a@duoc.cl', rol } })
+
+describe('Cliente de autenticación', () => {
+  beforeEach(() => localStorage.clear())
+  it('hace login con cookie y conserva el JWT solo en memoria', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(respuesta(200, sesion()))
+    const api = crearClienteApi({ fetchImpl })
+    expect((await api.login('a@duoc.cl', 'Clave123')).rol).toBe('CLIENTE')
+    expect(fetchImpl.mock.calls[0][1].credentials).toBe('include')
+    expect(localStorage.length).toBe(0)
+    expect(JSON.parse(fetchImpl.mock.calls[0][1].body)).toEqual({ correo: 'a@duoc.cl', password: 'Clave123' })
+  })
+  it('recupera la sesión con renovación sin leer un token del navegador', async () => {
+    const fetchImpl = vi.fn().mockResolvedValueOnce(respuesta(200, sesion())).mockResolvedValueOnce(respuesta(200, []))
+    const api = crearClienteApi({ fetchImpl })
+    await api.solicitar('ordenes')
+    expect(fetchImpl.mock.calls[0][0]).toMatch(/web\/renovar$/)
+    expect(fetchImpl.mock.calls[1][1].headers.Authorization).toBe('Bearer acceso')
+  })
+  it('crear otra cuenta no reemplaza la identidad del administrador', async () => {
+    const fetchImpl = vi.fn().mockResolvedValueOnce(respuesta(200, sesion('admin', 'ADMINISTRADOR')))
+      .mockResolvedValueOnce(respuesta(201, { id: 'cuenta-2', rol: 'CLIENTE' }))
+    const api = crearClienteApi({ fetchImpl })
+    await api.login('admin@duoc.cl', 'Clave123')
+    await api.registrar('nueva@duoc.cl', 'OtraClave123')
+    expect(api.usuarioActual().rol).toBe('ADMINISTRADOR')
+  })
+  it('comparte una sola renovación entre solicitudes paralelas', async () => {
+    let resolver
+    const fetchImpl = vi.fn().mockImplementation((url) => url.endsWith('/renovar') ? new Promise(r => { resolver = r }) : Promise.resolve(respuesta(200, [])))
+    const api = crearClienteApi({ fetchImpl })
+    const a = api.solicitar('ordenes'), b = api.solicitar('ordenes')
+    resolver(respuesta(200, sesion()))
+    await Promise.all([a, b])
+    expect(fetchImpl.mock.calls.filter(([url]) => url.endsWith('/renovar'))).toHaveLength(1)
+  })
+  it('renueva un JWT rechazado una sola vez y reintenta', async () => {
+    const fetchImpl = vi.fn()
+      .mockResolvedValueOnce(respuesta(200, sesion('viejo')))
+      .mockResolvedValueOnce(respuesta(401, { detail: 'Vencido' }))
+      .mockResolvedValueOnce(respuesta(200, sesion('nuevo')))
+      .mockResolvedValueOnce(respuesta(200, []))
+    const api = crearClienteApi({ fetchImpl })
+    await api.login('a@duoc.cl', 'Clave123')
+    await api.solicitar('ordenes')
+    expect(fetchImpl).toHaveBeenCalledTimes(4)
+    expect(fetchImpl.mock.calls[3][1].headers.Authorization).toBe('Bearer nuevo')
+  })
+  it('no intenta renovar ante un permiso 403', async () => {
+    const fetchImpl = vi.fn().mockResolvedValueOnce(respuesta(200, sesion())).mockResolvedValueOnce(respuesta(403, { detail: 'Sin permiso' }))
+    const api = crearClienteApi({ fetchImpl })
+    await api.login('a@duoc.cl', 'Clave123')
+    await expect(api.solicitar('autenticacion/usuarios')).rejects.toMatchObject({ status: 403 })
+    expect(fetchImpl).toHaveBeenCalledTimes(2)
+  })
+  it('abandona la sesión si el servidor rechaza también el JWT renovado', async () => {
+    const fetchImpl = vi.fn().mockResolvedValueOnce(respuesta(200, sesion('viejo')))
+      .mockResolvedValueOnce(respuesta(401, {})).mockResolvedValueOnce(respuesta(200, sesion('nuevo')))
+      .mockResolvedValueOnce(respuesta(401, {}))
+    const api = crearClienteApi({ fetchImpl })
+    await api.login('a@duoc.cl', 'Clave123')
+    await expect(api.solicitar('ordenes')).rejects.toMatchObject({ status: 401 })
+    expect(api.usuarioActual()).toBeNull()
+    expect(fetchImpl).toHaveBeenCalledTimes(4)
+  })
+  it('rechaza una cookie revocada sin inventar usuario', async () => {
+    const api = crearClienteApi({ fetchImpl: vi.fn().mockResolvedValue(respuesta(401, {})) })
+    await expect(api.renovar()).rejects.toMatchObject({ status: 401 })
+    expect(api.usuarioActual()).toBeNull()
+  })
+  it('logout limpia la identidad en memoria y llama al servidor', async () => {
+    const fetchImpl = vi.fn().mockResolvedValueOnce(respuesta(200, sesion())).mockResolvedValueOnce(respuesta(204))
+    const api = crearClienteApi({ fetchImpl })
+    const observer = vi.fn(); api.suscribir(observer)
+    await api.login('a@duoc.cl', 'Clave123'); await api.logout()
+    expect(api.usuarioActual()).toBeNull()
+    expect(observer).toHaveBeenLastCalledWith(null)
+    expect(fetchImpl.mock.calls[1][0]).toMatch(/web\/logout$/)
+  })
+  it('una renovación tardía no restaura un logout', async () => {
+    let resolver
+    const fetchImpl = vi.fn().mockImplementation(url => url.endsWith('/renovar') ? new Promise(r => { resolver = r }) : Promise.resolve(respuesta(204)))
+    const api = crearClienteApi({ fetchImpl })
+    const renovacion = api.renovar().catch(e => e)
+    const salida = api.logout()
+    resolver(respuesta(200, sesion()))
+    await Promise.all([renovacion, salida])
+    expect(api.usuarioActual()).toBeNull()
+  })
+  it('una falla de conexión produce un mensaje sin simular éxito', async () => {
+    const api = crearClienteApi({ fetchImpl: vi.fn().mockRejectedValue(new TypeError('network')) })
+    await expect(api.login('a@duoc.cl', 'Clave123')).rejects.toThrow('No se pudo conectar')
+    expect(api.usuarioActual()).toBeNull()
+  })
+})

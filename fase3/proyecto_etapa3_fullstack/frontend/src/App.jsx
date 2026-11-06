@@ -1,10 +1,19 @@
 import {
   BrowserRouter,
+  Navigate,
   Link,
   Outlet,
   Route,
   Routes,
 } from 'react-router-dom'
+import { useContext } from 'react'
+import { Alert } from 'react-bootstrap'
+import { AuthContext } from './context/AuthContext'
+import RutaRoles from './components/RutaRoles'
+import GestionLayout from './components/GestionLayout'
+import Ordenes from './pages/Ordenes'
+import CatalogoGestion from './pages/CatalogoGestion'
+import AdminCuentas from './pages/AdminCuentas'
 
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
@@ -39,9 +48,14 @@ import './styles/Admin.css'
 // ========================================
 
 function SitioPublico() {
+  const { usuario, cargandoSesion, errorSesion } = useContext(AuthContext)
+  if (cargandoSesion) return <p className="container py-5" role="status">Comprobando sesión…</p>
+  // El vendedor entra únicamente al catálogo y las órdenes de su panel.
+  if (usuario?.rol === 'VENDEDOR') return <Navigate to="/gestion/ordenes" replace />
   return (
     <>
       <Navbar />
+      {errorSesion && <Alert className="container mt-3" variant="warning">{errorSesion}</Alert>}
       <Outlet />
       <Footer />
     </>
@@ -78,7 +92,20 @@ function App() {
           <ScrollNavegacion />
 
           <Routes>
+            <Route element={<RutaRoles roles={['ADMINISTRADOR', 'VENDEDOR']} />}>
+              <Route path="/gestion" element={<GestionLayout />}>
+                <Route index element={<Navigate to="ordenes" replace />} />
+                <Route path="ordenes" element={<Ordenes />} />
+                <Route path="ordenes/:id" element={<Ordenes />} />
+                <Route path="catalogo" element={<CatalogoGestion />} />
+                <Route path="catalogo/:id" element={<CatalogoGestion />} />
+              </Route>
+            </Route>
             <Route element={<SitioPublico />}>
+              <Route element={<RutaRoles roles={['CLIENTE', 'ADMINISTRADOR']} />}>
+                <Route path="mis-ordenes" element={<Ordenes />} />
+                <Route path="mis-ordenes/:id" element={<Ordenes />} />
+              </Route>
               <Route path="/" element={<Inicio />} />
 
               <Route
@@ -133,6 +160,7 @@ function App() {
                 element={<AdminLayout />}
               >
                 <Route index element={<AdminHome />} />
+                <Route path="cuentas" element={<AdminCuentas />} />
 
                 <Route
                   path="pacientes"

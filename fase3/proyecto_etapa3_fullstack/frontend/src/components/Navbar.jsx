@@ -115,7 +115,7 @@ function Navbar({ cantidadCarrito }) {
                 Contacto
               </Nav.Link>
 
-              {usuario?.rol === 'admin' && (
+              {usuario?.rol === 'ADMINISTRADOR' && (
                 <Nav.Link
                   as={Link}
                   to="/admin"
@@ -127,8 +127,9 @@ function Navbar({ cantidadCarrito }) {
 
               {usuario ? (
                 <>
+                  <Nav.Link as={Link} to={usuario.rol === 'ADMINISTRADOR' ? '/gestion/ordenes' : '/mis-ordenes'}>Órdenes</Nav.Link>
                   <NavbarBootstrap.Text className="me-3 fw-bold text-light px-2">
-                    Hola, {usuario.nombre}
+                    Hola, {usuario.nombre || usuario.correo}
                   </NavbarBootstrap.Text>
 
                   <Nav.Item className="my-1 my-xl-0 me-xl-2">

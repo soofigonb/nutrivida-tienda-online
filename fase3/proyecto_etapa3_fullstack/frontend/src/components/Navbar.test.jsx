@@ -103,7 +103,7 @@ describe('Navbar según sesión y navegación', () => {
     mostrar({
       usuario: {
         nombre: 'Ana',
-        rol: 'paciente',
+        rol: 'CLIENTE',
       },
     })
 
@@ -134,7 +134,7 @@ describe('Navbar según sesión y navegación', () => {
     mostrar({
       usuario: {
         nombre: 'Administrador',
-        rol: 'admin',
+        rol: 'ADMINISTRADOR',
       },
     })
 
@@ -184,7 +184,7 @@ describe('Navbar según sesión y navegación', () => {
     const { user, cerrarSesion } = mostrar({
       usuario: {
         nombre: 'Ana',
-        rol: 'paciente',
+        rol: 'CLIENTE',
       },
     })
 

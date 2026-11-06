@@ -1,0 +1,136 @@
+// Pruebas del componente.
+
+// Paquete de la clase.
+package cl.nutrivida.ordenes.service;
+
+// Importa BigDecimal.
+import java.math.BigDecimal;
+// Importa los tipos del paquete.
+import java.util.*;
+// Importa CatalogoPort.
+import cl.nutrivida.ordenes.port.CatalogoPort;
+// Importa los tipos del paquete.
+import cl.nutrivida.ordenes.dto.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.ordenes.model.*;
+// Importa OrdenRepository.
+import cl.nutrivida.ordenes.repository.OrdenRepository;
+// Importa ApiException.
+import cl.nutrivida.ordenes.exceptions.ApiException;
+// Importa los tipos del paquete.
+import org.junit.jupiter.api.*;
+// Importa ExtendWith.
+import org.junit.jupiter.api.extension.ExtendWith;
+// Importa los tipos del paquete.
+import org.mockito.*;
+// Importa MockitoExtension.
+import org.mockito.junit.jupiter.MockitoExtension;
+// Importa Jwt.
+import org.springframework.security.oauth2.jwt.Jwt;
+// Importa los tipos del paquete.
+import static org.junit.jupiter.api.Assertions.*;
+// Importa los tipos del paquete.
+import static org.mockito.Mockito.*;
+
+// Activa MockitoExtension, que crea y gestiona los objetos marcados con @Mock.
+@ExtendWith(MockitoExtension.class)
+// Define la clase.
+class OrdenServiceTest {
+    // Simula la dependencia.
+    @Mock OrdenRepository repository;
+    // Simula la dependencia.
+    @Mock CatalogoPort catalogo;
+    // Servicio que se prueba.
+    OrdenService service;
+    // Identificadores de prueba.
+    UUID usuario = UUID.randomUUID();
+    // Conserva el JWT ficticio que identifica al usuario en los casos de órdenes.
+    Jwt jwt;
+    // Prepara objetos y respuestas antes de cada caso para mantener independientes las pruebas.
+    @BeforeEach void preparar() {
+        // Prepara el servicio con dependencias simuladas.
+        service = new OrdenService(repository, new OrdenMapper(), catalogo);
+        // Construye un JWT de prueba con sujeto y roles controlados.
+        jwt = Jwt.withTokenValue("jwt").header("alg", "RS256").subject(usuario.toString()).claim("roles", List.of("CLIENTE")).build();
+    }
+    // Caso de prueba.
+    @Test void calculaTotalConPrecioDelCatalogo() {
+        // Respuesta simulada.
+        when(catalogo.consultar(1L, "jwt")).thenReturn(new CatalogoPort.ProductoDTO(1L, "Consulta", new BigDecimal("30000"), true));
+        // Respuesta simulada.
+        when(repository.saveAndFlush(any())).thenAnswer(i -> i.getArgument(0));
+        // Identificadores de prueba.
+        OrdenDTO resultado = service.crear(new CrearOrdenDTO(UUID.randomUUID(), List.of(new CrearOrdenDTO.ItemDTO(1L, 2))), jwt);
+        // Comprueba el resultado.
+        assertEquals(new BigDecimal("60000"), resultado.total());
+        // Comprueba el resultado.
+        assertEquals(usuario, resultado.idUsuario());
+        // Comprueba el resultado.
+        assertEquals(EstadoOrden.PENDIENTE, resultado.estado());
+    }
+    // Caso de prueba.
+    @Test void rechazaPlanesInactivosSinGuardar() {
+        // Respuesta simulada.
+        when(catalogo.consultar(1L, "jwt")).thenReturn(new CatalogoPort.ProductoDTO(1L, "Consulta", BigDecimal.TEN, false));
+        // Comprueba la excepción esperada.
+        assertThrows(ApiException.class, () -> service.crear(new CrearOrdenDTO(UUID.randomUUID(), List.of(new CrearOrdenDTO.ItemDTO(1L, 1))), jwt));
+        // Verifica las llamadas esperadas.
+        verify(repository, never()).saveAndFlush(any());
+    }
+    // Caso de prueba.
+    @Test void clienteNoPuedeLeerOrdenAjena() {
+        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
+        Orden orden = new Orden(); orden.setIdUsuario(UUID.randomUUID());
+        // Identificadores de prueba.
+        UUID id = UUID.randomUUID(); when(repository.findById(id)).thenReturn(Optional.of(orden));
+        // Comprueba la excepción esperada.
+        assertThrows(ApiException.class, () -> service.obtener(id, jwt));
+    }
+    // Caso de prueba.
+    @Test void clienteSoloListaSusOrdenes() {
+        // Respuesta simulada.
+        when(repository.findByIdUsuarioOrderByCreadoEnDesc(usuario)).thenReturn(List.of());
+        // Verifica la condición.
+        assertTrue(service.listar(jwt).isEmpty());
+        // Verifica las llamadas esperadas.
+        verify(repository, never()).findAll();
+    }
+    // Caso de prueba.
+    @Test void noPermiteReabrirOrdenCancelada() {
+        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
+        Orden orden = new Orden(); orden.setIdUsuario(usuario); orden.setEstado(EstadoOrden.CANCELADA);
+        // Identificadores de prueba.
+        UUID id = UUID.randomUUID(); when(repository.findById(id)).thenReturn(Optional.of(orden));
+        // Comprueba la excepción esperada.
+        assertThrows(ApiException.class, () -> service.cambiarEstado(id, EstadoOrden.PENDIENTE, jwt));
+        // Comprueba el resultado.
+        assertEquals(EstadoOrden.CANCELADA, orden.getEstado());
+    }
+    // Caso de prueba.
+    @Test void reintentoDevuelveOrdenExistenteSinConsultarCatalogo() {
+        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
+        UUID clave = UUID.randomUUID(); Orden orden = new Orden(); orden.setIdUsuario(usuario);
+        // Prepara un detalle persistido ficticio para verificar si el reintento tiene los mismos datos.
+        DetalleOrden d = new DetalleOrden(); d.setIdPlan(1L); d.setCantidad(2); orden.getDetalles().add(d);
+        // Respuesta simulada.
+        when(repository.findByIdUsuarioAndClaveIdempotencia(usuario, clave)).thenReturn(Optional.of(orden));
+        // Ejecuta la creación o el reintento de la orden con datos controlados y el JWT ficticio del caso.
+        service.crear(new CrearOrdenDTO(clave, List.of(new CrearOrdenDTO.ItemDTO(1L, 2))), jwt);
+        // Comprueba que no hubo llamadas adicionales.
+        verifyNoInteractions(catalogo);
+        // Verifica las llamadas esperadas.
+        verify(repository, never()).saveAndFlush(any());
+    }
+    // Caso de prueba.
+    @Test void claveReutilizadaConOtrosDatosSeRechaza() {
+        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
+        UUID clave = UUID.randomUUID(); Orden orden = new Orden(); orden.setIdUsuario(usuario);
+        // Respuesta simulada.
+        when(repository.findByIdUsuarioAndClaveIdempotencia(usuario, clave)).thenReturn(Optional.of(orden));
+        // Comprueba la excepción esperada.
+        assertThrows(ApiException.class, () -> service.crear(new CrearOrdenDTO(clave, List.of(new CrearOrdenDTO.ItemDTO(1L, 2))), jwt));
+        // Comprueba que no hubo llamadas adicionales.
+        verifyNoInteractions(catalogo);
+    }
+}
+

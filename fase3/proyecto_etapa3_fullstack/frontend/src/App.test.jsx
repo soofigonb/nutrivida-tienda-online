@@ -14,8 +14,9 @@ import {
   vi,
 } from 'vitest'
 
-import { AuthProvider } from './context/AuthContext.jsx'
+import { AuthContext } from './context/AuthContext.jsx'
 import App from './App.jsx'
+import { api } from './services/api'
 
 // ========================================
 // 1. ENTORNO DE NAVEGACIÓN
@@ -34,9 +35,9 @@ function mostrar(ruta = '/', usuario = null) {
   }
 
   render(
-    <AuthProvider>
+    <AuthContext.Provider value={{ usuario, cargandoSesion: false, cerrarSesion: vi.fn() }}>
       <App />
-    </AuthProvider>,
+    </AuthContext.Provider>,
   )
 
   return userEvent.setup()
@@ -68,6 +69,21 @@ afterEach(() => {
 // ========================================
 
 describe('Rutas y layouts de App', () => {
+  test.each(['/agendar', '/admin/pacientes'])('el vendedor no entra a %s y solo ve catálogo y órdenes', async ruta => {
+    vi.spyOn(api, 'solicitar').mockResolvedValue([])
+    mostrar(ruta, { id: 'vendedor-1', correo: 'vendedor@duoc.cl', rol: 'VENDEDOR' })
+    expect(await screen.findByRole('heading', { name: 'Órdenes', level: 1 })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Catálogo' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Administración' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'Agendar' })).not.toBeInTheDocument()
+  })
+  test('el vendedor consulta un detalle sin controles de escritura', async () => {
+    vi.spyOn(api, 'solicitar').mockResolvedValue({ id: 'orden-1', estado: 'PENDIENTE', total: 35000, detalles: [] })
+    mostrar('/gestion/ordenes/orden-1', { id: 'vendedor-1', rol: 'VENDEDOR' })
+    expect(await screen.findByText('orden-1')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Cancelar orden' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Confirmar orden' })).not.toBeInTheDocument()
+  })
   test('compone el inicio y permite abrir un artículo y volver', async () => {
     const user = mostrar()
 
@@ -190,7 +206,7 @@ describe('Rutas y layouts de App', () => {
     mostrar('/admin', {
       id: 'paciente',
       nombre: 'Ana',
-      rol: 'paciente',
+      rol: 'CLIENTE',
     })
 
     expect(
@@ -206,7 +222,7 @@ describe('Rutas y layouts de App', () => {
     const user = mostrar('/admin', {
       id: 'admin',
       nombre: 'Administrador',
-      rol: 'admin',
+      rol: 'ADMINISTRADOR',
     })
 
     expect(

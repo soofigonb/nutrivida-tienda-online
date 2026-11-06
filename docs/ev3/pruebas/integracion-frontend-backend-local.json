@@ -1,0 +1,87 @@
+{
+  "entorno": "Dos bases nuevas PostgreSQL 17 local; tres aplicaciones Java reales; módulos HTTP y carrito reales de React ejecutados desde Node; catálogo simulado. No es una prueba visual del navegador ni de Supabase.",
+  "fecha": "2026-11-06T00:58:07.259Z",
+  "aprobadas": 20,
+  "resultados": [
+    {
+      "prueba": "Administrador inicial creado sin una contraseña predeterminada",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cookie y token comparten la duración configurada",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Registro público conserva rol no privilegiado",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cliente frontend consulta su identidad real",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Carrito frontend crea una orden pendiente",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Precio obtenido mediante adaptador comercial",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Contrato público utiliza identificador genérico",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Reintento del frontend no duplica la orden",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Consulta persistida de órdenes propias",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cliente no accede a una orden ajena",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Vendedor puede consultar el detalle",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Vendedor no puede escribir órdenes",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cliente no administra cuentas",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cancelación persistida",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "No permite reabrir una orden cancelada",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Nueva instancia frontend recupera sesión mediante cookie",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Logout impide renovar",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "CORS rechaza otro origen",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Migraciones actuales aplicadas: db_autenticacion",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Migraciones actuales aplicadas: db_ordenes",
+      "resultado": "OK"
+    }
+  ]
+}

@@ -162,7 +162,7 @@ function Registro() {
   // 3. PROCESAR EL REGISTRO
   // ========================================
 
-  function procesarRegistro(data) {
+  async function procesarRegistro(data) {
     clearErrors('root')
 
     const run = limpiarRut(data.rut)
@@ -178,13 +178,11 @@ function Registro() {
       fechaNacimiento: data.fechaNacimiento,
       region: data.region,
       comuna: data.comuna,
-      contrasena: data.password,
       password: data.password,
-      rol: 'paciente',
     }
 
     try {
-      const resultado = registrarPaciente(nuevoPaciente)
+      const resultado = await registrarPaciente(nuevoPaciente)
 
       if (!resultado?.exito) {
         let campo = 'root'
@@ -212,7 +210,7 @@ function Registro() {
         return
       }
 
-      navigate('/login')
+      navigate('/')
     } catch {
       setError('root', {
         type: 'manual',

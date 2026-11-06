@@ -23,6 +23,8 @@ function Login() {
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  // Bloquea envíos repetidos mientras se comprueban las credenciales.
+  const [enviando, setEnviando] = useState(false)
 
   const { iniciarSesion } =
     useContext(AuthContext)
@@ -51,15 +53,18 @@ function Login() {
   // 4. INICIAR SESIÓN
   // ========================================
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
     setErrorMsg('')
 
-    const resultado = iniciarSesion(
+    if (enviando) return
+    setEnviando(true)
+    const resultado = await iniciarSesion(
       correo.trim(),
       password,
       accesoAdministrador,
     )
+    setEnviando(false)
 
     if (!resultado.exito) {
       setErrorMsg(
@@ -70,8 +75,10 @@ function Login() {
       return
     }
 
-    if (resultado.usuario.rol === 'admin') {
+    if (resultado.usuario.rol === 'ADMINISTRADOR') {
       navigate('/admin', { replace: true })
+    } else if (resultado.usuario.rol === 'VENDEDOR') {
+      navigate('/gestion/ordenes', { replace: true })
     } else {
       navigate('/', { replace: true })
     }
@@ -175,6 +182,7 @@ function Login() {
                   <Button
                     variant="success"
                     type="submit"
+                    disabled={enviando}
                     className="w-100"
                   >
                     <i

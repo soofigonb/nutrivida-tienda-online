@@ -1,3 +1,5 @@
+import { api } from '../services/api'
+import { crearOrdenDesdeCarrito } from '../services/ordenes'
 import {
   createContext,
   useContext,
@@ -382,191 +384,18 @@ export function CarritoProvider({ children }) {
   // 7. CONFIRMAR LAS RESERVAS
   // ========================================
 
-  function confirmarReservas(
-    pacienteSesion = null,
-    simularFallo = false,
-  ) {
+  // Crea una orden en el servidor; la reserva clínica pertenece a agendamiento.
+  async function confirmarReservas() {
     try {
-      const actuales =
-        leerLista(CLAVE_CARRITO)
-
-      // Detectar cambios que no estén reflejados
-      // todavía en la vista del usuario.
-      if (
-        JSON.stringify(actuales) !==
-        JSON.stringify(reservas)
-      ) {
-        setEstado({
-          reservas: actuales,
-          errorCarrito: '',
-        })
-
-        return {
-          exito: false,
-          mensaje:
-            'El carrito cambió en otra operación. Revisa las reservas antes de confirmar nuevamente.',
-        }
+      const actuales = leerLista(CLAVE_CARRITO)
+      if (JSON.stringify(actuales) !== JSON.stringify(reservas)) {
+        setEstado({ reservas: actuales, errorCarrito: '' })
+        return { exito: false, mensaje: 'El carrito cambió. Revisa sus datos antes de reintentar.' }
       }
-
-      if (actuales.length === 0) {
-        return {
-          exito: false,
-          mensaje:
-            'El carrito está vacío. Agrega una consulta antes de confirmar.',
-        }
-      }
-
-      if (simularFallo) {
-        return {
-          exito: false,
-          mensaje:
-            'Simulación de fallo: no fue posible confirmar. Las reservas se conservan en tu carrito.',
-        }
-      }
-
-      const contenidoAnterior =
-        localStorage.getItem(CLAVE_CITAS)
-
-      const citas = leerLista(CLAVE_CITAS)
-
-      const profesionales = leerLista(
-        'nutricionistasNutriVida',
-        nutricionistasIniciales,
-      )
-
-      const nuevas = []
-      const confirmadas = []
-      const ids = new Set()
-
-      // Validar todas las reservas antes de guardar.
-      for (const reserva of actuales) {
-        if (
-          !reserva.id ||
-          ids.has(String(reserva.id))
-        ) {
-          throw new Error(
-            'El carrito contiene identificadores inválidos o repetidos.',
-          )
-        }
-
-        ids.add(String(reserva.id))
-
-        // Un intento anterior puede haber guardado
-        // la cita sin conseguir limpiar el carrito.
-        // Reutilizarla evita duplicarla al reintentar.
-        const existente = citas.find(
-          (cita) =>
-            String(cita.reservaId || cita.id) ===
-            String(reserva.id),
-        )
-
-        if (existente) {
-          if (
-            existente.estado !== 'confirmada' ||
-            !mismoHorario(existente, reserva)
-          ) {
-            throw new Error(
-              'La reserva ya tiene un registro asociado. Revisa sus datos.',
-            )
-          }
-
-          confirmadas.push(existente)
-          continue
-        }
-
-        const validada = prepararReserva(
-          reserva,
-          profesionales,
-        )
-
-        const ocupadas = [
-          ...citas.filter(
-            (item) =>
-              item.estado !== 'cancelada',
-          ),
-          ...nuevas,
-        ]
-
-        if (
-          ocupadas.some((item) =>
-            mismoHorario(item, validada),
-          )
-        ) {
-          throw new Error(
-            'El horario ya está ocupado. Elimina esa reserva y selecciona otro horario.',
-          )
-        }
-
-        const cita = {
-          ...validada,
-          reservaId: reserva.id,
-          idCita: `cita-${reserva.id}`,
-          fechaConfirmacion:
-            new Date().toISOString(),
-          pacienteId:
-            pacienteSesion?.id ||
-            reserva.pacienteId ||
-            'paciente-invitado',
-          pacienteNombre:
-            pacienteSesion?.nombre || 'Paciente',
-          pacienteCorreo:
-            pacienteSesion?.correo || '',
-          estado: 'confirmada',
-        }
-
-        nuevas.push(cita)
-        confirmadas.push(cita)
-      }
-
-      // ========================================
-      // 8. GUARDAR ANTES DE VACIAR
-      // ========================================
-
-      if (nuevas.length > 0) {
-        localStorage.setItem(
-          CLAVE_CITAS,
-          JSON.stringify([...citas, ...nuevas]),
-        )
-      }
-
-      try {
-        guardarCarrito([])
-      } catch {
-        // Si falla el vaciado, intentar restaurar
-        // el contenido anterior de las citas.
-        if (nuevas.length > 0) {
-          try {
-            if (contenidoAnterior === null) {
-              localStorage.removeItem(CLAVE_CITAS)
-            } else {
-              localStorage.setItem(
-                CLAVE_CITAS,
-                contenidoAnterior,
-              )
-            }
-          } catch {
-            return informarError(
-              'Las citas se guardaron, pero no se pudo limpiar el carrito. Puedes reintentar; no se duplicarán.',
-            )
-          }
-        }
-
-        return informarError(
-          'No se pudo vaciar el carrito. Las reservas se conservan; intenta nuevamente.',
-        )
-      }
-
-      return {
-        exito: true,
-        citasCreadas: confirmadas,
-        mensaje:
-          '¡Agendamiento confirmado con éxito!',
-      }
-    } catch (error) {
-      return informarError(
-        `No se pudo confirmar la reserva. ${error.message}`,
-      )
-    }
+      const orden = await crearOrdenDesdeCarrito(actuales, api.usuarioActual())
+      // No crea citas locales ni borra los horarios pendientes de agendamiento.
+      return { exito: true, orden }
+    } catch (error) { return informarError(error.message) }
   }
 
   // ========================================

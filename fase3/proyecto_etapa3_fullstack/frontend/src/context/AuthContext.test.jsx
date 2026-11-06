@@ -1,367 +1,98 @@
+// Prueba identidad, restauración y registro por API sin usar credenciales locales.
 import { useContext } from 'react'
-import {
-  act,
-  cleanup,
-  renderHook,
-} from '@testing-library/react'
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  test,
-  vi,
-} from 'vitest'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, expect, it, vi } from 'vitest'
+import { AuthContext, AuthProvider } from './AuthContext'
+import { api } from '../services/api'
 
-import { AuthContext, AuthProvider } from './AuthContext.jsx'
-
-// ========================================
-// 1. DATOS DE PRUEBA
-// ========================================
-
-const CLAVE = 'pacientesNutriVida'
-
-const paciente = {
-  id: 'paciente-1',
-  nombre: 'Ana',
-  run: '123456785',
-  correo: 'ana@duoc.cl',
-  contrasena: 'clave123',
-  rol: 'paciente',
-}
-
-const nuevo = {
-  nombre: 'Sofía',
-  rut: '11.111.111-1',
-  correo: 'sofia@gmail.com',
-  password: 'clave456',
-}
-
-function iniciarContexto() {
-  return renderHook(() => useContext(AuthContext), {
-    wrapper: AuthProvider,
-  })
-}
-
-// ========================================
-// 2. PREPARACIÓN Y LIMPIEZA
-// ========================================
-
+const estado = vi.hoisted(() => ({ usuario: null, listeners: new Set() }))
+vi.mock('../services/api', () => ({ api: {
+  usuarioActual: () => estado.usuario,
+  suscribir: (listener) => { estado.listeners.add(listener); return () => estado.listeners.delete(listener) },
+  renovar: vi.fn(), solicitar: vi.fn(), login: vi.fn(), logout: vi.fn(), registrar: vi.fn(),
+} }))
+const cliente = { id: 'cuenta-1', correo: 'ana@duoc.cl', rol: 'CLIENTE', estado: 'ACTIVO' }
+function publicar(cuenta) { estado.usuario = cuenta; estado.listeners.forEach(l => l(cuenta)) }
+const mostrar = () => renderHook(() => useContext(AuthContext), { wrapper: AuthProvider })
 beforeEach(() => {
-  localStorage.clear()
-
-  // Los fallos simulados no necesitan imprimir errores en la terminal.
-  vi.spyOn(console, 'error').mockImplementation(() => {})
+  localStorage.clear(); estado.usuario = null; estado.listeners.clear(); vi.resetAllMocks()
+  api.renovar.mockRejectedValue(Object.assign(new Error('Sin sesión'), { status: 401 }))
+  api.login.mockImplementation(async () => { publicar(cliente); return cliente })
+  api.logout.mockImplementation(async () => publicar(null))
+  api.registrar.mockResolvedValue(cliente)
+  api.solicitar.mockResolvedValue(cliente)
 })
 
-afterEach(() => {
-  cleanup()
-  vi.restoreAllMocks()
+it('ignora una identidad administrativa falsificada en localStorage', async () => {
+  localStorage.setItem('sesionNutriVida', JSON.stringify({ rol: 'ADMINISTRADOR' }))
+  const { result } = mostrar()
+  await waitFor(() => expect(result.current.cargandoSesion).toBe(false))
+  expect(result.current.usuario).toBeNull()
 })
-
-// ========================================
-// 3. REGISTRO Y CONSERVACIÓN DE DATOS
-// ========================================
-
-describe('Registro y sesión: AuthContext', () => {
-  // Cada entrada se ejecuta como un caso independiente: 5 pruebas.
-  test.each([
-    '{JSON inválido',
-    '{}',
-    '[null]',
-    '[[1]]',
-    '',
-  ])(
-    'conserva los pacientes y rechaza el registro si el almacenamiento contiene %j',
-    (contenido) => {
-      localStorage.setItem(CLAVE, contenido)
-
-      const { result } = iniciarContexto()
-      const escribir = vi.spyOn(Storage.prototype, 'setItem')
-
-      let respuesta
-
-      act(() => {
-        respuesta = result.current.registrarPaciente(nuevo)
-      })
-
-      expect(respuesta.exito).toBe(false)
-
-      expect(respuesta.mensaje).toMatch(
-        /datos originales se conservaron/i,
-      )
-
-      expect(localStorage.getItem(CLAVE)).toBe(contenido)
-      expect(escribir).not.toHaveBeenCalled()
-    },
-  )
-
-  test('no escribe pacientes si falla la lectura del navegador', () => {
-    const { result } = iniciarContexto()
-    const leer = Storage.prototype.getItem
-
-    vi.spyOn(Storage.prototype, 'getItem')
-      .mockImplementation(function (clave) {
-        if (clave === CLAVE) {
-          throw new Error('Lectura bloqueada')
-        }
-
-        return leer.call(this, clave)
-      })
-
-    const escribir = vi.spyOn(Storage.prototype, 'setItem')
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.registrarPaciente(nuevo)
-    })
-
-    expect(respuesta.exito).toBe(false)
-    expect(escribir).not.toHaveBeenCalled()
-  })
-
-  test('registra al primer paciente y fuerza el rol paciente', () => {
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.registrarPaciente({
-        ...nuevo,
-        rol: 'admin',
-      })
-    })
-
-    expect(respuesta.exito).toBe(true)
-
-    const guardados = JSON.parse(localStorage.getItem(CLAVE))
-
-    expect(guardados).toHaveLength(1)
-
-    expect(guardados[0]).toMatchObject({
-      run: '111111111',
-      correo: 'sofia@gmail.com',
-      rol: 'paciente',
-    })
-  })
-
-  test('agrega un paciente sin perder los registros anteriores', () => {
-    localStorage.setItem(CLAVE, JSON.stringify([paciente]))
-
-    const { result } = iniciarContexto()
-
-    act(() => {
-      result.current.registrarPaciente(nuevo)
-    })
-
-    const guardados = JSON.parse(localStorage.getItem(CLAVE))
-
-    expect(guardados).toHaveLength(2)
-    expect(guardados[0]).toMatchObject(paciente)
-  })
-
-  test('rechaza un RUN duplicado aunque tenga otro formato', () => {
-    localStorage.setItem(CLAVE, JSON.stringify([paciente]))
-
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.registrarPaciente({
-        ...nuevo,
-        rut: '12.345.678-5',
-      })
-    })
-
-    expect(respuesta).toMatchObject({
-      exito: false,
-      campo: 'rut',
-    })
-
-    expect(
-      JSON.parse(localStorage.getItem(CLAVE)),
-    ).toHaveLength(1)
-  })
-
-  test('rechaza un correo duplicado con mayúsculas o espacios exteriores', () => {
-    localStorage.setItem(CLAVE, JSON.stringify([paciente]))
-
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.registrarPaciente({
-        ...nuevo,
-        correo: ' ANA@DUOC.CL ',
-      })
-    })
-
-    expect(respuesta).toMatchObject({
-      exito: false,
-      campo: 'correo',
-    })
-
-    expect(
-      JSON.parse(localStorage.getItem(CLAVE)),
-    ).toHaveLength(1)
-  })
-
-  test('un fallo al guardar no borra los pacientes anteriores', () => {
-    const original = JSON.stringify([paciente])
-
-    localStorage.setItem(CLAVE, original)
-
-    const { result } = iniciarContexto()
-
-    vi.spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => {
-        throw new Error('Sin espacio')
-      })
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.registrarPaciente(nuevo)
-    })
-
-    expect(respuesta.exito).toBe(false)
-    expect(localStorage.getItem(CLAVE)).toBe(original)
-  })
-
-  // ========================================
-  // 4. INICIO Y CIERRE DE SESIÓN
-  // ========================================
-
-  test('inicia sesión como paciente y la persiste', () => {
-    localStorage.setItem(CLAVE, JSON.stringify([paciente]))
-
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.iniciarSesion(
-        'ana@duoc.cl',
-        'clave123',
-      )
-    })
-
-    expect(respuesta.exito).toBe(true)
-
-    expect(result.current.usuario).toMatchObject({
-      id: paciente.id,
-      rol: 'paciente',
-    })
-
-    expect(
-      JSON.parse(localStorage.getItem('sesionNutriVida')),
-    ).toEqual(result.current.usuario)
-  })
-
-  test('rechaza una contraseña incorrecta sin crear sesión', () => {
-    localStorage.setItem(CLAVE, JSON.stringify([paciente]))
-
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.iniciarSesion(
-        'ana@duoc.cl',
-        'incorrecta',
-      )
-    })
-
-    expect(respuesta.exito).toBe(false)
-    expect(result.current.usuario).toBeNull()
-    expect(localStorage.getItem('sesionNutriVida')).toBeNull()
-  })
-
-  test('impide que un paciente cree sesión desde el acceso administrativo', () => {
-    localStorage.setItem(CLAVE, JSON.stringify([paciente]))
-
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.iniciarSesion(
-        'ana@duoc.cl',
-        'clave123',
-        true,
-      )
-    })
-
-    expect(respuesta.exito).toBe(false)
-    expect(result.current.usuario).toBeNull()
-    expect(localStorage.getItem('sesionNutriVida')).toBeNull()
-  })
-
-  test('inicia sesión administrativa y permite cerrarla', () => {
-    const { result } = iniciarContexto()
-
-    act(() => {
-      result.current.iniciarSesion(
-        'admin@nutrivida.cl',
-        'admin123',
-        true,
-      )
-    })
-
-    expect(result.current.usuario?.rol).toBe('admin')
-
-    act(() => {
-      result.current.cerrarSesion()
-    })
-
-    expect(result.current.usuario).toBeNull()
-    expect(localStorage.getItem('sesionNutriVida')).toBeNull()
-  })
-
-  test('rechaza el login y conserva los datos cuando los pacientes están dañados', () => {
-    localStorage.setItem(CLAVE, '{datos dañados')
-
-    const { result } = iniciarContexto()
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.iniciarSesion(
-        'ana@duoc.cl',
-        'clave123',
-      )
-    })
-
-    expect(respuesta.exito).toBe(false)
-    expect(respuesta.mensaje).toMatch(/leer los pacientes/i)
-
-    expect(localStorage.getItem(CLAVE)).toBe('{datos dañados')
-    expect(localStorage.getItem('sesionNutriVida')).toBeNull()
-  })
-
-  test('no crea una sesión en memoria si falla su persistencia', () => {
-    const { result } = iniciarContexto()
-
-    vi.spyOn(Storage.prototype, 'setItem')
-      .mockImplementation(() => {
-        throw new Error('Escritura bloqueada')
-      })
-
-    let respuesta
-
-    act(() => {
-      respuesta = result.current.iniciarSesion(
-        'admin@nutrivida.cl',
-        'admin123',
-        true,
-      )
-    })
-
-    expect(respuesta.exito).toBe(false)
-    expect(result.current.usuario).toBeNull()
-    expect(localStorage.getItem('sesionNutriVida')).toBeNull()
-  })
+it('restaura la cuenta desde la renovación y consulta me', async () => {
+  api.renovar.mockImplementation(async () => publicar(cliente))
+  const { result } = mostrar()
+  await waitFor(() => expect(result.current.usuario?.id).toBe(cliente.id))
+  expect(api.solicitar).toHaveBeenCalledWith('autenticacion/me')
+})
+it('inicia sesión por API y normaliza el correo', async () => {
+  const { result } = mostrar()
+  await waitFor(() => expect(result.current.cargandoSesion).toBe(false))
+  let respuesta
+  await act(async () => { respuesta = await result.current.iniciarSesion(' ANA@DUOC.CL ', 'Clave123') })
+  expect(respuesta.exito).toBe(true)
+  expect(api.login).toHaveBeenCalledWith('ana@duoc.cl', 'Clave123')
+  expect(localStorage.getItem('sesionNutriVida')).toBeNull()
+})
+it('un login rechazado no crea una cuenta de demostración', async () => {
+  api.login.mockRejectedValue(new Error('Credenciales inválidas'))
+  const { result } = mostrar()
+  let respuesta
+  await act(async () => { respuesta = await result.current.iniciarSesion('admin@nutrivida.cl', 'admin123') })
+  expect(respuesta.exito).toBe(false)
+  expect(result.current.usuario).toBeNull()
+})
+it('un cliente no puede entrar mediante el acceso de personal', async () => {
+  const { result } = mostrar()
+  let respuesta
+  await act(async () => { respuesta = await result.current.iniciarSesion(cliente.correo, 'Clave123', true) })
+  expect(respuesta.exito).toBe(false)
+  expect(api.logout).toHaveBeenCalled()
+})
+it('separa credenciales y perfil clínico en sus respectivos servicios', async () => {
+  const { result } = mostrar()
+  let respuesta
+  await act(async () => { respuesta = await result.current.registrarPaciente({ correo: cliente.correo, password: 'Clave123', nombre: 'Ana', apellidos: 'Torres', run: '123456785', rol: 'ADMINISTRADOR' }) })
+  expect(respuesta.exito).toBe(true)
+  expect(api.registrar).toHaveBeenCalledWith(cliente.correo, 'Clave123')
+  const [ruta, opciones] = api.solicitar.mock.calls.find(([r]) => r === 'pacientes/me')
+  expect(ruta).toBe('pacientes/me')
+  expect(opciones.body).not.toHaveProperty('password')
+  expect(opciones.body).not.toHaveProperty('rol')
+  expect(opciones.body.run).toBe('123456785')
+})
+it('informa un perfil pendiente y no vuelve a crear las credenciales al reintentar', async () => {
+  api.solicitar.mockRejectedValue(new Error('Pacientes no disponible'))
+  const { result } = mostrar()
+  const datos = { correo: cliente.correo, password: 'Clave123', nombre: 'Ana' }
+  let respuesta
+  await act(async () => { respuesta = await result.current.registrarPaciente(datos) })
+  expect(respuesta.mensaje).toMatch(/cuenta ya está creada/i)
+  await act(async () => { await result.current.registrarPaciente(datos) })
+  expect(api.registrar).toHaveBeenCalledTimes(1)
+})
+it('conserva una marca sin secretos si no puede confirmar logout', async () => {
+  const { result } = mostrar()
+  await waitFor(() => expect(result.current.cargandoSesion).toBe(false))
+  api.logout.mockRejectedValue(new Error('Sin conexión'))
+  await act(async () => { await result.current.cerrarSesion() })
+  expect(localStorage.getItem('nutrivida:logout-pendiente')).toBe('1')
+  expect(result.current.errorSesion).toMatch(/servidor/i)
+})
+it('un cierre pendiente no restaura la sesión al recargar', async () => {
+  localStorage.setItem('nutrivida:logout-pendiente', '1')
+  const { result } = mostrar()
+  await waitFor(() => expect(result.current.cargandoSesion).toBe(false))
+  expect(api.logout).toHaveBeenCalled()
+  expect(api.renovar).not.toHaveBeenCalled()
 })
