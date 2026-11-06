@@ -91,6 +91,9 @@ function AdminLayout() {
           className="admin-nav"
           aria-label="Navegación administrativa"
         >
+          <NavLink to="/gestion/ordenes" className="admin-nav-link">Órdenes</NavLink>
+          <NavLink to="/gestion/catalogo" className="admin-nav-link">Catálogo</NavLink>
+          <NavLink to="/admin/cuentas" className="admin-nav-link">Cuentas de acceso</NavLink>
           <NavLink
             to="/admin"
             end
@@ -199,6 +202,8 @@ function AdminLayout() {
             </Link>
           )}
         </header>
+
+        {(esPaciente || esNutricionista) && <Alert role="note" variant="info">Esta sección utiliza datos de demostración mientras se completa su integración. Las cuentas de acceso se gestionan en «Cuentas de acceso».</Alert>}
 
         {errorDatos ? (
           <Alert variant="danger">

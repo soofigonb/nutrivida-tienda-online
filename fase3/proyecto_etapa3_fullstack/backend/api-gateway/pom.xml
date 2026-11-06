@@ -1,62 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Define este proyecto Maven. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <!-- Indica la versión 4.0.0 del formato POM de Maven. -->
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Indica el proyecto padre del que se heredan versiones y opciones de construcción. -->
     <parent>
+        <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
         <groupId>org.springframework.boot</groupId>
+        <!-- Configuración padre de Spring Boot: gestiona versiones y opciones comunes de construcción. -->
         <artifactId>spring-boot-starter-parent</artifactId>
+        <!-- Selecciona la versión 4.0.9. -->
         <version>4.0.9</version>
+        <!-- Vacío indica que Maven debe resolver el padre en sus repositorios. -->
         <relativePath/>
     </parent>
 
+    <!-- Identifica el grupo que publica el artefacto: cl.nutrivida. -->
     <groupId>cl.nutrivida</groupId>
+    <!-- Identifica el artefacto Maven de este componente: api-gateway. -->
     <artifactId>api-gateway</artifactId>
+    <!-- Selecciona la versión 0.0.1-SNAPSHOT. -->
     <version>0.0.1-SNAPSHOT</version>
+    <!-- Nombre legible del componente mostrado por Maven y por herramientas de desarrollo. -->
     <name>api-gateway</name>
+    <!-- Descripción del propósito del componente. -->
     <description>API Gateway de NutriVida</description>
 
+    <!-- Centraliza valores reutilizables, que se consultan con la sintaxis ${nombre}. -->
     <properties>
+        <!-- Compila para Java 17, la versión del lenguaje y de bytecode establecida para estos servicios. -->
         <java.version>17</java.version>
+        <!-- Versión de Spring Cloud. -->
         <spring-cloud.version>2025.1.4</spring-cloud.version>
     </properties>
 
+    <!-- Dependencias del proyecto. -->
     <dependencies>
 
-        <!-- Recibe las solicitudes y las dirige a cada microservicio -->
+        <!-- Declara una dependencia. -->
         <dependency>
+            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
+            <groupId>org.springframework.boot</groupId>
+            <!-- Añade soporte para recibir y validar tokens Bearer JWT en los servicios y en el gateway. -->
+            <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
+        </dependency>
+
+        <!-- Recibe las solicitudes y las dirige a cada microservicio -->
+        <!-- Declara una dependencia. -->
+        <dependency>
+            <!-- Identifica el grupo que publica el artefacto: org.springframework.cloud. -->
             <groupId>org.springframework.cloud</groupId>
+            <!-- Incluye el gateway reactivo que reenvía peticiones a las URLs configuradas. -->
             <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
         </dependency>
 
         <!-- Herramientas para pruebas -->
+        <!-- Declara una dependencia. -->
         <dependency>
+            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
+            <!-- Incluye JUnit, Mockito y utilidades para las pruebas automatizadas. -->
             <artifactId>spring-boot-starter-test</artifactId>
+            <!-- Esta dependencia solo se utiliza al compilar o ejecutar pruebas. -->
             <scope>test</scope>
         </dependency>
 
     </dependencies>
 
     <!-- Administra las versiones compatibles de Spring Cloud -->
+    <!-- Administra versiones compartidas. -->
     <dependencyManagement>
+        <!-- Dependencias del proyecto. -->
         <dependencies>
+            <!-- Declara una dependencia. -->
             <dependency>
+                <!-- Identifica el grupo que publica el artefacto: org.springframework.cloud. -->
                 <groupId>org.springframework.cloud</groupId>
+                <!-- BOM de Spring Cloud: define de forma central las versiones de sus bibliotecas. -->
                 <artifactId>spring-cloud-dependencies</artifactId>
+                <!-- Selecciona la versión ${spring-cloud.version}. -->
                 <version>${spring-cloud.version}</version>
+                <!-- Importa las versiones del BOM. -->
                 <type>pom</type>
+                <!-- Importa las versiones declaradas por el BOM. -->
                 <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
 
+    <!-- Agrupa las herramientas que construyen el componente. -->
     <build>
+        <!-- Enumera los plugins ejecutados por Maven durante la compilación, prueba o empaquetado. -->
         <plugins>
+            <!-- Declara una herramienta Maven que participa en la construcción o verificación del proyecto. -->
             <plugin>
+                <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
                 <groupId>org.springframework.boot</groupId>
+                <!-- Genera un JAR ejecutable con las dependencias para iniciar el servicio mediante java -jar. -->
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>

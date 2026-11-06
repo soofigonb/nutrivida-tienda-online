@@ -1,0 +1,125 @@
+{
+  "entorno": "PostgreSQL 17 local temporal, catálogo HTTP simulado, tres aplicaciones reales",
+  "resultados": [
+    {
+      "prueba": "Registro de cuenta cliente34340f62",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Registro de cuenta otro34340f62",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Registro de cuenta vendedor34340f62",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Registro de cuenta admin34340f62",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Login cliente",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Login otro",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Login vendedor",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Login admin",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Me con firma RSA real",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cliente sin acceso a cuentas",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Administrador lista cuentas",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Órdenes sin sesión",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Crear orden persistida",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Total calculado con catálogo simulado",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Reintento idempotente",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cliente ajeno no ve detalle",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Vendedor consulta detalle",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Vendedor no crea",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Servicio de órdenes rechaza vendedor directo",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Cliente cancela propia",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "No se reabre cancelada",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Renovar sesión en PostgreSQL",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Renovación no reutilizable",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Logout",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Logout revoca renovación",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Login web",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Renovación web con cookie",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Origen ajeno bloqueado",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Swagger JSON autenticación",
+      "resultado": "OK"
+    },
+    {
+      "prueba": "Swagger JSON órdenes",
+      "resultado": "OK"
+    }
+  ]
+}

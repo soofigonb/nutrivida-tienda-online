@@ -56,7 +56,7 @@ const paciente = {
   fechaNacimiento: '',
   password: 'clave123',
   contrasena: 'clave123',
-  rol: 'paciente',
+  rol: 'CLIENTE',
 }
 
 const profesional = {
@@ -72,7 +72,7 @@ const profesional = {
 const administrador = {
   id: 'admin',
   nombre: 'Administrador',
-  rol: 'admin',
+  rol: 'ADMINISTRADOR',
 }
 
 // ========================================

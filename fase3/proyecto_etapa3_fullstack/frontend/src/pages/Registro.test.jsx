@@ -63,8 +63,8 @@ function mostrar(respuesta = { exito: true }) {
           />
 
           <Route
-            path="/login"
-            element={<h1>Destino: iniciar sesión</h1>}
+            path="/"
+            element={<h1>Destino: tienda</h1>}
           />
         </Routes>
       </AuthContext.Provider>
@@ -274,7 +274,7 @@ describe('Interacción del formulario de Registro', () => {
     'profesor.duoc.cl',
     'gmail.com',
   ])(
-    'acepta %s, envía datos normalizados y navega al login',
+    'acepta %s, envía datos normalizados y navega a la tienda',
     async (dominio) => {
       const { user, registrarPaciente } = mostrar()
 
@@ -286,7 +286,7 @@ describe('Interacción del formulario de Registro', () => {
 
       expect(
         await screen.findByRole('heading', {
-          name: 'Destino: iniciar sesión',
+          name: 'Destino: tienda',
         }),
       ).toBeInTheDocument()
 
@@ -298,7 +298,6 @@ describe('Interacción del formulario de Registro', () => {
           apellidos: 'González Pérez',
           run: '123456785',
           correo: `sofia@${dominio}`,
-          rol: 'paciente',
           region: 'Región de La Araucanía',
           comuna: 'Temuco',
         }),

@@ -1,5 +1,7 @@
 # 🥑 NutriVida
 
+> **Avance EV3:** autenticación, órdenes y gateway están en `fase3/proyecto_etapa3_fullstack/backend`, con rutas directas y sin Eureka. El frontend de fase 3 integra sesión, cuentas y órdenes por API. Catálogo, pacientes y agendamiento reales siguen pendientes de coordinación con el equipo.
+
 <p align="center">
   <strong>Clínica nutricional para una vida más saludable</strong>
 </p>

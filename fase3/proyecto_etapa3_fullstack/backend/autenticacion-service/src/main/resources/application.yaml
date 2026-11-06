@@ -1,0 +1,42 @@
+# Configuración propia de la autenticación de NutriVida
+# Estas propiedades serán utilizadas por las clases de seguridad
+# que implementaremos en los siguientes pasos.
+
+# Agrupa las propiedades propias de NutriVida que se leen mediante @Value.
+app:
+  # Alta inicial opcional, desactivada por defecto y sin contraseñas predefinidas.
+  bootstrap:
+    # Solo se habilita durante la preparación del primer administrador.
+    enabled: ${BOOTSTRAP_ADMIN_ENABLED:false}
+    # Correo nuevo proporcionado por el operador.
+    email: ${BOOTSTRAP_ADMIN_EMAIL:}
+    # Contraseña temporal desde el entorno; nunca se guarda en Git.
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:}
+  # Política de registro propia del proyecto que utiliza este servicio.
+  registration:
+    # Debe existir en rol; solo el operador puede cambiarlo.
+    default-role: ${REGISTRATION_DEFAULT_ROLE:CLIENTE}
+    # Debe existir en estado_usuario.
+    default-state: ${REGISTRATION_DEFAULT_STATE:ACTIVO}
+  # Agrupa emisor, duraciones y ubicaciones de las claves que usa JwtConfig y AutenticacionService.
+  jwt:
+    # Identifica al servicio que emite los tokens
+    # Define el emisor del JWT mediante JWT_ISSUER o el valor local por defecto.
+    issuer: ${JWT_ISSUER:http://localhost:8081}
+
+    # Tiempo de validez del token de acceso: 15 minutos
+    # Duración configurable del JWT; m significa minutos.
+    access-token-duration: ${JWT_ACCESS_TOKEN_DURATION:15m}
+
+    # Tiempo de validez del token de renovación: 7 días
+    # Duración compartida por el secreto y su cookie; d significa días.
+    refresh-token-duration: ${JWT_REFRESH_TOKEN_DURATION:7d}
+
+    # Ubicación de las claves RSA para firmar y verificar los JWT
+    # Los valores deben ser rutas de recursos, por ejemplo:
+    # file:C:/ruta/privada/private.pem
+    # file:C:/ruta/privada/public.pem
+    # Lee la ubicación del archivo PEM PKCS8 de clave privada RSA.
+    private-key: ${JWT_PRIVATE_KEY_LOCATION}
+    # Lee la ubicación del archivo PEM SPKI de clave pública RSA que corresponde al mismo par que la privada.
+    public-key: ${JWT_PUBLIC_KEY_LOCATION}
