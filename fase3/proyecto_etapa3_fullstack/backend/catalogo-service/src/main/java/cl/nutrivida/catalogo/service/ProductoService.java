@@ -3,6 +3,7 @@ package cl.nutrivida.catalogo.service;
 import org.springframework.stereotype.Service;
 import cl.nutrivida.catalogo.dto.CrearProductoDTO;
 import cl.nutrivida.catalogo.dto.ProductoDTO;
+import cl.nutrivida.catalogo.exceptions.RecursoNoEncontradoException;
 import cl.nutrivida.catalogo.dto.CategoriaDTO;
 import cl.nutrivida.catalogo.mapper.ProductoMapper;
 import cl.nutrivida.catalogo.model.Categoria;
@@ -31,7 +32,7 @@ public class ProductoService {
 
     public ProductoDTO buscarPorId(UUID id) {
         Producto producto = productoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
         return mapper.toDTO(producto);
     }
 
@@ -41,7 +42,7 @@ public class ProductoService {
 
     public ProductoDTO crear(CrearProductoDTO datos) {
         Categoria categoria = categoriaRepository.findById(datos.idCategoria())
-                .orElseThrow(() -> new RuntimeException("Categoria no encontrada"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Categoria no encontrada"));
         Producto producto = new Producto();
         producto.setNombre(datos.nombre());
         producto.setDescripcion(datos.descripcion());
