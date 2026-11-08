@@ -1,6 +1,6 @@
 package cl.nutrivida.profesionales.controller;
 
-import cl.nutrivida.profesionales.model.Profesional;
+import cl.nutrivida.profesionales.dto.ProfesionalDTO;
 import cl.nutrivida.profesionales.service.ProfesionalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,24 +19,24 @@ public class ProfesionalController {
     }
 
     @GetMapping
-    public List<Profesional> listarActivos() {
+    public List<ProfesionalDTO> listarActivos() {
         return service.listarActivos();
     }
 
     @GetMapping("/{id}")
-    public Profesional obtenerPorId(@PathVariable Long id) {
+    public ProfesionalDTO obtenerPorId(@PathVariable Long id) {
         return service.obtenerPorId(id);
     }
 
     @PostMapping
-    public ResponseEntity<Profesional> crear(@RequestBody Profesional profesional) {
-        Profesional creado = service.crear(profesional);
+    public ResponseEntity<ProfesionalDTO> crear(@RequestBody ProfesionalDTO dto) {
+        ProfesionalDTO creado = service.crear(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
     @PutMapping("/{id}")
-    public Profesional actualizar(@PathVariable Long id, @RequestBody Profesional profesional) {
-        return service.actualizar(id, profesional);
+    public ProfesionalDTO actualizar(@PathVariable Long id, @RequestBody ProfesionalDTO dto) {
+        return service.actualizar(id, dto);
     }
 
     @DeleteMapping("/{id}")

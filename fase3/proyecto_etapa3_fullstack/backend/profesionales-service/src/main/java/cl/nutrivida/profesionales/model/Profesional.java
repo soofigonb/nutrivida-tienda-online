@@ -13,7 +13,6 @@ public class Profesional {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long profesionalId;
-
     private String nombre;
     private String especialidad;
     private Integer experiencia;

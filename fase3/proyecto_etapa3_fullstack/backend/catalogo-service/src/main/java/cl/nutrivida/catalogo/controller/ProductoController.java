@@ -43,6 +43,7 @@ public class ProductoController {
         return service.listarCategorias();
     }
 
+
     @PostMapping
     public ResponseEntity<ProductoDTO> crear(@RequestBody CrearProductoDTO datos) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(datos));
