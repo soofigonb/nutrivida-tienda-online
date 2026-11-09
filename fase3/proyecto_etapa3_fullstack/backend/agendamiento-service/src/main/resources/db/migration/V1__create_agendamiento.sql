@@ -12,3 +12,4 @@ CREATE TABLE IF NOT EXISTS db_agendamiento.reservas (
     estado VARCHAR(50) NOT NULL DEFAULT 'CONFIRMADA',
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
+
