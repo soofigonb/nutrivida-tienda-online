@@ -81,6 +81,18 @@ class PacienteServiceTest {
     }
 
     // Caso de prueba.
+    @Test void listarActivosYObtenerPorIdExistenteDevuelvenPacientes() {
+        // Prepara un paciente activo en el repositorio simulado.
+        Paciente entidad = new PacienteMapper().toEntity(dtoValido());
+        entidad.setPacienteId(2L);
+        when(repository.findByActivoTrue()).thenReturn(List.of(entidad));
+        when(repository.findById(2L)).thenReturn(Optional.of(entidad));
+        // Comprueba el listado y la búsqueda por ID.
+        assertEquals(1, service.listarActivos().size());
+        assertEquals(2L, service.obtenerPorId(2L).getPacienteId());
+    }
+
+    // Caso de prueba.
     @Test void rechazaRunDuplicadoSinGuardar() {
         // Prepara un DTO cuyo RUN ya figura activo en la base de datos.
         PacienteDTO dto = dtoValido();
@@ -103,12 +115,20 @@ class PacienteServiceTest {
     }
 
     // Caso de prueba.
-    @Test void rechazaDatosInvalidosEnNombreOCorreo() {
-        // Prepara un DTO con nombre demasiado corto.
+    @Test void rechazaDatosInvalidosEnRunNombreApellidosOCorreo() {
+        // RUN vacío.
+        PacienteDTO sinRun = dtoValido();
+        sinRun.setRun(" ");
+        assertThrows(IllegalArgumentException.class, () -> service.crear(sinRun));
+        // Nombre demasiado corto.
         PacienteDTO nombreCorto = dtoValido();
         nombreCorto.setNombre("A");
         assertThrows(IllegalArgumentException.class, () -> service.crear(nombreCorto));
-        // Prepara un DTO con correo inválido.
+        // Apellidos demasiado cortos.
+        PacienteDTO apellidoCorto = dtoValido();
+        apellidoCorto.setApellidos("B");
+        assertThrows(IllegalArgumentException.class, () -> service.crear(apellidoCorto));
+        // Correo inválido sin arroba.
         PacienteDTO correoInvalido = dtoValido();
         correoInvalido.setCorreo("correo-sin-arroba");
         assertThrows(IllegalArgumentException.class, () -> service.crear(correoInvalido));
@@ -116,7 +136,7 @@ class PacienteServiceTest {
     }
 
     // Caso de prueba.
-    @Test void actualizaPacienteExistenteCorrectamente() {
+    @Test void actualizaPacienteExistenteYValidaDuplicadosAlActualizar() {
         // Prepara un paciente existente almacenado.
         Paciente existente = new PacienteMapper().toEntity(dtoValido());
         existente.setPacienteId(4L);
@@ -128,11 +148,16 @@ class PacienteServiceTest {
         PacienteDTO cambios = dtoValido();
         cambios.setDireccion("Av. Apoquindo 4500");
         cambios.setComuna("Las Condes");
-        // Ejecuta la actualización.
+        // Ejecuta la actualización válida.
         PacienteDTO actualizado = service.actualizar(4L, cambios);
-        // Comprueba que se hayan guardado los cambios.
         assertEquals("Av. Apoquindo 4500", actualizado.getDireccion());
         assertEquals("Las Condes", actualizado.getComuna());
+        // Simula correo duplicado en otro paciente al actualizar.
+        when(repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot("valentina@duoc.cl", 4L)).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(4L, cambios));
+        // Simula RUN duplicado en otro paciente al actualizar.
+        when(repository.existsByRunAndActivoTrueAndPacienteIdNot("19876543-K", 4L)).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(4L, cambios));
     }
 
     // Caso de prueba.

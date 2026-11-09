@@ -45,17 +45,19 @@ class ReservaControllerTest {
     }
 
     // Caso de prueba.
-    @Test void listarActivasYActualizarDeleganEnElServicio() {
+    @Test void listarActivasObtenerPorIdYActualizarDeleganEnElServicio() {
         // Construye un doble del servicio.
         ReservaService service = mock(ReservaService.class);
         ReservaDTO dto = new ReservaDTO();
         dto.setReservaId(2L);
         when(service.listarActivas()).thenReturn(List.of(dto));
+        when(service.obtenerPorId(2L)).thenReturn(dto);
         when(service.actualizar(2L, dto)).thenReturn(dto);
         // Prepara el controlador.
         ReservaController controller = new ReservaController(service);
-        // Comprueba la respuesta de listado y actualización.
+        // Comprueba la respuesta de listado, consulta por ID y actualización.
         assertEquals(1, controller.listarActivas().size());
+        assertEquals(2L, controller.obtenerPorId(2L).getReservaId());
         assertEquals(2L, controller.actualizar(2L, dto).getReservaId());
     }
 
@@ -89,4 +91,3 @@ class ReservaControllerTest {
         assertEquals("Horario inválido", validacion.getBody().get("mensaje"));
     }
 }
-

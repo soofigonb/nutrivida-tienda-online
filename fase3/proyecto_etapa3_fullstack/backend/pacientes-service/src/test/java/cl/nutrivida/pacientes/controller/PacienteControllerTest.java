@@ -45,17 +45,19 @@ class PacienteControllerTest {
     }
 
     // Caso de prueba.
-    @Test void listarActivosYActualizarDeleganEnElServicio() {
+    @Test void listarActivosObtenerPorIdYActualizarDeleganEnElServicio() {
         // Construye un doble del servicio.
         PacienteService service = mock(PacienteService.class);
         PacienteDTO dto = new PacienteDTO();
         dto.setPacienteId(3L);
         when(service.listarActivos()).thenReturn(List.of(dto));
+        when(service.obtenerPorId(3L)).thenReturn(dto);
         when(service.actualizar(3L, dto)).thenReturn(dto);
         // Prepara el controlador.
         PacienteController controller = new PacienteController(service);
-        // Comprueba la respuesta de listado y actualización.
+        // Comprueba la respuesta de listado, consulta por ID y actualización.
         assertEquals(1, controller.listarActivos().size());
+        assertEquals(3L, controller.obtenerPorId(3L).getPacienteId());
         assertEquals(3L, controller.actualizar(3L, dto).getPacienteId());
     }
 
