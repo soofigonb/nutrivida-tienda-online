@@ -1,17 +1,17 @@
 package cl.nutrivida.catalogo.dto;
 
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public record ProductoDTO(
-    UUID id,
-    String nombre,
+    @NotNull UUID id,
+    @NotNull String nombre,
     String descripcion,
-    BigDecimal precio,
-    Integer stock,
+    @NotNull BigDecimal precio,
+    @NotNull Integer stock,
     String imagenUrl,
     String categoria,
-    Boolean activo
+    @NotNull Boolean activo
 ) {
-    
 }
