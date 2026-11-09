@@ -11,14 +11,12 @@ import {
   useSearchParams,
 } from 'react-router-dom'
 
-import planes from '../data/planes.js'
+import { usePlanesCatalogo } from '../hooks/usePlanesCatalogo'
 import { TarjetaServicio } from '../components/PlanesServicios.jsx'
 
-const categorias = [
-  ...new Set(planes.map((plan) => plan.categoria)),
-]
-
 function Servicios() {
+  const planes = usePlanesCatalogo()
+  const categorias = [...new Set(planes.map(plan => plan.categoria))]
   const [parametros, setParametros] = useSearchParams()
 
   const categoria = parametros.get('categoria') || ''

@@ -37,6 +37,7 @@ import AdminFormPaciente from './AdminFormPaciente'
 import AdminFormNutricionista from './AdminFormNutricionista'
 
 import fotos from '../data/nutricionistas'
+import { api } from '../services/api'
 
 // ========================================
 // 1. DATOS DE PRUEBA
@@ -157,6 +158,13 @@ function mostrar(
 
 beforeEach(() => {
   localStorage.clear()
+  vi.spyOn(api, 'solicitar').mockImplementation(async (ruta, opciones) => {
+    if (opciones.method === 'POST' || opciones.method === 'PUT') {
+      return { profesionalId: opciones.method === 'POST' ? 'n2' : 'n1', ...opciones.body }
+    }
+    return [{ profesionalId: profesional.id, ...profesional,
+      experiencia: 0, descripcion: profesional.experiencia, imagenUrl: 'nutricionista-1' }]
+  })
 })
 
 afterEach(() => {
@@ -463,13 +471,7 @@ describe('Administración de NutriVida', () => {
         'Registro creado correctamente.',
       )
 
-      const guardados = JSON.parse(
-        localStorage.getItem(
-          'nutricionistasNutriVida',
-        ),
-      )
-
-      const creado = guardados.at(-1)
+      const creado = api.solicitar.mock.calls.find(([, opciones]) => opciones.method === 'POST')[1].body
 
       expect(creado.nombre).toBe(
         'Lic. Profesional Nuevo',
@@ -567,17 +569,13 @@ describe('Administración de NutriVida', () => {
 
       const user = userEvent.setup()
 
-      localStorage.setItem(
-        'nutricionistasNutriVida',
-        JSON.stringify([profesional]),
-      )
-
       render(
         <DatosProvider>
           <Editor />
         </DatosProvider>,
       )
 
+      await screen.findByText(profesional.nombre)
       await user.click(
         screen.getByRole('button', {
           name: 'Actualizar',
@@ -585,20 +583,15 @@ describe('Administración de NutriVida', () => {
       )
 
       expect(
-        screen.getByText(
+        await screen.findByText(
           'Nombre actualizado',
         ),
       ).toBeInTheDocument()
 
-      const guardados = JSON.parse(
-        localStorage.getItem(
-          'nutricionistasNutriVida',
-        ),
-      )
-
-      expect(guardados[0].nombre).toBe(
-        'Nombre actualizado',
-      )
+      expect(api.solicitar).toHaveBeenCalledWith('profesionales/n1', expect.objectContaining({
+        method: 'PUT',
+        body: expect.objectContaining({ nombre: 'Nombre actualizado' }),
+      }))
     },
   )
 })

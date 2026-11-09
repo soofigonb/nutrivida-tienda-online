@@ -38,6 +38,7 @@ function AdminListado({ tipo }) {
   const {
     pacientes,
     nutricionistas,
+    errorProfesionales,
     eliminarRegistro,
   } = useDatos()
 
@@ -97,10 +98,10 @@ function AdminListado({ tipo }) {
   // 4. CONFIRMAR ELIMINACIÓN
   // ========================================
 
-  function confirmarEliminacion() {
+  async function confirmarEliminacion() {
     if (!seleccionado) return
 
-    const resultado = eliminarRegistro(
+    const resultado = await eliminarRegistro(
       tipo,
       seleccionado.id,
     )
@@ -119,6 +120,7 @@ function AdminListado({ tipo }) {
 
   return (
     <section aria-labelledby={`titulo-${tipo}`}>
+      {!esPaciente && errorProfesionales && <Alert variant="danger">{errorProfesionales}</Alert>}
       {/* Mensajes de las operaciones */}
       <div aria-live="polite">
         {mensaje && (

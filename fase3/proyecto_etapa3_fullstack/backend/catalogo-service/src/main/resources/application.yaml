@@ -1,0 +1,42 @@
+spring:
+  profiles:
+    default: nutrivida
+  datasource:
+    url: ${CATALOGO_DB_URL}
+    username: ${CATALOGO_DB_USERNAME}
+    password: ${CATALOGO_DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: db_catalogo
+  flyway:
+    locations: classpath:db/migration
+    default-schema: db_catalogo
+    schemas: db_catalogo
+    clean-disabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER:http://localhost:8081}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/.well-known/jwks.json}
+app:
+  security:
+    roles-claim: ${JWT_ROLES_CLAIM:roles}
+    write-role: ${CATALOGO_WRITE_ROLE:ADMINISTRADOR}
+springdoc:
+  swagger-ui:
+    path: /doc/swagger-ui.html
+---
+# Datos de ejemplo para NutriVida.
+spring:
+  config:
+    activate:
+      on-profile: nutrivida
+  flyway:
+    locations: classpath:db/migration,classpath:db/nutrivida
+catalogo:
+  precio-decimales: 0

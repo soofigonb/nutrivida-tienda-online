@@ -83,7 +83,7 @@ function crearId() {
 // 2. VALIDAR Y NORMALIZAR UNA RESERVA
 // ========================================
 
-function prepararReserva(reserva, profesionales) {
+function prepararReserva(reserva, profesionales, planesDisponibles) {
   const horariosPermitidos = [
     '09:00',
     '11:00',
@@ -137,10 +137,10 @@ function prepararReserva(reserva, profesionales) {
   // Compatibilidad con reservas antiguas
   // que guardaban el servicio sin planId.
   const plan = reserva.planId
-    ? planes.find(
+    ? planesDisponibles.find(
         (item) => item.id === reserva.planId,
       )
-    : planes.find(
+    : planesDisponibles.find(
         (item) =>
           item.nombre === reserva.servicio,
       )
@@ -292,15 +292,10 @@ export function CarritoProvider({ children }) {
   // 5. AGREGAR UNA RESERVA
   // ========================================
 
-  function agregarReserva(datosReserva) {
+  function agregarReserva(datosReserva, profesionales = nutricionistasIniciales, planesDisponibles = planes) {
     try {
       const carrito = leerLista(CLAVE_CARRITO)
       const citas = leerLista(CLAVE_CITAS)
-
-      const profesionales = leerLista(
-        'nutricionistasNutriVida',
-        nutricionistasIniciales,
-      )
 
       const nueva = prepararReserva(
         {
@@ -310,6 +305,7 @@ export function CarritoProvider({ children }) {
             datosReserva.pacienteId || null,
         },
         profesionales,
+        planesDisponibles,
       )
 
       const registrosOcupados = [

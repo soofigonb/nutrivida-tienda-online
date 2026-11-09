@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import planes, {
+import {
   promocionPrimeraConsulta,
 } from '../data/planes.js'
+import { usePlanesCatalogo } from '../hooks/usePlanesCatalogo.js'
 import formatearPrecio from '../utils/formatearPrecio.js'
 
 // Tarjeta compartida entre el inicio y el catálogo.
@@ -44,6 +45,7 @@ export function TarjetaServicio({ plan }) {
 }
 
 function PlanesServicios() {
+  const planes = usePlanesCatalogo()
   const [mostrarPromocion, setMostrarPromocion] = useState(false)
 
   return (

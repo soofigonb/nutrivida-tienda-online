@@ -31,6 +31,12 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column(name = "id_venta", insertable = false, updatable = false)
+    private Long idVenta;
+
+    @Column(name = "codigo", length = 100, updatable = false)
+    private String codigo;
+
     @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
 

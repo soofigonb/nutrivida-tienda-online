@@ -12,6 +12,7 @@ public record ProductoDTO(
     @NotNull Integer stock,
     String imagenUrl,
     String categoria,
+    UUID idCategoria,
     @NotNull Boolean activo
 ) {
 }

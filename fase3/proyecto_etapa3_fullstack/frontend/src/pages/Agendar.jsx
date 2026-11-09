@@ -11,7 +11,7 @@ import {
 import { Link, useLocation } from 'react-router-dom'
 import { useCarrito } from '../context/CarritoContext'
 import { useDatos } from '../context/DatosContext'
-import planes from '../data/planes'
+import { usePlanesCatalogo } from '../hooks/usePlanesCatalogo'
 import formatearPrecio from '../utils/formatearPrecio'
 import {
   esFechaHoraFutura,
@@ -19,7 +19,8 @@ import {
 } from '../utils/validaciones'
 
 function Agendar() {
-  const { nutricionistas } = useDatos()
+  const { nutricionistas, errorProfesionales } = useDatos()
+  const planes = usePlanesCatalogo()
   // ========================================
   // 1. ESTADOS Y CONTEXTO
   // ========================================
@@ -57,7 +58,7 @@ function Agendar() {
         setPlanId(planEncontrado.id)
       }
     }
-  }, [location.search])
+  }, [location.search, planes])
 
   const planSeleccionado =
     planes.find((plan) => plan.id === planId) || null
@@ -73,7 +74,7 @@ function Agendar() {
   function validarFormulario() {
     const nuevosErrores = {}
 
-    if (!planId) {
+    if (!planSeleccionado) {
       nuevosErrores.planId =
         'Debes seleccionar un plan o servicio.'
     }
@@ -159,7 +160,7 @@ function Agendar() {
       motivo: motivo.trim(),
     }
 
-    const resultado = agregarReserva(nuevaReserva)
+    const resultado = agregarReserva(nuevaReserva, nutricionistas, planes)
 
     if (resultado.exito) {
       setMensajeExito({
@@ -186,6 +187,7 @@ function Agendar() {
   return (
     <main className="agendar-main pagina-gestion">
       <Container>
+        {errorProfesionales && <Alert variant="danger">{errorProfesionales}</Alert>}
         <div className="seccion-encabezado">
           <p className="seccion-etiqueta">
             Atención nutricional

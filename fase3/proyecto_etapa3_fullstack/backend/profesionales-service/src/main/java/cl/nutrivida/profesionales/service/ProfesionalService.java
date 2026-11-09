@@ -2,14 +2,16 @@ package cl.nutrivida.profesionales.service;
 
 import cl.nutrivida.profesionales.dto.ProfesionalDTO;
 import cl.nutrivida.profesionales.exceptions.RecursoNoEncontradoException;
-import cl.nutrivida.profesionales.mapper.ProfesionalMapper;
+import cl.nutrivida.profesionales.dto.ProfesionalMapper;
 import cl.nutrivida.profesionales.model.Profesional;
 import cl.nutrivida.profesionales.repository.ProfesionalRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class ProfesionalService {
 
     private final ProfesionalRepository repository;
@@ -20,21 +22,21 @@ public class ProfesionalService {
         this.mapper = mapper;
     }
 
-    // GET / -> solo activos
+    @Transactional(readOnly = true)
     public List<ProfesionalDTO> listarActivos() {
         return repository.findByActivoTrue().stream()
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // GET /{id}
+    @Transactional(readOnly = true)
     public ProfesionalDTO obtenerPorId(Long id) {
         Profesional p = repository.findById(id)
+                .filter(profesional -> Boolean.TRUE.equals(profesional.getActivo()))
                 .orElseThrow(() -> new RecursoNoEncontradoException("Profesional no encontrado con id: " + id));
         return mapper.toDTO(p);
     }
 
-    // POST /
     public ProfesionalDTO crear(ProfesionalDTO dto) {
         validar(dto);
         Profesional p = mapper.toEntity(dto);
@@ -44,7 +46,6 @@ public class ProfesionalService {
         return mapper.toDTO(guardado);
     }
 
-    // PUT /{id}
     public ProfesionalDTO actualizar(Long id, ProfesionalDTO dto) {
         Profesional existente = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Profesional no encontrado con id: " + id));
@@ -61,7 +62,6 @@ public class ProfesionalService {
         return mapper.toDTO(guardado);
     }
 
-    // DELETE /{id} -> baja controlada
     public void darDeBaja(Long id) {
         Profesional existente = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Profesional no encontrado con id: " + id));

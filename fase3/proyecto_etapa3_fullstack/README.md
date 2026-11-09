@@ -32,7 +32,7 @@ La tercera etapa de **NutriVida** incorpora un backend de microservicios al siti
 | API Gateway | Entrada al backend. Enruta por URL directa, valida JWT y controla el acceso a las rutas. | `/api/v1` |
 | Autenticación | Registro, inicio de sesión, renovación, cierre de sesión y gestión de cuentas y roles. | `/api/v1/autenticacion` |
 | Pacientes | Alta, consulta, actualización y baja de pacientes. Valida duplicados de RUN y correo. | `/api/v1/pacientes` |
-| Catálogo | Lista productos y categorías, consulta el detalle de un producto y registra nuevos productos. | `/api/productos` |
+| Catálogo | CRUD de productos, consulta de categorías y planes de venta utilizados por el carrito y órdenes. | `/api/v1/catalogo` |
 | Profesionales | Alta, consulta, actualización y baja de profesionales. | `/api/v1/profesionales` |
 | Agendamiento | Creación, consulta, actualización y cancelación de reservas. Valida fecha, horario y motivo de consulta. | `/api/v1/agendamiento` |
 | Órdenes | Creación, consulta, cambio de estado y cancelación de órdenes. Verifica precios y disponibilidad mediante el catálogo. | `/api/v1/ordenes` |
@@ -67,7 +67,7 @@ proyecto_etapa3_fullstack/
 
 ## 🚀 Ejecución local
 
-Se requiere Java 17, Node.js y acceso a las bases de Supabase. Configura la URL JDBC, el usuario y la contraseña de cada servicio mediante variables de entorno. Autenticación también requiere `JWT_PRIVATE_KEY_LOCATION` y `JWT_PUBLIC_KEY_LOCATION`. Los scripts de `backend/scripts/` permiten generar las claves e iniciar autenticación u órdenes solicitando la contraseña en la terminal. Para catálogo y profesionales, prepara los archivos de configuración local con los datos del equipo.
+Se requiere Java 17, Node.js y acceso a las bases de Supabase. Configura la URL JDBC, el usuario y la contraseña de cada servicio mediante variables de entorno. Para catálogo usa `CATALOGO_DB_URL`, `CATALOGO_DB_USERNAME` y `CATALOGO_DB_PASSWORD`. Para profesionales usa `PROFESIONALES_DB_URL`, `PROFESIONALES_DB_USERNAME` y `PROFESIONALES_DB_PASSWORD`. Autenticación también requiere `JWT_PRIVATE_KEY_LOCATION` y `JWT_PUBLIC_KEY_LOCATION`. Los scripts de `backend/scripts/` permiten generar las claves e iniciar autenticación u órdenes solicitando la contraseña en la terminal.
 
 Desde la carpeta de cada servicio, inicia Spring Boot en una terminal independiente:
 
@@ -84,11 +84,23 @@ npm run dev
 
 Vite reenvía `/api` al gateway en el puerto `8080`. [Abrir NutriVida](http://localhost:5173).
 
-Para probar las APIs disponibles, inicia los servicios correspondientes y abre su interfaz Swagger. [Autenticación](http://localhost:8081/doc/swagger-ui.html) · [Pacientes](http://localhost:8082/doc/swagger-ui.html) · [Agendamiento](http://localhost:8085/doc/swagger-ui.html) · [Órdenes](http://localhost:8086/doc/swagger-ui.html).
+Para probar las APIs disponibles, inicia los servicios correspondientes y abre su interfaz Swagger. [Autenticación](http://localhost:8081/doc/swagger-ui.html) · [Pacientes](http://localhost:8082/doc/swagger-ui.html) · [Catálogo](http://localhost:8083/doc/swagger-ui.html) · [Profesionales](http://localhost:8084/doc/swagger-ui.html) · [Agendamiento](http://localhost:8085/doc/swagger-ui.html) · [Órdenes](http://localhost:8086/doc/swagger-ui.html).
+
+El CRUD de catálogo identifica los productos por UUID. El carrito y órdenes consultan `/api/v1/catalogo/planes`, que expone el identificador numérico de venta del mismo producto. Para crear, editar o dar de baja productos y profesionales, autoriza Swagger con un JWT de administrador.
+
+### Reutilizar catálogo y profesionales
+
+Cada servicio puede arrancar directamente con su configuración de PostgreSQL y su proveedor JWT. El perfil predeterminado `nutrivida` incluye los datos de ejemplo del proyecto. Para una instalación nueva en otro proyecto, usa una base propia y activa `SPRING_PROFILES_ACTIVE=generico`. Para una base que ya tiene las migraciones de NutriVida, mantén activo `nutrivida`.
+
+- Configura `JWT_ISSUER`, `JWT_JWK_SET_URI` y, si corresponde, `JWT_ROLES_CLAIM` (por defecto `roles`). El rol de escritura se configura con `CATALOGO_WRITE_ROLE` o `PROFESIONALES_WRITE_ROLE`.
+- En un catálogo vacío, crea la primera categoría con `POST /api/v1/catalogo/categorias` antes de registrar productos. El perfil genérico admite hasta dos decimales y el de NutriVida usa pesos enteros.
+- Desde la carpeta de cada servicio, puedes empaquetar con `./mvnw clean package` y construir su imagen con `docker build -t nombre-del-servicio .`. Pasa las variables de base de datos y JWT al ejecutar el contenedor. `JWT_JWK_SET_URI` debe ser accesible desde el contenedor.
 
 ## 🧪 Pruebas y evidencias
 
 Ejecuta `./mvnw verify` desde cada servicio Java y `npm run test -- --run` desde `frontend/`. El gateway tiene pruebas de rutas, JWT y permisos. Pacientes y agendamiento incluyen pruebas de controladores y lógica de negocio. Los informes de cobertura de los módulos con JaCoCo se generan en `target/site/jacoco/index.html`.
+
+Catálogo y profesionales prueban sus operaciones REST y sus permisos sin conectarse a una base. Maven verifica un mínimo del 80 % de cobertura de líneas en ambos módulos. Para ejecutar también su prueba de arranque, configura una base PostgreSQL de pruebas y activa `RUN_DATABASE_TESTS=true`.
 
 | Servicio con informe verificado | Pruebas aprobadas | Cobertura de líneas |
 | --- | ---: | ---: |
@@ -103,7 +115,6 @@ La EV3 pide los enlaces de GitHub y los archivos comprimidos del frontend y back
 
 ## 📌 Pendientes para la entrega
 
-- Alinear la ruta y los identificadores del catálogo con órdenes, el gateway y el carrito. Completar la actualización y baja de productos.
 - Conectar el registro con el perfil de paciente y el flujo de reservas con agendamiento. Verificar los permisos sobre registros propios.
 - Probar el flujo completo en el navegador con los tres roles y reunir los informes de pruebas de todos los servicios.
 - Incorporar la documentación grupal y preparar los archivos de entrega.

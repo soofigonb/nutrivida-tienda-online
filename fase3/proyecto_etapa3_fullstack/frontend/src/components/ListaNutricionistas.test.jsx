@@ -12,10 +12,12 @@ import {
   describe,
   expect,
   test,
+  vi,
 } from 'vitest'
 
 import { DatosProvider } from '../context/DatosContext.jsx'
 import ListaNutricionistas from './ListaNutricionistas.jsx'
+import { api } from '../services/api'
 
 // ========================================
 // 1. DATOS DE PRUEBA
@@ -48,12 +50,13 @@ const profesionales = [
 // 2. CONFIGURACIÓN E INTERACCIONES
 // ========================================
 
-function mostrar() {
+async function mostrar() {
   render(
     <DatosProvider>
       <ListaNutricionistas />
     </DatosProvider>,
   )
+  await screen.findAllByRole('article')
 
   return userEvent.setup()
 }
@@ -85,14 +88,14 @@ async function esperarCierre() {
 beforeEach(() => {
   localStorage.clear()
 
-  localStorage.setItem(
-    'nutricionistasNutriVida',
-    JSON.stringify(profesionales),
-  )
+  vi.spyOn(api, 'solicitar').mockResolvedValue(profesionales.map(item => ({
+    ...item, profesionalId: item.id, descripcion: item.experiencia, imagenUrl: item.foto,
+  })))
 })
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
   localStorage.clear()
 })
 
@@ -101,8 +104,8 @@ afterEach(() => {
 // ========================================
 
 describe('ListaNutricionistas', () => {
-  test('renderiza los profesionales guardados con sus datos e imágenes', () => {
-    mostrar()
+  test('renderiza los profesionales de la API con sus datos e imágenes', async () => {
+    await mostrar()
 
     expect(
       screen.getAllByRole('article'),
@@ -138,7 +141,7 @@ describe('ListaNutricionistas', () => {
   })
 
   test('abre el detalle seleccionado, lo cierra y permite elegir otro profesional', async () => {
-    const user = mostrar()
+    const user = await mostrar()
 
     let dialogo = await abrir(user)
 
@@ -182,7 +185,7 @@ describe('ListaNutricionistas', () => {
   // ========================================
 
   test('cierra el detalle mediante el botón superior', async () => {
-    const user = mostrar()
+    const user = await mostrar()
 
     const dialogo = await abrir(user)
 
@@ -196,7 +199,7 @@ describe('ListaNutricionistas', () => {
   })
 
   test('cierra el detalle al presionar Escape', async () => {
-    const user = mostrar()
+    const user = await mostrar()
 
     await abrir(user)
     await user.keyboard('{Escape}')

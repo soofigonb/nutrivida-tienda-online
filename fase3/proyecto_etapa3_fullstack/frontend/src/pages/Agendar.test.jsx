@@ -1,8 +1,10 @@
 import {
+  afterEach,
   beforeEach,
   describe,
   expect,
   test,
+  vi,
 } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -14,6 +16,8 @@ import {
 import { CarritoProvider } from '../context/CarritoContext'
 import { DatosProvider } from '../context/DatosContext'
 import Agendar from './Agendar'
+import { api } from '../services/api'
+import profesionales from '../data/nutricionistas'
 
 // ========================================
 // 1. PREPARACIÓN DEL COMPONENTE
@@ -48,7 +52,11 @@ function renderAgendar(rutaInicial = '/agendar') {
 describe('Módulo de agendamiento', () => {
   beforeEach(() => {
     localStorage.clear()
+    vi.spyOn(api, 'solicitar').mockResolvedValue(profesionales.map(item => ({
+      ...item, profesionalId: item.id, descripcion: item.experiencia, imagenUrl: item.foto,
+    })))
   })
+  afterEach(() => vi.restoreAllMocks())
 
   test('selecciona automáticamente el plan indicado en la URL', () => {
     renderAgendar('/agendar?plan=plan-integral')
