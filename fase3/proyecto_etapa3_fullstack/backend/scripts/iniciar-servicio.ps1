@@ -1,6 +1,6 @@
-param(
+﻿param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('autenticacion-service', 'ordenes-service')]
+    [ValidateSet('autenticacion-service', 'ordenes-service', 'pacientes-service', 'agendamiento-service')]
     [string]$Servicio,
     [switch]$CrearAdministradorInicial,
     [string]$Issuer = 'http://localhost:8081',
@@ -8,7 +8,12 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$prefijo = if ($Servicio -eq 'autenticacion-service') { 'AUTENTICACION' } else { 'ORDENES' }
+$prefijo = switch ($Servicio) {
+    'autenticacion-service' { 'AUTENTICACION' }
+    'ordenes-service'       { 'ORDENES' }
+    'pacientes-service'     { 'PACIENTES' }
+    'agendamiento-service'  { 'AGENDAMIENTO' }
+}
 $anteriores = @{}
 
 function Set-VariableDeProceso([string]$Nombre, [string]$Valor) {
@@ -24,6 +29,11 @@ try {
         if ([string]::IsNullOrWhiteSpace($respuesta)) {
             'jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require'
         } else { $respuesta }
+    } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service')) {
+        $respuesta = Read-Host "URL JDBC de $Servicio (Enter para usar Supabase configurado)"
+        if ([string]::IsNullOrWhiteSpace($respuesta)) {
+            'jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require'
+        } else { $respuesta }
     } else {
         Read-Host 'URL JDBC de este proyecto Supabase, sin usuario ni contraseña'
     }
@@ -34,9 +44,11 @@ try {
         throw 'La URL de Supabase debe incluir sslmode=require o una verificación SSL superior.'
     }
     Set-VariableDeProceso ($prefijo + '_DB_URL') $jdbc
-    $usuarioDb = Read-Host 'Usuario PostgreSQL completo (en órdenes, Enter utiliza el configurado)'
+    $usuarioDb = Read-Host 'Usuario PostgreSQL completo (Enter utiliza el configurado por defecto)'
     if ($Servicio -eq 'ordenes-service' -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
         $usuarioDb = 'postgres.ngjummwpmhqdtabcieeg'
+    } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service') -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
+        $usuarioDb = 'postgres.nyaxmfgatgsrspxdfxwf'
     }
     Set-VariableDeProceso ($prefijo + '_DB_USERNAME') $usuarioDb
     $clave = Read-Host 'Contraseña PostgreSQL' -AsSecureString
@@ -57,7 +69,7 @@ try {
             $claveAdmin = Read-Host 'Contraseña inicial del administrador' -AsSecureString
             Set-VariableDeProceso 'BOOTSTRAP_ADMIN_PASSWORD' ([Net.NetworkCredential]::new('', $claveAdmin).Password)
         }
-    } else {
+    } elseif ($Servicio -eq 'ordenes-service') {
         Set-VariableDeProceso 'JWT_JWK_SET_URI' $Jwks
     }
 
@@ -65,10 +77,15 @@ try {
         Set-VariableDeProceso 'JAVA_HOME' 'C:\Program Files\Java\jdk-17'
     }
     $backend = Split-Path -Parent $PSScriptRoot
-    # Pasa las variables a Maven.
-    # Conserva los argumentos con espacios.
     $argumentosMaven = @('-f', (Join-Path $backend ($Servicio + '/pom.xml')), 'spring-boot:run')
-    & mvn @argumentosMaven
+    $comandoMvn = if (Get-Command mvn -ErrorAction SilentlyContinue) {
+        'mvn'
+    } elseif (Test-Path -LiteralPath 'C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd') {
+        'C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd'
+    } else {
+        'mvn'
+    }
+    & $comandoMvn @argumentosMaven
     if ($LASTEXITCODE -ne 0) { throw 'El servicio no pudo iniciarse; revisa el registro anterior.' }
 } finally {
     foreach ($nombre in $anteriores.Keys) {
