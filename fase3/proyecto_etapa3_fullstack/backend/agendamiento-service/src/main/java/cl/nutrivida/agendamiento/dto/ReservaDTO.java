@@ -1,8 +1,11 @@
 package cl.nutrivida.agendamiento.dto;
 
+import java.util.UUID;
+
 public class ReservaDTO {
 
     private Long reservaId;
+    private UUID usuarioId;
     private Long pacienteId;
     private String planId;
     private String servicio;
@@ -21,6 +24,14 @@ public class ReservaDTO {
 
     public void setReservaId(Long reservaId) {
         this.reservaId = reservaId;
+    }
+
+    public UUID getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(UUID usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public Long getPacienteId() {
@@ -111,4 +122,3 @@ public class ReservaDTO {
         this.activo = activo;
     }
 }
-

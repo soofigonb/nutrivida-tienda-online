@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "pacientes")
 public class Paciente {
@@ -15,6 +17,9 @@ public class Paciente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "paciente_id")
     private Long pacienteId;
+
+    @Column(name = "usuario_id", unique = true)
+    private UUID usuarioId;
 
     @Column(name = "run", nullable = false, unique = true)
     private String run;
@@ -25,7 +30,7 @@ public class Paciente {
     @Column(name = "apellidos", nullable = false)
     private String apellidos;
 
-    @Column(name = "correo", nullable = false, unique = true)
+    @Column(name = "correo", unique = true)
     private String correo;
 
     @Column(name = "telefono")
@@ -55,6 +60,14 @@ public class Paciente {
 
     public void setPacienteId(Long pacienteId) {
         this.pacienteId = pacienteId;
+    }
+
+    public UUID getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(UUID usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public String getRun() {
@@ -137,4 +150,3 @@ public class Paciente {
         this.activo = activo;
     }
 }
-

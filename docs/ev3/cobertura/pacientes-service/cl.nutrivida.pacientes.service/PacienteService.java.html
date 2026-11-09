@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PacienteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pacientes-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.pacientes.service</a> &gt; <span class="el_source">PacienteService.java</span></div><h1>PacienteService.java</h1><pre class="source lang-java linenums">package cl.nutrivida.pacientes.service;
+
+import cl.nutrivida.pacientes.dto.PacienteDTO;
+import cl.nutrivida.pacientes.exceptions.RecursoNoEncontradoException;
+import cl.nutrivida.pacientes.mapper.PacienteMapper;
+import cl.nutrivida.pacientes.model.Paciente;
+import cl.nutrivida.pacientes.repository.PacienteRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class PacienteService {
+
+    private final PacienteRepository repository;
+    private final PacienteMapper mapper;
+
+<span class="fc" id="L19">    public PacienteService(PacienteRepository repository, PacienteMapper mapper) {</span>
+<span class="fc" id="L20">        this.repository = repository;</span>
+<span class="fc" id="L21">        this.mapper = mapper;</span>
+<span class="fc" id="L22">    }</span>
+
+    // GET / -&gt; solo activos
+    public List&lt;PacienteDTO&gt; listarActivos() {
+<span class="fc" id="L26">        return repository.findByActivoTrue().stream()</span>
+<span class="fc" id="L27">                .map(mapper::toDTO)</span>
+<span class="fc" id="L28">                .collect(Collectors.toList());</span>
+    }
+
+    // GET /{id}
+    public PacienteDTO obtenerPorId(Long id) {
+<span class="fc" id="L33">        Paciente p = repository.findById(id)</span>
+<span class="fc" id="L34">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L35">        return mapper.toDTO(p);</span>
+    }
+
+    // POST /
+    public PacienteDTO crear(PacienteDTO dto) {
+<span class="fc" id="L40">        validar(dto);</span>
+
+<span class="fc" id="L42">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
+<span class="fc" id="L43">        String correoNormalizado = dto.getCorreo().trim().toLowerCase();</span>
+
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrue(runNormalizado)) {</span>
+<span class="fc" id="L46">            throw new IllegalArgumentException(&quot;El RUN ya está registrado&quot;);</span>
+        }
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (repository.existsByCorreoIgnoreCaseAndActivoTrue(correoNormalizado)) {</span>
+<span class="fc" id="L49">            throw new IllegalArgumentException(&quot;El correo ya está registrado&quot;);</span>
+        }
+
+<span class="fc" id="L52">        Paciente p = mapper.toEntity(dto);</span>
+<span class="fc" id="L53">        p.setPacienteId(null);</span>
+<span class="fc" id="L54">        p.setRun(runNormalizado);</span>
+<span class="fc" id="L55">        p.setNombre(dto.getNombre().trim());</span>
+<span class="fc" id="L56">        p.setApellidos(dto.getApellidos().trim());</span>
+<span class="fc" id="L57">        p.setCorreo(correoNormalizado);</span>
+<span class="fc" id="L58">        p.setActivo(true);</span>
+
+<span class="fc" id="L60">        Paciente guardado = repository.save(p);</span>
+<span class="fc" id="L61">        return mapper.toDTO(guardado);</span>
+    }
+
+    // PUT /{id}
+    public PacienteDTO actualizar(Long id, PacienteDTO dto) {
+<span class="fc" id="L66">        Paciente existente = repository.findById(id)</span>
+<span class="pc" id="L67">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L68">        validar(dto);</span>
+
+<span class="fc" id="L70">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
+<span class="fc" id="L71">        String correoNormalizado = dto.getCorreo().trim().toLowerCase();</span>
+
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {</span>
+<span class="fc" id="L74">            throw new IllegalArgumentException(&quot;El RUN ya está registrado por otro paciente&quot;);</span>
+        }
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(correoNormalizado, id)) {</span>
+<span class="fc" id="L77">            throw new IllegalArgumentException(&quot;El correo ya está registrado por otro paciente&quot;);</span>
+        }
+
+<span class="fc" id="L80">        existente.setRun(runNormalizado);</span>
+<span class="fc" id="L81">        existente.setNombre(dto.getNombre().trim());</span>
+<span class="fc" id="L82">        existente.setApellidos(dto.getApellidos().trim());</span>
+<span class="fc" id="L83">        existente.setCorreo(correoNormalizado);</span>
+<span class="fc" id="L84">        existente.setTelefono(dto.getTelefono());</span>
+<span class="fc" id="L85">        existente.setDireccion(dto.getDireccion());</span>
+<span class="fc" id="L86">        existente.setFechaNacimiento(dto.getFechaNacimiento());</span>
+<span class="fc" id="L87">        existente.setRegion(dto.getRegion());</span>
+<span class="fc" id="L88">        existente.setComuna(dto.getComuna());</span>
+
+<span class="fc" id="L90">        Paciente guardado = repository.save(existente);</span>
+<span class="fc" id="L91">        return mapper.toDTO(guardado);</span>
+    }
+
+    // DELETE /{id} -&gt; baja controlada
+    public void darDeBaja(Long id) {
+<span class="fc" id="L96">        Paciente existente = repository.findById(id)</span>
+<span class="pc" id="L97">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L98">        existente.setActivo(false);</span>
+<span class="fc" id="L99">        repository.save(existente);</span>
+<span class="fc" id="L100">    }</span>
+
+    private void validar(PacienteDTO dto) {
+<span class="pc bpc" id="L103" title="1 of 4 branches missed.">        if (dto.getRun() == null || dto.getRun().isBlank()) {</span>
+<span class="fc" id="L104">            throw new IllegalArgumentException(&quot;El RUN es obligatorio&quot;);</span>
+        }
+<span class="pc bpc" id="L106" title="1 of 4 branches missed.">        if (dto.getNombre() == null || dto.getNombre().trim().length() &lt; 2) {</span>
+<span class="fc" id="L107">            throw new IllegalArgumentException(&quot;El nombre debe tener al menos 2 caracteres&quot;);</span>
+        }
+<span class="pc bpc" id="L109" title="1 of 4 branches missed.">        if (dto.getApellidos() == null || dto.getApellidos().trim().length() &lt; 2) {</span>
+<span class="fc" id="L110">            throw new IllegalArgumentException(&quot;Los apellidos deben tener al menos 2 caracteres&quot;);</span>
+        }
+<span class="pc bpc" id="L112" title="2 of 6 branches missed.">        if (dto.getCorreo() == null || dto.getCorreo().isBlank() || !dto.getCorreo().contains(&quot;@&quot;)) {</span>
+<span class="fc" id="L113">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
+        }
+<span class="fc" id="L115">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

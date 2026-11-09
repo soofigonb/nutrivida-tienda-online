@@ -1,14 +1,17 @@
 package cl.nutrivida.agendamiento.service;
 
 import cl.nutrivida.agendamiento.dto.ReservaDTO;
+import cl.nutrivida.agendamiento.exceptions.AccesoDenegadoException;
 import cl.nutrivida.agendamiento.exceptions.RecursoNoEncontradoException;
 import cl.nutrivida.agendamiento.mapper.ReservaMapper;
 import cl.nutrivida.agendamiento.model.Reserva;
 import cl.nutrivida.agendamiento.repository.ReservaRepository;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,22 +27,38 @@ public class ReservaService {
         this.mapper = mapper;
     }
 
-    // GET / -> listar reservas activas
+    // GET / -> listar reservas activas (todas para ADMINISTRADOR, propias para CLIENTE)
     public List<ReservaDTO> listarActivas() {
-        return repository.findByActivoTrue().stream()
+        return listarActivas(null);
+    }
+
+    public List<ReservaDTO> listarActivas(Jwt jwt) {
+        List<Reserva> reservas = (jwt != null && !esAdministrador(jwt))
+                ? repository.findByUsuarioIdAndActivoTrue(extraerUsuarioId(jwt))
+                : repository.findByActivoTrue();
+        return reservas.stream()
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
     }
 
-    // GET /{id} -> obtener reserva por id
+    // GET /{id} -> obtener reserva por id verificando pertenencia
     public ReservaDTO obtenerPorId(Long id) {
+        return obtenerPorId(id, null);
+    }
+
+    public ReservaDTO obtenerPorId(Long id, Jwt jwt) {
         Reserva r = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada con id: " + id));
+        verificarPropietarioOAdmin(r, jwt);
         return mapper.toDTO(r);
     }
 
-    // POST / -> crear nueva reserva validando conflicto de horario
+    // POST / -> crear nueva reserva identificando al paciente desde su sesión y validando conflicto de horario
     public ReservaDTO crear(ReservaDTO dto) {
+        return crear(dto, null);
+    }
+
+    public ReservaDTO crear(ReservaDTO dto, Jwt jwt) {
         validar(dto);
 
         boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(
@@ -55,6 +74,9 @@ public class ReservaService {
 
         Reserva r = mapper.toEntity(dto);
         r.setReservaId(null);
+        if (jwt != null) {
+            r.setUsuarioId(extraerUsuarioId(jwt));
+        }
         r.setFecha(dto.getFecha().trim());
         r.setHora(dto.getHora().trim());
         r.setMotivo(dto.getMotivo().trim());
@@ -65,10 +87,15 @@ public class ReservaService {
         return mapper.toDTO(guardada);
     }
 
-    // PUT /{id} -> actualizar reserva existente
+    // PUT /{id} -> actualizar reserva existente verificando pertenencia
     public ReservaDTO actualizar(Long id, ReservaDTO dto) {
+        return actualizar(id, dto, null);
+    }
+
+    public ReservaDTO actualizar(Long id, ReservaDTO dto, Jwt jwt) {
         Reserva existente = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada con id: " + id));
+        verificarPropietarioOAdmin(existente, jwt);
         validar(dto);
 
         boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(
@@ -83,7 +110,9 @@ public class ReservaService {
             );
         }
 
-        existente.setPacienteId(dto.getPacienteId());
+        if (dto.getPacienteId() != null) {
+            existente.setPacienteId(dto.getPacienteId());
+        }
         existente.setPlanId(dto.getPlanId());
         existente.setServicio(dto.getServicio());
         existente.setPrecio(dto.getPrecio());
@@ -100,13 +129,44 @@ public class ReservaService {
         return mapper.toDTO(guardada);
     }
 
-    // DELETE /{id} -> cancelar / dar de baja una reserva
+    // DELETE /{id} -> cancelar / dar de baja una reserva verificando pertenencia
     public void cancelar(Long id) {
+        cancelar(id, null);
+    }
+
+    public void cancelar(Long id, Jwt jwt) {
         Reserva existente = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada con id: " + id));
+        verificarPropietarioOAdmin(existente, jwt);
         existente.setEstado("CANCELADA");
         existente.setActivo(false);
         repository.save(existente);
+    }
+
+    private void verificarPropietarioOAdmin(Reserva reserva, Jwt jwt) {
+        if (jwt == null || esAdministrador(jwt)) {
+            return;
+        }
+        UUID usuarioId = extraerUsuarioId(jwt);
+        if (reserva.getUsuarioId() == null || !reserva.getUsuarioId().equals(usuarioId)) {
+            throw new AccesoDenegadoException("No tienes permiso para acceder o modificar una cita de otro paciente");
+        }
+    }
+
+    private boolean esAdministrador(Jwt jwt) {
+        List<String> roles = jwt.getClaimAsStringList("roles");
+        return roles != null && roles.contains("ADMINISTRADOR");
+    }
+
+    private UUID extraerUsuarioId(Jwt jwt) {
+        if (jwt == null || jwt.getSubject() == null || jwt.getSubject().isBlank()) {
+            throw new AccesoDenegadoException("Token de sesión inválido o sin identificador de usuario");
+        }
+        try {
+            return UUID.fromString(jwt.getSubject());
+        } catch (IllegalArgumentException ex) {
+            throw new AccesoDenegadoException("El identificador de la cuenta en el token no es un UUID válido");
+        }
     }
 
     private void validar(ReservaDTO dto) {
@@ -136,4 +196,3 @@ public class ReservaService {
         }
     }
 }
-

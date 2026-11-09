@@ -352,7 +352,7 @@ function AdminFormulario({ tipo }) {
 
   async function enviar(valores) {
     const resultado = esPaciente
-      ? guardarPaciente(valores, id)
+      ? await guardarPaciente(valores, id)
       : await guardarNutricionista(valores, id)
 
     if (!resultado.exito) {

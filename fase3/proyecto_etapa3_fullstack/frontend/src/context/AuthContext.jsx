@@ -78,7 +78,7 @@ export function AuthProvider({ children }) {
     // Envía solo datos del perfil.
     const { nombre, apellidos, run, telefono, direccion, fechaNacimiento, region, comuna } = datos
     try {
-      await api.solicitar('pacientes/me', { method: 'PUT', body: { nombre, apellidos, run, telefono, direccion, fechaNacimiento: fechaNacimiento || null, region, comuna } })
+      await api.solicitar('pacientes/me', { method: 'PUT', body: { nombre, apellidos, run, correo: cuenta.correo, telefono, direccion, fechaNacimiento: fechaNacimiento || null, region, comuna } })
       return { exito: true }
     } catch (error) {
       return { exito: false, mensaje: `Tu cuenta ya está creada. El perfil de paciente todavía no se pudo guardar: ${error.message}` }

@@ -7,6 +7,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "reservas")
 public class Reserva {
@@ -15,6 +17,9 @@ public class Reserva {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reserva_id")
     private Long reservaId;
+
+    @Column(name = "usuario_id")
+    private UUID usuarioId;
 
     @Column(name = "paciente_id")
     private Long pacienteId;
@@ -58,6 +63,14 @@ public class Reserva {
 
     public void setReservaId(Long reservaId) {
         this.reservaId = reservaId;
+    }
+
+    public UUID getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(UUID usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public Long getPacienteId() {
@@ -148,4 +161,3 @@ public class Reserva {
         this.activo = activo;
     }
 }
-

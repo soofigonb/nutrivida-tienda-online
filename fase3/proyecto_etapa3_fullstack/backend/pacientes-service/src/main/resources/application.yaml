@@ -76,6 +76,18 @@ spring:
     # Impide utilizar clean para borrar los objetos del esquema.
     clean-disabled: true
 
+  # Verificación de tokens JWT emitidos por el servicio de autenticación.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER:http://localhost:8081}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/.well-known/jwks.json}
+
+app:
+  security:
+    roles-claim: ${JWT_ROLES_CLAIM:roles}
+
 # Nivel de detalle de los eventos que se muestran en consola.
 logging:
   # Cada entrada establece el nivel para todo el proceso o para un paquete.
