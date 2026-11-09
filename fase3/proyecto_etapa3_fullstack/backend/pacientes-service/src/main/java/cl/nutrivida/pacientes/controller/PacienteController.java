@@ -5,9 +5,12 @@ import cl.nutrivida.pacientes.service.PacienteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +22,7 @@ import java.util.List;
         name = "Pacientes",
         description = "Endpoints CRUD para la gestión de fichas y perfiles de pacientes de NutriVida"
 )
+@SecurityRequirement(name = "bearerAuth")
 public class PacienteController {
 
     private final PacienteService service;
@@ -37,6 +41,32 @@ public class PacienteController {
         return service.listarActivos();
     }
 
+    @GetMapping("/me")
+    @Operation(
+            summary = "Consultar perfil propio del paciente autenticado",
+            description = "Obtiene el perfil del paciente vinculado al UUID del sub del JWT validado"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Perfil propio obtenido correctamente"),
+            @ApiResponse(responseCode = "404", description = "La cuenta actual aún no tiene perfil de paciente")
+    })
+    public PacienteDTO obtenerPerfilPropio(@AuthenticationPrincipal Jwt jwt) {
+        return service.obtenerPerfilPropio(jwt);
+    }
+
+    @PutMapping("/me")
+    @Operation(
+            summary = "Crear o actualizar el perfil propio del paciente autenticado",
+            description = "Vincula el perfil con el UUID del sub del JWT. Repetir la solicitud actualiza el mismo perfil sin duplicarlo"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Perfil propio creado o actualizado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos o RUN/correo ya utilizado por otro paciente")
+    })
+    public PacienteDTO guardarPerfilPropio(@RequestBody PacienteDTO dto, @AuthenticationPrincipal Jwt jwt) {
+        return service.guardarPerfilPropio(dto, jwt);
+    }
+
     @GetMapping("/{id}")
     @Operation(
             summary = "Obtener paciente por ID",
@@ -44,9 +74,14 @@ public class PacienteController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paciente encontrado correctamente"),
+            @ApiResponse(responseCode = "403", description = "Sin permisos para consultar el perfil de otro paciente"),
             @ApiResponse(responseCode = "404", description = "Paciente no encontrado con el ID indicado")
     })
-    public PacienteDTO obtenerPorId(@PathVariable Long id) {
+    public PacienteDTO obtenerPorId(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        return service.obtenerPorId(id, jwt);
+    }
+
+    public PacienteDTO obtenerPorId(Long id) {
         return service.obtenerPorId(id);
     }
 
@@ -72,9 +107,14 @@ public class PacienteController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Paciente actualizado correctamente"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos o RUN/correo duplicado en otro paciente"),
+            @ApiResponse(responseCode = "403", description = "Sin permisos para modificar el perfil de otro paciente"),
             @ApiResponse(responseCode = "404", description = "Paciente no encontrado")
     })
-    public PacienteDTO actualizar(@PathVariable Long id, @RequestBody PacienteDTO dto) {
+    public PacienteDTO actualizar(@PathVariable Long id, @RequestBody PacienteDTO dto, @AuthenticationPrincipal Jwt jwt) {
+        return service.actualizar(id, dto, jwt);
+    }
+
+    public PacienteDTO actualizar(Long id, PacienteDTO dto) {
         return service.actualizar(id, dto);
     }
 

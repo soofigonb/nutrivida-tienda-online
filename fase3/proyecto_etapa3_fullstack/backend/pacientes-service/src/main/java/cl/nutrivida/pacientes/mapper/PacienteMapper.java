@@ -10,6 +10,7 @@ public class PacienteMapper {
     public PacienteDTO toDTO(Paciente p) {
         PacienteDTO dto = new PacienteDTO();
         dto.setPacienteId(p.getPacienteId());
+        dto.setUsuarioId(p.getUsuarioId());
         dto.setRun(p.getRun());
         dto.setNombre(p.getNombre());
         dto.setApellidos(p.getApellidos());
@@ -26,6 +27,7 @@ public class PacienteMapper {
     public Paciente toEntity(PacienteDTO dto) {
         Paciente p = new Paciente();
         p.setPacienteId(dto.getPacienteId());
+        p.setUsuarioId(dto.getUsuarioId());
         p.setRun(dto.getRun());
         p.setNombre(dto.getNombre());
         p.setApellidos(dto.getApellidos());
@@ -39,4 +41,3 @@ public class PacienteMapper {
         return p;
     }
 }
-

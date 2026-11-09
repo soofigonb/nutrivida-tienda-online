@@ -7,6 +7,7 @@ import {
 } from 'react'
 
 import iniciales from '../data/nutricionistas'
+import { darDeBajaPaciente, guardarPacienteRemoto, listarPacientes } from '../services/pacientes'
 import { darDeBajaProfesional, guardarProfesional, listarProfesionales } from '../services/profesionales'
 import { regionesComunas } from '../data/regionesComunas'
 
@@ -131,8 +132,9 @@ function validarPaciente(datos, lista, id) {
   }
 
   if (
-    datos.password.length < 6 ||
-    !datos.password.trim()
+    !id &&
+    (datos.password.length < 6 ||
+      !datos.password.trim())
   ) {
     return 'La contraseña debe tener al menos 6 caracteres.'
   }
@@ -184,6 +186,11 @@ export function DatosProvider({ children }) {
     }).catch(error => {
       if (activo) setErrorProfesionales(error.message || 'No se pudieron consultar los profesionales.')
     })
+    listarPacientes().then(lista => {
+      if (activo && Array.isArray(lista) && (lista.length > 0 || leerLista(CLAVE_PACIENTES).length === 0)) {
+        setPacientes(lista)
+      }
+    }).catch(() => {})
     return () => { activo = false }
   }, [])
 
@@ -238,9 +245,10 @@ export function DatosProvider({ children }) {
   // 6. CREAR O ACTUALIZAR PACIENTES
   // ========================================
 
-  function guardarPaciente(valores, id = null) {
+  async function guardarPaciente(valores, id = null) {
     try {
-      const lista = leerLista(CLAVE_PACIENTES)
+      const listaLocal = leerLista(CLAVE_PACIENTES)
+      const lista = pacientes.length > 0 ? pacientes : listaLocal
 
       const anterior = id
         ? lista.find(
@@ -298,13 +306,16 @@ export function DatosProvider({ children }) {
         }
       }
 
+      const guardadoRemoto = await guardarPacienteRemoto(datos, id)
+      const registroFinal = { ...datos, ...guardadoRemoto, password, contrasena: password }
+
       const actualizada = id
         ? lista.map((item) =>
             String(item.id) === String(id)
-              ? datos
+              ? registroFinal
               : item,
           )
-        : [...lista, datos]
+        : [...lista, registroFinal]
 
       localStorage.setItem(
         CLAVE_PACIENTES,
@@ -441,7 +452,9 @@ export function DatosProvider({ children }) {
     try {
       const esPaciente = tipo === 'pacientes'
 
-      const lista = esPaciente ? leerLista(CLAVE_PACIENTES) : nutricionistas
+      const lista = esPaciente
+        ? (pacientes.length > 0 ? pacientes : leerLista(CLAVE_PACIENTES))
+        : nutricionistas
 
       const registro = lista.find(
         (item) => String(item.id) === String(id),
@@ -482,6 +495,7 @@ export function DatosProvider({ children }) {
       )
 
       if (esPaciente) {
+        await darDeBajaPaciente(id)
         localStorage.setItem(CLAVE_PACIENTES, JSON.stringify(actualizada))
         setPacientes(actualizada)
       } else {

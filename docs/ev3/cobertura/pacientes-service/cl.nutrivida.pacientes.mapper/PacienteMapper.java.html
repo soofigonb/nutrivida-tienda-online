@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PacienteMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pacientes-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.pacientes.mapper</a> &gt; <span class="el_source">PacienteMapper.java</span></div><h1>PacienteMapper.java</h1><pre class="source lang-java linenums">package cl.nutrivida.pacientes.mapper;
+
+import cl.nutrivida.pacientes.dto.PacienteDTO;
+import cl.nutrivida.pacientes.model.Paciente;
+import org.springframework.stereotype.Component;
+
+@Component
+<span class="fc" id="L8">public class PacienteMapper {</span>
+
+    public PacienteDTO toDTO(Paciente p) {
+<span class="fc" id="L11">        PacienteDTO dto = new PacienteDTO();</span>
+<span class="fc" id="L12">        dto.setPacienteId(p.getPacienteId());</span>
+<span class="fc" id="L13">        dto.setRun(p.getRun());</span>
+<span class="fc" id="L14">        dto.setNombre(p.getNombre());</span>
+<span class="fc" id="L15">        dto.setApellidos(p.getApellidos());</span>
+<span class="fc" id="L16">        dto.setCorreo(p.getCorreo());</span>
+<span class="fc" id="L17">        dto.setTelefono(p.getTelefono());</span>
+<span class="fc" id="L18">        dto.setDireccion(p.getDireccion());</span>
+<span class="fc" id="L19">        dto.setFechaNacimiento(p.getFechaNacimiento());</span>
+<span class="fc" id="L20">        dto.setRegion(p.getRegion());</span>
+<span class="fc" id="L21">        dto.setComuna(p.getComuna());</span>
+<span class="fc" id="L22">        dto.setActivo(p.getActivo());</span>
+<span class="fc" id="L23">        return dto;</span>
+    }
+
+    public Paciente toEntity(PacienteDTO dto) {
+<span class="fc" id="L27">        Paciente p = new Paciente();</span>
+<span class="fc" id="L28">        p.setPacienteId(dto.getPacienteId());</span>
+<span class="fc" id="L29">        p.setRun(dto.getRun());</span>
+<span class="fc" id="L30">        p.setNombre(dto.getNombre());</span>
+<span class="fc" id="L31">        p.setApellidos(dto.getApellidos());</span>
+<span class="fc" id="L32">        p.setCorreo(dto.getCorreo());</span>
+<span class="fc" id="L33">        p.setTelefono(dto.getTelefono());</span>
+<span class="fc" id="L34">        p.setDireccion(dto.getDireccion());</span>
+<span class="fc" id="L35">        p.setFechaNacimiento(dto.getFechaNacimiento());</span>
+<span class="fc" id="L36">        p.setRegion(dto.getRegion());</span>
+<span class="fc" id="L37">        p.setComuna(dto.getComuna());</span>
+<span class="pc bpc" id="L38" title="1 of 2 branches missed.">        p.setActivo(dto.getActivo() != null ? dto.getActivo() : true);</span>
+<span class="fc" id="L39">        return p;</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

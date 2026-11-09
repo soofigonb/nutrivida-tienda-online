@@ -1,8 +1,11 @@
 package cl.nutrivida.pacientes.dto;
 
+import java.util.UUID;
+
 public class PacienteDTO {
 
     private Long pacienteId;
+    private UUID usuarioId;
     private String run;
     private String nombre;
     private String apellidos;
@@ -20,6 +23,14 @@ public class PacienteDTO {
 
     public void setPacienteId(Long pacienteId) {
         this.pacienteId = pacienteId;
+    }
+
+    public UUID getUsuarioId() {
+        return usuarioId;
+    }
+
+    public void setUsuarioId(UUID usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public String getRun() {
@@ -102,4 +113,3 @@ public class PacienteDTO {
         this.activo = activo;
     }
 }
-

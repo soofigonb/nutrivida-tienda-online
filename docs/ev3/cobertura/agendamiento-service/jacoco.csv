@@ -1,0 +1,9 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+agendamiento-service,cl.nutrivida.agendamiento.model,Reserva,0,94,0,0,0,41,0,25,0,25
+agendamiento-service,cl.nutrivida.agendamiento.dto,ReservaDTO,0,87,0,0,0,37,0,25,0,25
+agendamiento-service,cl.nutrivida.agendamiento.exceptions,RecursoNoEncontradoException,0,4,0,0,0,2,0,1,0,1
+agendamiento-service,cl.nutrivida.agendamiento.exceptions,GlobalExceptionHandler,0,19,0,0,0,5,0,3,0,3
+agendamiento-service,cl.nutrivida.agendamiento.service,ReservaService,20,338,12,32,0,72,13,20,2,9
+agendamiento-service,cl.nutrivida.agendamiento,AgendamientoServiceApplication,8,0,0,0,3,0,2,0,2,0
+agendamiento-service,cl.nutrivida.agendamiento.controller,ReservaController,0,38,0,0,0,10,0,6,0,6
+agendamiento-service,cl.nutrivida.agendamiento.mapper,ReservaMapper,7,116,2,2,0,29,2,3,0,3
