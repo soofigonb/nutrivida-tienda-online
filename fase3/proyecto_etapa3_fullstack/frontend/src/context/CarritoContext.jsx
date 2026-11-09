@@ -1,5 +1,6 @@
 import { api } from '../services/api'
 import { crearOrdenDesdeCarrito } from '../services/ordenes'
+import { registrarCitasDesdeCarrito } from '../services/agendamiento'
 import {
   createContext,
   useContext,
@@ -388,7 +389,13 @@ export function CarritoProvider({ children }) {
         return { exito: false, mensaje: 'El carrito cambió. Revisa sus datos antes de reintentar.' }
       }
       const orden = await crearOrdenDesdeCarrito(actuales, api.usuarioActual())
-      return { exito: true, orden }
+      let citas = []
+      try {
+        citas = await registrarCitasDesdeCarrito(actuales)
+      } catch (errorCitas) {
+        console.warn('No se pudo registrar la cita en agendamiento:', errorCitas)
+      }
+      return { exito: true, orden, citas }
     } catch (error) { return informarError(error.message) }
   }
 

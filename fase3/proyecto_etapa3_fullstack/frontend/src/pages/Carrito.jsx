@@ -9,6 +9,7 @@ export default function Carrito() {
   const { usuario } = useContext(AuthContext)
   const { reservas, cantidad, total, errorCarrito, eliminarReserva, vaciarCarrito, confirmarReservas } = useCarrito()
   const [orden, setOrden] = useState(null)
+  const [citasRegistradas, setCitasRegistradas] = useState([])
   const [error, setError] = useState('')
   const [revisando, setRevisando] = useState(false)
   const [procesando, setProcesando] = useState(false)
@@ -19,8 +20,11 @@ export default function Carrito() {
     enCurso.current = true; setProcesando(true); setError('')
     try {
       const resultado = await confirmarReservas()
-      if (resultado.exito) { setOrden(resultado.orden); setRevisando(false) }
-      else setError(resultado.mensaje)
+      if (resultado.exito) {
+        setOrden(resultado.orden)
+        setCitasRegistradas(resultado.citas || [])
+        setRevisando(false)
+      } else setError(resultado.mensaje)
     } catch { setError('No se pudo completar la orden. Puedes reintentar con el mismo carrito.') }
     finally { enCurso.current = false; setProcesando(false) }
   }
@@ -29,7 +33,7 @@ export default function Carrito() {
     if (!window.confirm('¿Vaciar los borradores del carrito? Las órdenes ya creadas no se cancelan.')) return
     const resultado = vaciarCarrito()
     if (!resultado.exito) setError(resultado.mensaje)
-    else { setOrden(null); setRevisando(false) }
+    else { setOrden(null); setCitasRegistradas([]); setRevisando(false) }
   }
 
   return <main className="pagina-gestion py-5"><Container>
@@ -41,7 +45,18 @@ export default function Carrito() {
       <h2 className="h5">Orden registrada</h2>
       <p>Código: <strong>{orden.id}</strong></p>
       <p>Estado: {orden.estado}. Total validado: <strong>{formatearPrecio(orden.total)}</strong>.</p>
-      <p>Los borradores se conservaron para completar el agendamiento cuando esté disponible.</p>
+      {citasRegistradas.length > 0 && (
+        <div className="mt-2 pt-2 border-top">
+          <p className="mb-1 text-success fw-bold">✓ Cita registrada en PostgreSQL (Agendamiento):</p>
+          <ul className="mb-2 ps-3">
+            {citasRegistradas.map(c => (
+              <li key={c.reservaId || c.id}>
+                Reserva N° <strong>{c.reservaId || c.id}</strong> — Profesional: {c.nutricionistaNombre} ({c.fecha} · {c.hora}) — Estado: <strong>{c.estado || 'CONFIRMADA'}</strong>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Link to={`/mis-ordenes/${orden.id}`}>Ver mi orden</Link>
     </Alert>}
     {cantidad === 0 ? <Card body><p>Tu carrito está vacío.</p><Link to="/agendar">Seleccionar una consulta</Link></Card> : <>
