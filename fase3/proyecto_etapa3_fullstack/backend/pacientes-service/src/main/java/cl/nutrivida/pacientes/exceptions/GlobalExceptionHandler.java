@@ -22,3 +22,4 @@ public class GlobalExceptionHandler {
                 .body(Map.of("mensaje", ex.getMessage()));
     }
 }
+

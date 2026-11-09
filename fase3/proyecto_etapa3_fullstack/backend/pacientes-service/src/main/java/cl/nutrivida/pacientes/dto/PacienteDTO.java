@@ -102,3 +102,4 @@ public class PacienteDTO {
         this.activo = activo;
     }
 }
+
