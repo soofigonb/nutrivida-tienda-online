@@ -1,7 +1,7 @@
-# Solicita credenciales de forma interactiva y las conserva solo durante la ejecución.
+﻿# Solicita credenciales de forma interactiva y las conserva solo durante la ejecución.
 param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('autenticacion-service', 'ordenes-service')]
+    [ValidateSet('autenticacion-service', 'ordenes-service', 'pacientes-service', 'agendamiento-service')]
     [string]$Servicio,
     [switch]$CrearAdministradorInicial,
     # Perfil opcional para una base con migraciones históricas ya aplicadas.
@@ -12,7 +12,12 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-$prefijo = if ($Servicio -eq 'autenticacion-service') { 'AUTENTICACION' } else { 'ORDENES' }
+$prefijo = switch ($Servicio) {
+    'autenticacion-service' { 'AUTENTICACION' }
+    'ordenes-service'       { 'ORDENES' }
+    'pacientes-service'     { 'PACIENTES' }
+    'agendamiento-service'  { 'AGENDAMIENTO' }
+}
 $anteriores = @{}
 
 function Set-VariableDeProceso([string]$Nombre, [string]$Valor) {
@@ -24,11 +29,16 @@ function Set-VariableDeProceso([string]$Nombre, [string]$Valor) {
 }
 
 try {
-    # Órdenes ya tiene datos públicos confirmados; Enter conserva esos valores.
+    # Órdenes, pacientes y agendamiento ya tienen datos públicos confirmados; Enter conserva esos valores.
     $jdbc = if ($Servicio -eq 'ordenes-service') {
         $respuesta = Read-Host 'URL JDBC de órdenes (Enter para usar Supabase configurado)'
         if ([string]::IsNullOrWhiteSpace($respuesta)) {
             'jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require'
+        } else { $respuesta }
+    } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service')) {
+        $respuesta = Read-Host "URL JDBC de $Servicio (Enter para usar Supabase configurado)"
+        if ([string]::IsNullOrWhiteSpace($respuesta)) {
+            'jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require'
         } else { $respuesta }
     } else {
         Read-Host 'URL JDBC de este proyecto Supabase, sin usuario ni contraseña'
@@ -40,9 +50,11 @@ try {
         throw 'La URL de Supabase debe incluir sslmode=require o una verificación SSL superior.'
     }
     Set-VariableDeProceso ($prefijo + '_DB_URL') $jdbc
-    $usuarioDb = Read-Host 'Usuario PostgreSQL completo (en órdenes, Enter utiliza el configurado)'
+    $usuarioDb = Read-Host 'Usuario PostgreSQL completo (Enter utiliza el configurado por defecto)'
     if ($Servicio -eq 'ordenes-service' -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
         $usuarioDb = 'postgres.ngjummwpmhqdtabcieeg'
+    } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service') -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
+        $usuarioDb = 'postgres.nyaxmfgatgsrspxdfxwf'
     }
     Set-VariableDeProceso ($prefijo + '_DB_USERNAME') $usuarioDb
     # SecureString evita que se vea la contraseña al escribirla.
@@ -64,7 +76,7 @@ try {
             $claveAdmin = Read-Host 'Contraseña inicial del administrador' -AsSecureString
             Set-VariableDeProceso 'BOOTSTRAP_ADMIN_PASSWORD' ([Net.NetworkCredential]::new('', $claveAdmin).Password)
         }
-    } else {
+    } elseif ($Servicio -eq 'ordenes-service') {
         Set-VariableDeProceso 'JWT_JWK_SET_URI' $Jwks
     }
 
@@ -80,7 +92,14 @@ try {
     # La lista mantiene cada argumento separado, incluso si la ruta contiene espacios.
     $argumentosMaven = @('-f', (Join-Path $backend ($Servicio + '/pom.xml')), 'spring-boot:run')
     if ($Perfil) { $argumentosMaven += ('-Dspring-boot.run.profiles=' + $Perfil) }
-    & mvn @argumentosMaven
+    $comandoMvn = if (Get-Command mvn -ErrorAction SilentlyContinue) {
+        'mvn'
+    } elseif (Test-Path -LiteralPath 'C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd') {
+        'C:\Program Files\JetBrains\IntelliJ IDEA 2026.2.2\plugins\maven-plugin\lib\maven3\bin\mvn.cmd'
+    } else {
+        'mvn'
+    }
+    & $comandoMvn @argumentosMaven
     # Comunica los fallos de Maven al proceso que invocó este script.
     if ($LASTEXITCODE -ne 0) { throw 'El servicio no pudo iniciarse; revisa el registro anterior.' }
 } finally {
