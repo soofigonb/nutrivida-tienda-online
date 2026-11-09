@@ -163,3 +163,4 @@ class ReservaServiceTest {
         assertThrows(RecursoNoEncontradoException.class, () -> service.obtenerPorId(99L));
     }
 }
+
