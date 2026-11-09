@@ -41,18 +41,14 @@ import lombok.Setter;
 
 // Lombok genera métodos para leer los atributos.
 @Getter
-// Lombok genera métodos para asignar valores a los atributos.
 @Setter
 // Genera el constructor de dependencias.
 @NoArgsConstructor
-// Declara una entidad que JPA relaciona con una tabla SQL.
 @Entity
-// Relaciona la entidad con la tabla usuario en el esquema SQL especificado.
 @Table(name = "usuario", schema = "db_autenticacion")
 // Define la clase.
 public class Usuario {
 
-    // Marca el identificador que corresponde a la clave primaria.
     @Id
     // JPA genera un UUID al persistir el registro.
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -69,23 +65,17 @@ public class Usuario {
     // Hash BCrypt persistido de la contraseña.
     private String passwordHash;
 
-    // Varios registros pueden compartir la entidad relacionada.
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    // La relación usa la columna id_rol como clave foránea en la tabla de esta entidad.
     @JoinColumn(name = "id_rol", nullable = false)
-    // Relación con el rol asignado a la cuenta, que determina los permisos de acceso.
     private Rol rol;
 
-    // Varios registros pueden compartir la entidad relacionada.
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    // La relación usa la columna id_estado_usuario como clave foránea en la tabla de esta entidad.
     @JoinColumn(name = "id_estado_usuario", nullable = false)
     // Relación con el estado de la cuenta.
     private EstadoUsuario estadoUsuario;
 
     // Configura la columna y sus restricciones.
     @Column(name = "creado_en", nullable = false, updatable = false)
-    // Instante de creación de este registro, representado con java.time.Instant.
     private Instant creadoEn;
 
     // Configura la columna y sus restricciones.
@@ -102,21 +92,16 @@ public class Usuario {
 
     // JPA ejecuta este método antes de insertar la entidad.
     @PrePersist
-    // Prepara las fechas de la nueva entidad antes de que JPA la inserte.
     protected void antesDeCrear() {
-        // Captura un instante de la línea de tiempo para usar una referencia temporal coherente en esta operación.
         Instant ahora = Instant.now();
         // Copia el instante capturado al campo de creación.
         creadoEn = ahora;
-        // Al crear la cuenta, su fecha de actualización coincide con la fecha de creación.
         actualizadoEn = ahora;
     }
 
     // JPA ejecuta este método antes de actualizar la entidad.
     @PreUpdate
-    // Actualiza la fecha de modificación antes de guardar cambios en la cuenta.
     protected void antesDeActualizar() {
-        // Actualiza la marca temporal antes de que JPA escriba una modificación de la cuenta.
         actualizadoEn = Instant.now();
     }
 }

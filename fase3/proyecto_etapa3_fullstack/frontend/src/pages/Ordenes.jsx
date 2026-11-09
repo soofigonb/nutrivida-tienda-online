@@ -1,4 +1,3 @@
-// Consulta órdenes reales; el backend determina cuáles puede ver cada usuario.
 import { useContext, useState } from 'react'
 import { Alert, Button, Container, Table } from 'react-bootstrap'
 import { Link, useLocation, useParams } from 'react-router-dom'
@@ -23,7 +22,6 @@ export default function Ordenes() {
     if (!window.confirm(estado === 'CANCELADA' ? '¿Cancelar esta orden pendiente?' : '¿Confirmar esta orden? Esta acción no reserva un horario clínico.')) return
     setActualizando(true); setError('')
     try {
-      // El vendedor no tiene controles de escritura y tampoco permiso en la API.
       if (estado === 'CANCELADA') await api.solicitar(`ordenes/${id}`, { method: 'DELETE' })
       else await api.solicitar(`ordenes/${id}`, { method: 'PUT', body: { estado } })
       setRevision(v => v + 1)

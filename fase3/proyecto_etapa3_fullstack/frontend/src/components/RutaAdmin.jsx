@@ -4,7 +4,6 @@ import { AuthContext } from '../context/AuthContext'
 
 function RutaAdmin() {
   const { usuario, cargandoSesion } = useContext(AuthContext)
-  // Espera la renovación antes de decidir si se permite el acceso.
   if (cargandoSesion) return <p className="container py-5" role="status">Comprobando sesión…</p>
 
   // Sin sesión: ir al inicio de sesión.

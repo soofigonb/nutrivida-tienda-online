@@ -1,4 +1,3 @@
-// El alta inicial no sobrescribe cuentas ni usa contraseñas predeterminadas.
 package cl.nutrivida.autenticacion.config;
 
 import java.util.Set;

@@ -4,7 +4,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
 
-  // El navegador conserva su origen; Vite dirige las API al gateway sin Eureka.
   server: {
     port: 5173,
     strictPort: true,
@@ -12,7 +11,6 @@ export default defineConfig({
   },
 
   test: {
-    // Limita procesos simultáneos para que la suite sea estable en el equipo de desarrollo.
     maxWorkers: 2,
     // ========================================
     // 1. ENTORNO DE PRUEBAS

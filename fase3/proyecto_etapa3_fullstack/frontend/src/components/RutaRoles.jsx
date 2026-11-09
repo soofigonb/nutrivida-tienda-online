@@ -1,4 +1,3 @@
-// Las rutas esperan la sesión real y admiten únicamente los roles enumerados.
 import { useContext } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'

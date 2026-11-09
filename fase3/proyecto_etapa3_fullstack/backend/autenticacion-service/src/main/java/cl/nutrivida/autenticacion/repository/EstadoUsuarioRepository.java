@@ -10,7 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 // Importa EstadoUsuario.
 import cl.nutrivida.autenticacion.model.EstadoUsuario;
 
-// Declara el repositorio de la entidad y el tipo de su clave.
 public interface EstadoUsuarioRepository extends JpaRepository<EstadoUsuario, Long> {
     // Spring Data genera una consulta por el campo nombre.
     Optional<EstadoUsuario> findByNombre(String nombre);

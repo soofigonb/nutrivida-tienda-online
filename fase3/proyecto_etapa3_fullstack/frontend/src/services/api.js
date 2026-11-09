@@ -1,4 +1,4 @@
-// Cliente HTTP: el token de acceso solo vive en memoria; la renovación viaja en cookie HttpOnly.
+// JWT en memoria y renovación HttpOnly.
 export class ApiError extends Error {
   constructor(message, status = 0, details = null) {
     super(message)
@@ -7,7 +7,7 @@ export class ApiError extends Error {
   }
 }
 
-// La fábrica permite probar el cliente con respuestas HTTP controladas.
+// Permite simular llamadas HTTP.
 export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => fetch(...args) } = {}) {
   let sesion = null
   let renovando = null
@@ -27,7 +27,7 @@ export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => 
       if (error.name === 'AbortError') throw error
       throw new ApiError('No se pudo conectar con el servidor. Inténtalo nuevamente.')
     }
-    // Un 204 no tiene cuerpo; los errores pueden incluir un ProblemDetail.
+    // Omite el cuerpo de un 204.
     const text = response.status === 204 ? '' : await response.text()
     let data = null
     try { data = text ? JSON.parse(text) : null } catch { /* Un proxy puede responder HTML ante un error. */ }
@@ -36,7 +36,7 @@ export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => 
   }
 
   function guardarSesion(data, version) {
-    // Una respuesta tardía no puede recuperar una sesión cerrada mientras viajaba.
+    // Ignora respuestas de sesiones cerradas.
     if (version !== generacion) throw new ApiError('La sesión cambió. Vuelve a ingresar.', 401)
     if (!data?.accessToken || !data?.usuario?.id || !data?.usuario?.rol) throw new ApiError('La respuesta de sesión no es válida.')
     publicar({ ...data, venceEn: Date.now() + Number(data.expiresIn) * 1000 })
@@ -44,7 +44,7 @@ export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => 
   }
 
   function renovar() {
-    // Comparte la rotación entre llamadas paralelas y el montaje de StrictMode.
+    // Comparte una renovación en curso.
     if (!renovando) {
       const version = generacion
       renovando = enviar('autenticacion/web/renovar', { method: 'POST' })
@@ -62,7 +62,7 @@ export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => 
     try { return await enviar(ruta, { ...opciones, token: tokenEnviado }) }
     catch (error) {
       if (error.status !== 401) throw error
-      // Evita una segunda rotación si otro request ya renovó este token.
+      // Reutiliza el token ya renovado.
       if (sesion?.accessToken === tokenEnviado) await renovar()
       if (!sesion) throw error
       try { return await enviar(ruta, { ...opciones, token: sesion.accessToken }) }
@@ -75,14 +75,14 @@ export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => 
     usuarioActual: () => sesion?.usuario ?? null,
     suscribir: (listener) => { listeners.add(listener); return () => listeners.delete(listener) },
     async login(correo, password) {
-      // Una rotación anterior no debe reemplazar después la cookie del nuevo login.
+      // Espera la renovación antes del login.
       if (renovando) await renovando.catch(() => {})
       generacion += 1
       const version = generacion
       return guardarSesion(await enviar('autenticacion/web/login', { method: 'POST', body: { correo, password } }), version)
     },
     async logout() {
-      // Espera cualquier rotación pendiente antes de revocar la cookie más reciente.
+      // Revoca la cookie más reciente.
       const pendiente = renovando
       generacion += 1
       publicar(null)
@@ -93,5 +93,5 @@ export function crearClienteApi({ baseUrl = '/api/v1', fetchImpl = (...args) => 
   }
 }
 
-// En desarrollo Vite reenvía /api al gateway; en producción la URL es configurable.
+// Vite reenvía /api al gateway.
 export const api = crearClienteApi({ baseUrl: import.meta.env?.VITE_API_URL || '/api/v1' })

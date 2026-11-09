@@ -23,7 +23,6 @@ function Login() {
   const [correo, setCorreo] = useState('')
   const [password, setPassword] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
-  // Bloquea envíos repetidos mientras se comprueban las credenciales.
   const [enviando, setEnviando] = useState(false)
 
   const { iniciarSesion } =

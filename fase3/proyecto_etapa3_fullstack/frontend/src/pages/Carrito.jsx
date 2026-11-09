@@ -1,4 +1,3 @@
-// El carrito mantiene borradores de consultas y crea una orden comercial real.
 import { useContext, useRef, useState } from 'react'
 import { Alert, Button, Card, Container, Table } from 'react-bootstrap'
 import { Link } from 'react-router-dom'

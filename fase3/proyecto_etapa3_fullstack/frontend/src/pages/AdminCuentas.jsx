@@ -1,4 +1,3 @@
-// Administración de identidades; los perfiles clínicos siguen en pacientes-service.
 import { useContext, useEffect, useState } from 'react'
 import { Alert, Button, Container, Form, Table } from 'react-bootstrap'
 import { AuthContext } from '../context/AuthContext'
@@ -45,7 +44,7 @@ export default function AdminCuentas() {
     const datos = new FormData(formulario)
     let cuenta
     try {
-      // El alta no cambia la sesión actual del administrador ni guarda la contraseña localmente.
+      // Conserva la sesión del administrador.
       cuenta = await api.registrar(String(datos.get('correo')).trim().toLowerCase(), String(datos.get('password')))
       if (datos.get('rol') !== cuenta.rol) {
         await api.solicitar(`autenticacion/usuarios/${cuenta.id}`, { method: 'PUT', body: { rol: datos.get('rol'), estado: 'ACTIVO' } })

@@ -1,4 +1,3 @@
-// El carrito conserva borradores; la confirmación solo crea una orden comercial.
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { CarritoProvider, useCarrito } from './CarritoContext'

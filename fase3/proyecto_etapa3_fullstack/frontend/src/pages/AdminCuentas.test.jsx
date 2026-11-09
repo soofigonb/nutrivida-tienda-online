@@ -1,4 +1,3 @@
-// Comprueba administración de cuentas sin cambiar la sesión del administrador.
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, expect, it, vi } from 'vitest'

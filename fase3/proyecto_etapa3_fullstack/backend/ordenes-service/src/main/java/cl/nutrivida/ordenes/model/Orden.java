@@ -1,4 +1,3 @@
-// Cabecera persistente de la orden, su propietario, total, estado y colección de detalles.
 
 // Paquete de la clase.
 package cl.nutrivida.ordenes.model;
@@ -16,11 +15,9 @@ import lombok.*;
 
 // Genera el constructor de dependencias.
 @Getter @Setter @NoArgsConstructor
-// Declara una entidad que JPA relaciona con una tabla SQL.
 @Entity @Table(name = "orden", schema = "db_ordenes")
 // Define la clase.
 public class Orden {
-    // Marca el identificador que corresponde a la clave primaria.
     @Id @GeneratedValue(strategy = GenerationType.UUID) private UUID id;
     // Configura la columna y sus restricciones.
     @Column(name = "id_usuario", nullable = false) private UUID idUsuario;
@@ -36,7 +33,6 @@ public class Orden {
     @Column(name = "creado_en", nullable = false) private Instant creadoEn;
     // Detecta cambios concurrentes.
     @Version private Long version;
-    // Una cabecera tiene varios detalles: mappedBy="orden" señala el atributo dueño de la relación.
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
     // Colección de detalles de la orden.
     private List<DetalleOrden> detalles = new ArrayList<>();

@@ -1,4 +1,3 @@
-// El vendedor solo dispone de catálogo y órdenes en este panel.
 import { useContext } from 'react'
 import { Alert, Button, Container, Nav, Navbar } from 'react-bootstrap'
 import { Link, Outlet, useNavigate } from 'react-router-dom'

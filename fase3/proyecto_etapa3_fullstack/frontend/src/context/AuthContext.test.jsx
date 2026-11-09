@@ -1,4 +1,3 @@
-// Prueba identidad, restauración y registro por API sin usar credenciales locales.
 import { useContext } from 'react'
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, expect, it, vi } from 'vitest'

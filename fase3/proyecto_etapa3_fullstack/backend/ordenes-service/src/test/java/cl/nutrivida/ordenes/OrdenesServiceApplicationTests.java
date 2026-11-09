@@ -19,11 +19,9 @@ class OrdenesServiceApplicationTests {
 
 	// Caso de prueba.
 	@Test
-	// Define el caso o la preparación validaCantidadYClaveDeLaSolicitud.
 	void validaCantidadYClaveDeLaSolicitud() {
         // Cierra el validador al terminar.
         try (var factory = Validation.buildDefaultValidatorFactory()) {
-            // Obtiene el validador que ejecutará las restricciones anotadas en los DTO de entrada.
             var validator = factory.getValidator();
             // Verifica la condición.
             assertFalse(validator.validate(new CrearOrdenDTO(null, List.of(new CrearOrdenDTO.ItemDTO(1L, 0)))).isEmpty());

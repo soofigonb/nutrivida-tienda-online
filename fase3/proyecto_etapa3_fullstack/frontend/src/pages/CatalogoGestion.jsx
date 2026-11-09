@@ -1,4 +1,3 @@
-// Lectura del catálogo real para el vendedor; no presenta acciones administrativas.
 import { useState } from 'react'
 import { Alert, Button, Container, Table } from 'react-bootstrap'
 import { Link, useParams } from 'react-router-dom'

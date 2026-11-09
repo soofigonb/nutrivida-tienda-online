@@ -1,4 +1,3 @@
-// Relaciona los métodos HTTP de órdenes con las operaciones de negocio y sus permisos por rol.
 
 // Paquete de la clase.
 package cl.nutrivida.ordenes.controller;
@@ -38,7 +37,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController @RequiredArgsConstructor
 // Prefijo de las rutas del controlador.
 @RequestMapping("/api/v1/ordenes")
-// Agrupa estas operaciones en la sección de Swagger cuyo nombre indica la anotación.
 @Tag(name = "Órdenes") @SecurityRequirement(name = "bearerAuth")
 // Define la clase.
 public class OrdenController {
@@ -52,7 +50,6 @@ public class OrdenController {
     @PostMapping @PreAuthorize("hasAnyRole('CLIENTE','ADMINISTRADOR')")
     // Crea la orden con precios del catálogo.
     ResponseEntity<OrdenDTO> crear(@Valid @RequestBody CrearOrdenDTO dto, @AuthenticationPrincipal Jwt jwt) {
-        // Ejecuta el alta del servicio y devuelve HTTP 201 Created con el DTO creado como cuerpo JSON.
         return ResponseEntity.status(201).body(service.crear(dto, jwt));
     }
     // Describe la operación en Swagger.
@@ -73,7 +70,6 @@ public class OrdenController {
     @PutMapping("/{id}") @PreAuthorize("hasRole('ADMINISTRADOR')")
     // Valida y actualiza el registro.
     OrdenDTO actualizar(@PathVariable UUID id, @Valid @RequestBody EstadoDTO dto, @AuthenticationPrincipal Jwt jwt) {
-        // Entrega al servicio el identificador de orden, el nuevo estado y el JWT.
         return service.cambiarEstado(id, dto.estado(), jwt);
     }
     // Describe la operación en Swagger.

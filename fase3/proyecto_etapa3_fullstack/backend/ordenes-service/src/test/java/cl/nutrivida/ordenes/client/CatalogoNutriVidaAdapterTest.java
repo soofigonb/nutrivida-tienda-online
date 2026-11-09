@@ -1,4 +1,3 @@
-// Comprueba que el catálogo nutricional se traduzca al contrato comercial reutilizable.
 package cl.nutrivida.ordenes.client;
 
 import java.math.BigDecimal;

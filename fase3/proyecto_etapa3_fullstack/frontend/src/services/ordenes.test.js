@@ -1,4 +1,3 @@
-// Valida el contrato del carrito y los reintentos antes de invocar órdenes.
 import { beforeEach, expect, it, vi } from 'vitest'
 import { crearOrdenDesdeCarrito } from './ordenes'
 

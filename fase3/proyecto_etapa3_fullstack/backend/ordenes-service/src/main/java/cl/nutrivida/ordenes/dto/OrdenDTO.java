@@ -12,7 +12,6 @@ import java.util.*;
 // Importa EstadoOrden.
 import cl.nutrivida.ordenes.model.EstadoOrden;
 
-// Respuesta de orden con UUID propio, UUID del dueño, estado y total.
 public record OrdenDTO(UUID id, UUID idUsuario, EstadoOrden estado, BigDecimal total,
                        // Agrega fecha y detalles a la respuesta.
                        Instant creadoEn, List<DetalleDTO> detalles) {

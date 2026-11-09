@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.*;
 // Importa los tipos del paquete.
 import static org.mockito.Mockito.*;
 
-// Activa MockitoExtension, que crea y gestiona los objetos marcados con @Mock.
 @ExtendWith(MockitoExtension.class)
 // Define la clase.
 class AutenticacionServiceTest {
     @Test void permiteOtraPoliticaDeRegistroSinDatosClinicos() {
-        // Otro proyecto puede configurar un rol inicial que exista en su propia base.
         org.springframework.test.util.ReflectionTestUtils.setField(service, "rolRegistro", "MIEMBRO");
         Rol rol = new Rol(); rol.setNombre("MIEMBRO");
         EstadoUsuario estado = new EstadoUsuario(); estado.setNombre("ACTIVO");
@@ -57,16 +55,13 @@ class AutenticacionServiceTest {
     @Mock JwtEncoder encoder;
     // Servicio que se prueba.
     AutenticacionService service;
-    // Prepara objetos y respuestas antes de cada caso para mantener independientes las pruebas.
     @BeforeEach void preparar() {
         // Prepara el servicio para la prueba.
         service = new AutenticacionService(usuarios, roles, estados, tokens, new UsuarioMapper(), new BCryptPasswordEncoder(), encoder);
     }
     // Caso de prueba.
     @Test void registroNormalizaCorreoYGuardaSoloHashComoCliente() {
-        // Prepara un rol de prueba y le asigna el nombre que el caso necesita.
         Rol rol = new Rol(); rol.setNombre("CLIENTE");
-        // Prepara un estado de cuenta ficticio para controlar si el usuario está activo en este caso.
         EstadoUsuario estado = new EstadoUsuario(); estado.setNombre("ACTIVO");
         // Respuesta simulada.
         when(roles.findByNombre("CLIENTE")).thenReturn(Optional.of(rol));
@@ -76,7 +71,6 @@ class AutenticacionServiceTest {
         when(usuarios.save(any())).thenAnswer(i -> i.getArgument(0));
         // Comprueba la normalización del correo.
         UsuarioDTO resultado = service.registrar(new RegistroDTO(" CLIENTE@DUOC.CL ", "UnaClave123"));
-        // Crea un capturador para inspeccionar el valor que el servicio intenta enviar a la dependencia simulada.
         ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
         // Verifica las llamadas esperadas.
         verify(usuarios).save(captor.capture());
@@ -127,9 +121,7 @@ class AutenticacionServiceTest {
     }
     // Caso de prueba.
     @Test void logoutEsIdempotenteYNoGuardaTokenEnClaro() {
-        // Ejecuta logout con un texto ficticio y luego comprueba que se busque su hash.
         service.logout("secreto");
-        // Crea un capturador para inspeccionar el valor que el servicio intenta enviar a la dependencia simulada.
         ArgumentCaptor<String> hash = ArgumentCaptor.forClass(String.class);
         // Verifica las llamadas esperadas.
         verify(tokens).buscarParaRenovar(hash.capture());

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 // Importa Usuario.
 import cl.nutrivida.autenticacion.model.Usuario;
 
-// Registra esta clase auxiliar como un componente inyectable.
 @Component
 // Define la clase.
 public class UsuarioMapper {

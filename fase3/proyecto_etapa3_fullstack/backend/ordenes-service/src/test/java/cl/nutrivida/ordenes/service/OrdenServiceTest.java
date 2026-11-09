@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.*;
 // Importa los tipos del paquete.
 import static org.mockito.Mockito.*;
 
-// Activa MockitoExtension, que crea y gestiona los objetos marcados con @Mock.
 @ExtendWith(MockitoExtension.class)
 // Define la clase.
 class OrdenServiceTest {
@@ -44,13 +43,10 @@ class OrdenServiceTest {
     OrdenService service;
     // Identificadores de prueba.
     UUID usuario = UUID.randomUUID();
-    // Conserva el JWT ficticio que identifica al usuario en los casos de órdenes.
     Jwt jwt;
-    // Prepara objetos y respuestas antes de cada caso para mantener independientes las pruebas.
     @BeforeEach void preparar() {
         // Prepara el servicio con dependencias simuladas.
         service = new OrdenService(repository, new OrdenMapper(), catalogo);
-        // Construye un JWT de prueba con sujeto y roles controlados.
         jwt = Jwt.withTokenValue("jwt").header("alg", "RS256").subject(usuario.toString()).claim("roles", List.of("CLIENTE")).build();
     }
     // Caso de prueba.
@@ -79,7 +75,6 @@ class OrdenServiceTest {
     }
     // Caso de prueba.
     @Test void clienteNoPuedeLeerOrdenAjena() {
-        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
         Orden orden = new Orden(); orden.setIdUsuario(UUID.randomUUID());
         // Identificadores de prueba.
         UUID id = UUID.randomUUID(); when(repository.findById(id)).thenReturn(Optional.of(orden));
@@ -97,7 +92,6 @@ class OrdenServiceTest {
     }
     // Caso de prueba.
     @Test void noPermiteReabrirOrdenCancelada() {
-        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
         Orden orden = new Orden(); orden.setIdUsuario(usuario); orden.setEstado(EstadoOrden.CANCELADA);
         // Identificadores de prueba.
         UUID id = UUID.randomUUID(); when(repository.findById(id)).thenReturn(Optional.of(orden));
@@ -108,13 +102,10 @@ class OrdenServiceTest {
     }
     // Caso de prueba.
     @Test void reintentoDevuelveOrdenExistenteSinConsultarCatalogo() {
-        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
         UUID clave = UUID.randomUUID(); Orden orden = new Orden(); orden.setIdUsuario(usuario);
-        // Prepara un detalle persistido ficticio para verificar si el reintento tiene los mismos datos.
         DetalleOrden d = new DetalleOrden(); d.setIdPlan(1L); d.setCantidad(2); orden.getDetalles().add(d);
         // Respuesta simulada.
         when(repository.findByIdUsuarioAndClaveIdempotencia(usuario, clave)).thenReturn(Optional.of(orden));
-        // Ejecuta la creación o el reintento de la orden con datos controlados y el JWT ficticio del caso.
         service.crear(new CrearOrdenDTO(clave, List.of(new CrearOrdenDTO.ItemDTO(1L, 2))), jwt);
         // Comprueba que no hubo llamadas adicionales.
         verifyNoInteractions(catalogo);
@@ -123,7 +114,6 @@ class OrdenServiceTest {
     }
     // Caso de prueba.
     @Test void claveReutilizadaConOtrosDatosSeRechaza() {
-        // Crea una orden de prueba en memoria con el dueño y el estado que requiere este escenario.
         UUID clave = UUID.randomUUID(); Orden orden = new Orden(); orden.setIdUsuario(usuario);
         // Respuesta simulada.
         when(repository.findByIdUsuarioAndClaveIdempotencia(usuario, clave)).thenReturn(Optional.of(orden));

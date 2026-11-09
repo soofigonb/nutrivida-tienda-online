@@ -50,7 +50,6 @@ import './styles/Admin.css'
 function SitioPublico() {
   const { usuario, cargandoSesion, errorSesion } = useContext(AuthContext)
   if (cargandoSesion) return <p className="container py-5" role="status">Comprobando sesión…</p>
-  // El vendedor entra únicamente al catálogo y las órdenes de su panel.
   if (usuario?.rol === 'VENDEDOR') return <Navigate to="/gestion/ordenes" replace />
   return (
     <>

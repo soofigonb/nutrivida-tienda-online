@@ -1,4 +1,4 @@
-// El contexto comparte una identidad validada por el backend, sin credenciales locales.
+// Identidad validada por el backend.
 import { createContext, useEffect, useState } from 'react'
 import { api } from '../services/api'
 
@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
     const cancelar = api.suscribir((cuenta) => { if (activo) setUsuario(cuenta) })
     async function restaurar() {
       try {
-        // Esta marca no contiene secretos y evita restaurar un cierre pendiente.
+        // Evita restaurar una sesión cerrada.
         if (localStorage.getItem(CLAVE_SALIDA)) {
           await api.logout()
           localStorage.removeItem(CLAVE_SALIDA)
@@ -63,7 +63,7 @@ export function AuthProvider({ children }) {
   }
 
   async function registrarPaciente(datos) {
-    // La identidad pertenece a autenticación; los datos clínicos viajan a pacientes.
+    // Separa la cuenta del perfil clínico.
     let cuenta = api.usuarioActual()
     if (!cuenta) {
       const registro = await registrarCuenta(datos.correo, datos.password)
@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
     if (cuenta.correo !== datos.correo.trim().toLowerCase() || cuenta.rol !== 'CLIENTE') {
       return { exito: false, mensaje: 'Cierra tu sesión antes de registrar una cuenta diferente.' }
     }
-    // Excluye contraseña, rol e identificadores elegidos por el navegador.
+    // Envía solo datos del perfil.
     const { nombre, apellidos, run, telefono, direccion, fechaNacimiento, region, comuna } = datos
     try {
       await api.solicitar('pacientes/me', { method: 'PUT', body: { nombre, apellidos, run, telefono, direccion, fechaNacimiento: fechaNacimiento || null, region, comuna } })

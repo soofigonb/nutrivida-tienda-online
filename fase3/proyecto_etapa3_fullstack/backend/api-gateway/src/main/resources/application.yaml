@@ -1,0 +1,86 @@
+# Puerto de entrada para las solicitudes del frontend
+# Agrupa la configuración del servidor HTTP.
+server:
+  # Hace que el gateway escuche en el puerto 8080.
+  port: 8080
+
+spring:
+  # Colores en la consola
+  # Agrupa el formato de salida de la consola.
+  output:
+    # Agrupa la opción de colores ANSI de la terminal.
+    ansi:
+      enabled: ALWAYS
+
+  cloud:
+    gateway:
+      # Agrupa las opciones del servidor Gateway.
+      server:
+        webflux:
+
+          # Rutas hacia los seis microservicios
+          # Inicia una lista de rutas.
+          routes:
+
+            # Autenticación
+            # Da un nombre interno único a esta ruta del gateway.
+            - id: autenticacion-service
+              # Destino directo configurable, sin Eureka.
+              uri: ${AUTENTICACION_SERVICE_URL:http://localhost:8081}
+              # Enumera las condiciones de esta ruta.
+              predicates:
+                - Path=/api/v1/autenticacion/**
+
+            # Pacientes
+            # Da un nombre interno único a esta ruta del gateway.
+            - id: pacientes-service
+              # Destino directo configurable, sin Eureka.
+              uri: ${PACIENTES_SERVICE_URL:http://localhost:8082}
+              # Enumera las condiciones de esta ruta.
+              predicates:
+                - Path=/api/v1/pacientes/**
+
+            # Catálogo
+            # Da un nombre interno único a esta ruta del gateway.
+            - id: catalogo-service
+              # Destino directo configurable, sin Eureka.
+              uri: ${CATALOGO_SERVICE_URL:http://localhost:8083}
+              # Enumera las condiciones de esta ruta.
+              predicates:
+                - Path=/api/v1/catalogo/**
+
+            # Profesionales
+            # Da un nombre interno único a esta ruta del gateway.
+            - id: profesionales-service
+              # Destino directo configurable, sin Eureka.
+              uri: ${PROFESIONALES_SERVICE_URL:http://localhost:8084}
+              # Enumera las condiciones de esta ruta.
+              predicates:
+                - Path=/api/v1/profesionales/**
+
+            # Agendamiento
+            # Da un nombre interno único a esta ruta del gateway.
+            - id: agendamiento-service
+              # Destino directo configurable, sin Eureka.
+              uri: ${AGENDAMIENTO_SERVICE_URL:http://localhost:8085}
+              # Enumera las condiciones de esta ruta.
+              predicates:
+                - Path=/api/v1/agendamiento/**
+
+            # Órdenes
+            # Da un nombre interno único a esta ruta del gateway.
+            - id: ordenes-service
+              # Destino directo configurable, sin Eureka.
+              uri: ${ORDENES_SERVICE_URL:http://localhost:8086}
+              # Enumera las condiciones de esta ruta.
+              predicates:
+                - Path=/api/v1/ordenes/**
+
+
+# Información que se muestra en consola
+# Agrupa las opciones de registro de eventos.
+logging:
+  level:
+    root: INFO
+    # Configura INFO para los eventos del gateway.
+    org.springframework.cloud.gateway: INFO

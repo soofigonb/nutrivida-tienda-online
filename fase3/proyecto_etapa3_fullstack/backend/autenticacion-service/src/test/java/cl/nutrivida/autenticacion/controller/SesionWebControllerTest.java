@@ -30,21 +30,16 @@ class SesionWebControllerTest {
     }
     // Caso de prueba.
     @Test void cookieDeRenovacionEsHttpOnlyYNoSeEntregaEnJson() {
-        // Construye un doble de la dependencia para controlar sus respuestas sin ejecutar infraestructura real.
         AutenticacionService service = mock(AutenticacionService.class);
-        // Prepara credenciales ficticias de prueba para invocar el controlador.
         LoginDTO dto = new LoginDTO("cliente@duoc.cl", "Clave123");
         // Respuesta simulada.
         when(service.login(dto)).thenReturn(new SesionDTO("jwt", "secreto", "Bearer", 900,
-            // Completa el usuario ficticio de la sesión con su correo, rol y estado controlados.
             new UsuarioDTO(UUID.randomUUID(), dto.correo(), "CLIENTE", "ACTIVO")));
         // Prepara el controlador y sus cookies.
         var controller = new SesionWebController(service, "https://nutrivida.example", true, java.time.Duration.ofDays(7));
         // Ejecuta y comprueba la respuesta web.
         var respuesta = controller.login("https://nutrivida.example", dto);
-        // Lee Set-Cookie de la respuesta para revisar sus atributos de seguridad sin usar un navegador real.
         String cookie = respuesta.getHeaders().getFirst("Set-Cookie");
-        // Comprueba que el resultado exista y no sea null antes de utilizarlo en las verificaciones siguientes.
         assertNotNull(cookie);
         // Verifica la condición.
         assertTrue(cookie.contains("HttpOnly"));
@@ -61,7 +56,6 @@ class SesionWebControllerTest {
     }
     // Caso de prueba.
     @Test void renovacionDesdeOtroOrigenSeRechazaAntesDeAccederAlServicio() {
-        // Construye un doble de la dependencia para controlar sus respuestas sin ejecutar infraestructura real.
         AutenticacionService service = mock(AutenticacionService.class);
         // Prepara el controlador y sus cookies.
         var controller = new SesionWebController(service, "https://nutrivida.example", true, java.time.Duration.ofDays(7));
@@ -72,7 +66,6 @@ class SesionWebControllerTest {
     }
     // Caso de prueba.
     @Test void logoutBorraLaCookieConLaMismaRuta() {
-        // Construye un doble de la dependencia para controlar sus respuestas sin ejecutar infraestructura real.
         AutenticacionService service = mock(AutenticacionService.class);
         // Prepara el controlador y sus cookies.
         var controller = new SesionWebController(service, "https://nutrivida.example", true, java.time.Duration.ofDays(7));

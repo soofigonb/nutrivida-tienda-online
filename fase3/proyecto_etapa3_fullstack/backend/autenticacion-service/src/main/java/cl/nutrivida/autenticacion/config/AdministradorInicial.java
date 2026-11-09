@@ -1,4 +1,3 @@
-// Crea el primer administrador solo cuando el operador habilita este arranque explícitamente.
 package cl.nutrivida.autenticacion.config;
 
 import cl.nutrivida.autenticacion.dto.RegistroDTO;
@@ -23,7 +22,6 @@ public class AdministradorInicial implements ApplicationRunner {
     private final String correo;
     private final String password;
 
-    // Las credenciales vienen del entorno del operador, nunca de una migración ni de React.
     public AdministradorInicial(AutenticacionService service, UsuarioRepository usuarios, Validator validator,
         @Value("${app.bootstrap.email:}") String correo, @Value("${app.bootstrap.password:}") String password) {
         this.service = service; this.usuarios = usuarios; this.validator = validator;
@@ -33,13 +31,11 @@ public class AdministradorInicial implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        // Un reinicio no modifica ni eleva cuentas cuando ya existe un administrador.
         if (usuarios.existsByRol_Nombre("ADMINISTRADOR")) return;
         RegistroDTO dto = new RegistroDTO(correo, password);
         if (!validator.validate(dto).isEmpty() || password.getBytes(StandardCharsets.UTF_8).length > 72) {
             throw new IllegalStateException("Configure un correo y contraseña inicial válidos mediante el entorno");
         }
-        // El correo debe ser nuevo: no se toma posesión de una cuenta preexistente.
         UsuarioDTO creado = service.registrar(dto);
         service.actualizar(creado.id(), "ADMINISTRADOR", "ACTIVO");
     }

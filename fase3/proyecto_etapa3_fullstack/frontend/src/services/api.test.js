@@ -1,4 +1,3 @@
-// Verifica sesiones reales de API usando respuestas controladas, sin tokens en almacenamiento.
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { crearClienteApi } from './api'
 

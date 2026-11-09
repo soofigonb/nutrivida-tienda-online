@@ -1,5 +1,14 @@
 **/application*.properties
 **/application*.yaml
 **/application*.yml
+
+# Configuraciones base. Los secretos se leen del entorno.
+!backend/api-gateway/src/main/resources/application.properties
+!backend/api-gateway/src/main/resources/application.yaml
+!backend/autenticacion-service/src/main/resources/application.properties
+!backend/autenticacion-service/src/main/resources/application.yaml
+!backend/ordenes-service/src/main/resources/application.properties
+!backend/ordenes-service/src/main/resources/application.yaml
+
 .vscode/
 target/

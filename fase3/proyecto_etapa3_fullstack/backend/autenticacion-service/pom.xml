@@ -7,36 +7,25 @@
     <!-- Indica la versión 4.0.0 del formato POM de Maven. -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Indica el proyecto padre del que se heredan versiones y opciones de construcción. -->
     <parent>
-        <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
         <groupId>org.springframework.boot</groupId>
-        <!-- Configuración padre de Spring Boot: gestiona versiones y opciones comunes de construcción. -->
         <artifactId>spring-boot-starter-parent</artifactId>
         <!-- Selecciona la versión 4.0.9. -->
         <version>4.0.9</version>
-        <!-- Vacío indica que Maven debe resolver el padre en sus repositorios. -->
         <relativePath/>
     </parent>
 
-    <!-- Identifica el grupo que publica el artefacto: cl.nutrivida. -->
     <groupId>cl.nutrivida</groupId>
-    <!-- Identifica el artefacto Maven de este componente: autenticacion-service. -->
     <artifactId>autenticacion-service</artifactId>
     <!-- Selecciona la versión 0.0.1-SNAPSHOT. -->
     <version>0.0.1-SNAPSHOT</version>
-    <!-- Nombre legible del componente mostrado por Maven y por herramientas de desarrollo. -->
     <name>autenticacion-service</name>
     <!-- Descripción del propósito del componente. -->
     <description>Servicio de autenticación y autorización de NutriVida</description>
 
-    <!-- Centraliza valores reutilizables, que se consultan con la sintaxis ${nombre}. -->
     <properties>
-        <!-- Compila para Java 17, la versión del lenguaje y de bytecode establecida para estos servicios. -->
         <java.version>17</java.version>
-        <!-- Guarda en springdoc.version la versión 3.0.3, reutilizada desde otras secciones para evitar repetirla. -->
         <springdoc.version>3.0.3</springdoc.version>
-        <!-- Guarda en jacoco.version la versión 0.8.12, reutilizada desde otras secciones para evitar repetirla. -->
         <jacoco.version>0.8.12</jacoco.version>
     </properties>
 
@@ -46,26 +35,20 @@
         <!-- API REST -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Incluye Spring MVC y el servidor servlet para exponer controladores REST. -->
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
 
         <!-- Persistencia -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Incluye Spring Data JPA y Hibernate para mapear entidades y generar repositorios. -->
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.postgresql. -->
             <groupId>org.postgresql</groupId>
-            <!-- Driver JDBC que comunica Java con PostgreSQL, incluido Supabase. -->
             <artifactId>postgresql</artifactId>
             <!-- Esta dependencia se necesita al ejecutar la aplicación. -->
             <scope>runtime</scope>
@@ -74,15 +57,12 @@
         <!-- Migraciones de la base de datos -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Integra el arranque de Flyway para ejecutar las migraciones antes de utilizar las entidades. -->
             <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
 
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.flywaydb. -->
             <groupId>org.flywaydb</groupId>
             <!-- Añade a Flyway el soporte específico de PostgreSQL. -->
             <artifactId>flyway-database-postgresql</artifactId>
@@ -91,35 +71,27 @@
         <!-- Validaciones -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Incluye la implementación de Jakarta Validation para comprobar las restricciones de los DTO. -->
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
         <!-- Seguridad y soporte para JWT -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Incluye filtros y herramientas de Spring Security para proteger la API. -->
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Añade soporte para recibir y validar tokens Bearer JWT en los servicios y en el gateway. -->
             <artifactId>spring-boot-starter-security-oauth2-resource-server</artifactId>
         </dependency>
 
         <!-- Documentación OpenAPI y Swagger UI -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springdoc. -->
             <groupId>org.springdoc</groupId>
-            <!-- Genera el documento OpenAPI y la interfaz Swagger UI de los servicios MVC. -->
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
             <!-- Selecciona la versión ${springdoc.version}. -->
             <version>${springdoc.version}</version>
@@ -128,78 +100,57 @@
         <!-- Generación de código repetitivo -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.projectlombok. -->
             <groupId>org.projectlombok</groupId>
-            <!-- Genera constructores, getters, setters y otras partes repetitivas durante la compilación. -->
             <artifactId>lombok</artifactId>
-            <!-- Evita propagar esta dependencia de forma automática a otros proyectos que dependan de este componente. -->
             <optional>true</optional>
         </dependency>
 
         <!-- Herramientas de desarrollo -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Añade herramientas de desarrollo como reinicio automático cuando se ejecuta en modo de desarrollo. -->
             <artifactId>spring-boot-devtools</artifactId>
             <!-- Esta dependencia se necesita al ejecutar la aplicación. -->
             <scope>runtime</scope>
-            <!-- Evita propagar esta dependencia de forma automática a otros proyectos que dependan de este componente. -->
             <optional>true</optional>
         </dependency>
 
         <!-- Pruebas generales: JUnit, Mockito y utilidades -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Incluye JUnit, Mockito y utilidades para las pruebas automatizadas. -->
             <artifactId>spring-boot-starter-test</artifactId>
-            <!-- Esta dependencia solo se utiliza al compilar o ejecutar pruebas. -->
             <scope>test</scope>
         </dependency>
 
         <!-- Pruebas de controladores -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Añade soporte de pruebas de la capa web MVC en Spring Boot 4. -->
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
-            <!-- Esta dependencia solo se utiliza al compilar o ejecutar pruebas. -->
             <scope>test</scope>
         </dependency>
 
         <!-- Pruebas de persistencia -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Añade soporte para probar repositorios y persistencia JPA. -->
             <artifactId>spring-boot-starter-data-jpa-test</artifactId>
-            <!-- Esta dependencia solo se utiliza al compilar o ejecutar pruebas. -->
             <scope>test</scope>
         </dependency>
 
         <!-- Pruebas de seguridad -->
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Añade herramientas de prueba de autenticación y permisos. -->
             <artifactId>spring-boot-starter-security-test</artifactId>
-            <!-- Esta dependencia solo se utiliza al compilar o ejecutar pruebas. -->
             <scope>test</scope>
         </dependency>
 
         <!-- Declara una dependencia. -->
         <dependency>
-            <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
             <groupId>org.springframework.boot</groupId>
-            <!-- Añade soporte de pruebas para aplicaciones que reciben tokens OAuth2/JWT. -->
             <artifactId>spring-boot-starter-security-oauth2-resource-server-test</artifactId>
-            <!-- Esta dependencia solo se utiliza al compilar o ejecutar pruebas. -->
             <scope>test</scope>
         </dependency>
 
@@ -207,25 +158,18 @@
 
     <!-- Agrupa las herramientas que construyen el componente. -->
     <build>
-        <!-- Enumera los plugins ejecutados por Maven durante la compilación, prueba o empaquetado. -->
         <plugins>
 
             <!-- Procesamiento de anotaciones Lombok -->
-            <!-- Declara una herramienta Maven que participa en la construcción o verificación del proyecto. -->
             <plugin>
-                <!-- Identifica el grupo que publica el artefacto: org.apache.maven.plugins. -->
                 <groupId>org.apache.maven.plugins</groupId>
-                <!-- Compila Java y configura el procesador de anotaciones Lombok. -->
                 <artifactId>maven-compiler-plugin</artifactId>
                 <!-- Agrupa opciones específicas del plugin que la contiene. -->
                 <configuration>
-                    <!-- Define los procesadores que se ejecutan al compilar para generar código desde anotaciones. -->
                     <annotationProcessorPaths>
                         <!-- Declara el artefacto de un procesador de anotaciones. -->
                         <path>
-                            <!-- Identifica el grupo que publica el artefacto: org.projectlombok. -->
                             <groupId>org.projectlombok</groupId>
-                            <!-- Genera constructores, getters, setters y otras partes repetitivas durante la compilación. -->
                             <artifactId>lombok</artifactId>
                         </path>
                     </annotationProcessorPaths>
@@ -233,21 +177,15 @@
             </plugin>
 
             <!-- Empaquetado ejecutable -->
-            <!-- Declara una herramienta Maven que participa en la construcción o verificación del proyecto. -->
             <plugin>
-                <!-- Identifica el grupo que publica el artefacto: org.springframework.boot. -->
                 <groupId>org.springframework.boot</groupId>
-                <!-- Genera un JAR ejecutable con las dependencias para iniciar el servicio mediante java -jar. -->
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <!-- Agrupa opciones específicas del plugin que la contiene. -->
                 <configuration>
-                    <!-- Enumera dependencias que no se copiarán dentro del JAR ejecutable. -->
                     <excludes>
                         <!-- Describe una dependencia que se excluye del JAR. -->
                         <exclude>
-                            <!-- Identifica el grupo que publica el artefacto: org.projectlombok. -->
                             <groupId>org.projectlombok</groupId>
-                            <!-- Genera constructores, getters, setters y otras partes repetitivas durante la compilación. -->
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
@@ -255,37 +193,46 @@
             </plugin>
 
             <!-- Reporte de cobertura -->
-            <!-- Declara una herramienta Maven que participa en la construcción o verificación del proyecto. -->
             <plugin>
-                <!-- Identifica el grupo que publica el artefacto: org.jacoco. -->
                 <groupId>org.jacoco</groupId>
-                <!-- Instrumenta la ejecución de pruebas y genera el reporte de cobertura al verificar. -->
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <!-- Selecciona la versión ${jacoco.version}. -->
                 <version>${jacoco.version}</version>
-                <!-- Agrupa ejecuciones automáticas del plugin durante el ciclo Maven. -->
                 <executions>
-                    <!-- Define una ejecución con su identificador, fase opcional y objetivos. -->
                     <execution>
-                        <!-- Da el identificador prepare-agent a esta ejecución del plugin para distinguirla de las demás. -->
                         <id>prepare-agent</id>
-                        <!-- Enumera los objetivos concretos que ejecutará el plugin. -->
                         <goals>
-                            <!-- Prepara el agente JaCoCo que medirá qué código recorren las pruebas. -->
                             <goal>prepare-agent</goal>
                         </goals>
                     </execution>
-                    <!-- Define una ejecución con su identificador, fase opcional y objetivos. -->
                     <execution>
-                        <!-- Da el identificador report a esta ejecución del plugin para distinguirla de las demás. -->
                         <id>report</id>
-                        <!-- Asocia la ejecución a verify, fase de comprobación posterior a las pruebas y al empaquetado. -->
                         <phase>verify</phase>
-                        <!-- Enumera los objetivos concretos que ejecutará el plugin. -->
                         <goals>
-                            <!-- Genera el reporte JaCoCo usando la información recogida durante las pruebas. -->
                             <goal>report</goal>
                         </goals>
+                    </execution>
+                    <!-- Exige al menos 81 % de líneas. -->
+                    <execution>
+                        <id>coverage-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.81</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

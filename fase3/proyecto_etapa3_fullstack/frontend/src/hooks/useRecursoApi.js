@@ -1,4 +1,4 @@
-// Evita mostrar datos de una ruta anterior mientras se carga otra lista o detalle.
+// Descarta resultados de rutas anteriores.
 import { useEffect, useState } from 'react'
 import { api } from '../services/api'
 

@@ -384,7 +384,6 @@ export function CarritoProvider({ children }) {
   // 7. CONFIRMAR LAS RESERVAS
   // ========================================
 
-  // Crea una orden en el servidor; la reserva clínica pertenece a agendamiento.
   async function confirmarReservas() {
     try {
       const actuales = leerLista(CLAVE_CARRITO)
@@ -393,7 +392,6 @@ export function CarritoProvider({ children }) {
         return { exito: false, mensaje: 'El carrito cambió. Revisa sus datos antes de reintentar.' }
       }
       const orden = await crearOrdenDesdeCarrito(actuales, api.usuarioActual())
-      // No crea citas locales ni borra los horarios pendientes de agendamiento.
       return { exito: true, orden }
     } catch (error) { return informarError(error.message) }
   }
