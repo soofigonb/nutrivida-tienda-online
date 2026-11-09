@@ -9,6 +9,10 @@
 !backend/autenticacion-service/src/main/resources/application.yaml
 !backend/ordenes-service/src/main/resources/application.properties
 !backend/ordenes-service/src/main/resources/application.yaml
+!backend/catalogo-service/src/main/resources/application.properties
+!backend/catalogo-service/src/main/resources/application.yaml
+!backend/profesionales-service/src/main/resources/application.properties
+!backend/profesionales-service/src/main/resources/application.yaml
 
 .vscode/
 target/

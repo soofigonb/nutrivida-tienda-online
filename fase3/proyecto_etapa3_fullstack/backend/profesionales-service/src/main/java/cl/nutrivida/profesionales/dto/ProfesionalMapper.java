@@ -1,6 +1,5 @@
-package cl.nutrivida.profesionales.mapper;
+package cl.nutrivida.profesionales.dto;
 
-import cl.nutrivida.profesionales.dto.ProfesionalDTO;
 import cl.nutrivida.profesionales.model.Profesional;
 import org.springframework.stereotype.Component;
 

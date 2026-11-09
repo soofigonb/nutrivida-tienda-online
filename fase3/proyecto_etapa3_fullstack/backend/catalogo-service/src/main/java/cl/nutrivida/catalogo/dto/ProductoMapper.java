@@ -1,8 +1,6 @@
-package cl.nutrivida.catalogo.mapper;
+package cl.nutrivida.catalogo.dto;
 
 import org.springframework.stereotype.Component;
-import cl.nutrivida.catalogo.dto.CategoriaDTO;
-import cl.nutrivida.catalogo.dto.ProductoDTO;
 import cl.nutrivida.catalogo.model.Categoria;
 import cl.nutrivida.catalogo.model.Producto;
 
@@ -18,6 +16,7 @@ public class ProductoMapper {
             producto.getStock(),
             producto.getImagenUrl(),
             producto.getCategoria().getNombre(),
+            producto.getCategoria().getId(),
             producto.getActivo()
         );
     }

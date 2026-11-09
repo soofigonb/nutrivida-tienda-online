@@ -1,6 +1,7 @@
 package cl.nutrivida.catalogo.dto;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ import java.util.UUID;
 public record CrearProductoDTO(
 
     @NotBlank(message = "El nombre del producto es obligatorio")
-    @Size(min = 3, max = 150, message = "El nombre debe tener entre 3 y 150 caracteres")
+    @Size(min = 3, max = 100, message = "El nombre debe tener entre 3 y 100 caracteres")
     String nombre,
 
     @Size(max = 500, message = "La descripción no puede superar los 500 caracteres")
@@ -19,6 +20,7 @@ public record CrearProductoDTO(
 
     @NotNull(message = "El precio es obligatorio")
     @DecimalMin(value = "0.0", inclusive = false, message = "El precio debe ser mayor a 0")
+    @Digits(integer = 8, fraction = 2, message = "El precio admite hasta ocho enteros y dos decimales")
     BigDecimal precio,
 
     @NotNull(message = "El stock es obligatorio")

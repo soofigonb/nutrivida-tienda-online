@@ -350,10 +350,10 @@ function AdminFormulario({ tipo }) {
   // 5. GUARDAR EL REGISTRO
   // ========================================
 
-  function enviar(valores) {
+  async function enviar(valores) {
     const resultado = esPaciente
       ? guardarPaciente(valores, id)
-      : guardarNutricionista(valores, id)
+      : await guardarNutricionista(valores, id)
 
     if (!resultado.exito) {
       setErrorGeneral(resultado.mensaje)

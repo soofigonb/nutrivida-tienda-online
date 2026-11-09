@@ -51,7 +51,7 @@ function TarjetaNutricionista({
 // ========================================
 
 function ListaNutricionistas() {
-  const { nutricionistas } = useDatos()
+  const { nutricionistas, errorProfesionales } = useDatos()
 
   const [seleccionado, setSeleccionado] =
     useState(null)
@@ -82,6 +82,7 @@ function ListaNutricionistas() {
           </p>
         </div>
 
+        {errorProfesionales && <p role="alert">{errorProfesionales}</p>}
         {/* Tarjetas */}
         <div className="nutricionistas-grid">
           {nutricionistas.map((nutricionista) => (

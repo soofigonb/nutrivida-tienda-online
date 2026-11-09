@@ -7,6 +7,7 @@ import {
 } from 'react'
 
 import iniciales from '../data/nutricionistas'
+import { darDeBajaProfesional, guardarProfesional, listarProfesionales } from '../services/profesionales'
 import { regionesComunas } from '../data/regionesComunas'
 
 import {
@@ -25,7 +26,6 @@ import {
 const DatosContext = createContext(null)
 
 const CLAVE_PACIENTES = 'pacientesNutriVida'
-const CLAVE_NUTRICIONISTAS = 'nutricionistasNutriVida'
 
 // ========================================
 // 2. FUNCIONES AUXILIARES
@@ -173,8 +173,19 @@ export function DatosProvider({ children }) {
   const [cargando, setCargando] = useState(true)
   const [pacientes, setPacientes] = useState([])
   const [nutricionistas, setNutricionistas] =
-    useState(iniciales)
+    useState([])
   const [errorDatos, setErrorDatos] = useState('')
+  const [errorProfesionales, setErrorProfesionales] = useState('')
+
+  useEffect(() => {
+    let activo = true
+    listarProfesionales().then(lista => {
+      if (activo) setNutricionistas(lista)
+    }).catch(error => {
+      if (activo) setErrorProfesionales(error.message || 'No se pudieron consultar los profesionales.')
+    })
+    return () => { activo = false }
+  }, [])
 
   // ========================================
   // 5. CARGAR Y SINCRONIZAR LOS DATOS
@@ -185,13 +196,7 @@ export function DatosProvider({ children }) {
       const pacientesGuardados =
         leerLista(CLAVE_PACIENTES)
 
-      const profesionales = leerLista(
-        CLAVE_NUTRICIONISTAS,
-        iniciales,
-      )
-
       setPacientes(pacientesGuardados)
-      setNutricionistas(profesionales)
       setErrorDatos('')
     } catch (error) {
       setErrorDatos(
@@ -322,18 +327,13 @@ export function DatosProvider({ children }) {
   // 7. CREAR O ACTUALIZAR NUTRICIONISTAS
   // ========================================
 
-  function guardarNutricionista(
+  async function guardarNutricionista(
     valores,
     id = null,
   ) {
     try {
-      const lista = leerLista(
-        CLAVE_NUTRICIONISTAS,
-        iniciales,
-      )
-
       const anterior = id
-        ? lista.find(
+        ? nutricionistas.find(
             (item) =>
               String(item.id) === String(id),
           )
@@ -349,7 +349,6 @@ export function DatosProvider({ children }) {
       // El precio pertenece al plan o servicio.
       // No se guarda una tarifa adicional por profesional.
       const datos = {
-        id: anterior?.id || crearId(),
         nombre: texto(valores.nombre),
         especialidad: texto(valores.especialidad),
         experiencia: texto(valores.experiencia),
@@ -418,20 +417,11 @@ export function DatosProvider({ children }) {
         }
       }
 
-      const actualizada = id
-        ? lista.map((item) =>
-            String(item.id) === String(id)
-              ? datos
-              : item,
-          )
-        : [...lista, datos]
-
-      localStorage.setItem(
-        CLAVE_NUTRICIONISTAS,
-        JSON.stringify(actualizada),
-      )
-
-      setNutricionistas(actualizada)
+      const guardado = await guardarProfesional(datos, id, anterior)
+      setNutricionistas(lista => id
+        ? lista.map(item => String(item.id) === String(id) ? guardado : item)
+        : [...lista, guardado])
+      setErrorProfesionales('')
 
       return { exito: true }
     } catch (error) {
@@ -447,18 +437,11 @@ export function DatosProvider({ children }) {
   // 8. ELIMINAR REGISTROS
   // ========================================
 
-  function eliminarRegistro(tipo, id) {
+  async function eliminarRegistro(tipo, id) {
     try {
       const esPaciente = tipo === 'pacientes'
 
-      const clave = esPaciente
-        ? CLAVE_PACIENTES
-        : CLAVE_NUTRICIONISTAS
-
-      const lista = leerLista(
-        clave,
-        esPaciente ? [] : iniciales,
-      )
+      const lista = esPaciente ? leerLista(CLAVE_PACIENTES) : nutricionistas
 
       const registro = lista.find(
         (item) => String(item.id) === String(id),
@@ -498,15 +481,12 @@ export function DatosProvider({ children }) {
         (item) => String(item.id) !== String(id),
       )
 
-      localStorage.setItem(
-        clave,
-        JSON.stringify(actualizada),
-      )
-
       if (esPaciente) {
+        localStorage.setItem(CLAVE_PACIENTES, JSON.stringify(actualizada))
         setPacientes(actualizada)
       } else {
-        setNutricionistas(actualizada)
+        await darDeBajaProfesional(id)
+        setNutricionistas(lista => lista.filter(item => String(item.id) !== String(id)))
       }
 
       return { exito: true }
@@ -529,6 +509,7 @@ export function DatosProvider({ children }) {
         pacientes,
         nutricionistas,
         errorDatos,
+        errorProfesionales,
         recargarDatos,
         guardarPaciente,
         guardarNutricionista,

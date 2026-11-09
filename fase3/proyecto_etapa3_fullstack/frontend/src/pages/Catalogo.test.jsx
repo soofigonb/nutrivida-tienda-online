@@ -17,10 +17,12 @@ import {
   describe,
   expect,
   test,
+  vi,
 } from 'vitest'
 
 import Servicios from './Servicios.jsx'
 import Ofertas from './Ofertas.jsx'
+import { api } from '../services/api'
 
 // ========================================
 // 1. ENTORNO DE NAVEGACIÓN
@@ -75,6 +77,7 @@ function mostrar(ruta = '/servicios') {
 
 afterEach(() => {
   cleanup()
+  vi.restoreAllMocks()
 })
 
 // ========================================
@@ -82,6 +85,17 @@ afterEach(() => {
 // ========================================
 
 describe('Catálogo por categorías', () => {
+  test('usa el precio y la disponibilidad del catálogo remoto', async () => {
+    vi.spyOn(api, 'solicitar').mockResolvedValue([
+      { id: 1000000000, codigo: 'consulta-inicial', nombre: 'Consulta en línea', precio: 39000, activo: true },
+      { id: 1000000001, codigo: 'plan-integral', nombre: 'Plan sin stock', precio: 60000, activo: false },
+    ])
+    mostrar()
+
+    const consulta = await screen.findByRole('heading', { name: 'Consulta en línea' })
+    expect(within(consulta.closest('article')).getByText('$39.000 CLP')).toBeInTheDocument()
+    expect(screen.queryByText('Plan sin stock')).not.toBeInTheDocument()
+  })
   test('muestra todos los servicios y sus precios', () => {
     mostrar()
 
