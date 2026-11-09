@@ -11,3 +11,4 @@ CREATE TABLE IF NOT EXISTS db_pacientes.pacientes (
     comuna VARCHAR(100),
     activo BOOLEAN NOT NULL DEFAULT TRUE
 );
+

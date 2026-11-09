@@ -17,3 +17,4 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     boolean existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(String correo, Long pacienteId);
 }
+
