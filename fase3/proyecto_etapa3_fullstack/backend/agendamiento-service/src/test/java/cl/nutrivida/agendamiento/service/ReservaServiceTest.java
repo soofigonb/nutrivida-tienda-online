@@ -83,6 +83,19 @@ class ReservaServiceTest {
     }
 
     // Caso de prueba.
+    @Test void listarActivasYObtenerPorIdExistenteDevuelvenReservas() {
+        // Prepara una entidad activa simulada en el repositorio.
+        Reserva entidad = new ReservaMapper().toEntity(dtoValido());
+        entidad.setReservaId(3L);
+        when(repository.findByActivoTrue()).thenReturn(List.of(entidad));
+        when(repository.findById(3L)).thenReturn(Optional.of(entidad));
+        // Comprueba la lista de reservas activas y la búsqueda por ID.
+        List<ReservaDTO> lista = service.listarActivas();
+        assertEquals(1, lista.size());
+        assertEquals(3L, service.obtenerPorId(3L).getReservaId());
+    }
+
+    // Caso de prueba.
     @Test void rechazaReservaConConflictoDeHorarioSinGuardar() {
         // Prepara los datos de entrada.
         ReservaDTO dto = dtoValido();
@@ -106,21 +119,40 @@ class ReservaServiceTest {
     }
 
     // Caso de prueba.
-    @Test void rechazaMotivoDemasiadoCortoOSinPlan() {
-        // Prepara un DTO con motivo menor a 5 caracteres.
-        ReservaDTO dto = dtoValido();
-        dto.setMotivo("abc");
-        // Comprueba la excepción por motivo inválido.
-        assertThrows(IllegalArgumentException.class, () -> service.crear(dto));
-        // Prepara un DTO sin identificador de plan.
+    @Test void rechazaCamposObligatoriosInvalidosEnReserva() {
+        // Motivo demasiado corto.
+        ReservaDTO motivoCorto = dtoValido();
+        motivoCorto.setMotivo("abc");
+        assertThrows(IllegalArgumentException.class, () -> service.crear(motivoCorto));
+        // Sin identificador de plan.
         ReservaDTO sinPlan = dtoValido();
         sinPlan.setPlanId(" ");
         assertThrows(IllegalArgumentException.class, () -> service.crear(sinPlan));
+        // Sin nombre de servicio.
+        ReservaDTO sinServicio = dtoValido();
+        sinServicio.setServicio(" ");
+        assertThrows(IllegalArgumentException.class, () -> service.crear(sinServicio));
+        // Precio menor o igual a cero.
+        ReservaDTO precioInvalido = dtoValido();
+        precioInvalido.setPrecio(0);
+        assertThrows(IllegalArgumentException.class, () -> service.crear(precioInvalido));
+        // Sin nutricionistaId.
+        ReservaDTO sinNutricionista = dtoValido();
+        sinNutricionista.setNutricionistaId(null);
+        assertThrows(IllegalArgumentException.class, () -> service.crear(sinNutricionista));
+        // Sin nombre de nutricionista.
+        ReservaDTO sinNombreNutri = dtoValido();
+        sinNombreNutri.setNutricionistaNombre(" ");
+        assertThrows(IllegalArgumentException.class, () -> service.crear(sinNombreNutri));
+        // Fecha con formato inválido.
+        ReservaDTO fechaInvalida = dtoValido();
+        fechaInvalida.setFecha("15-05-2027");
+        assertThrows(IllegalArgumentException.class, () -> service.crear(fechaInvalida));
         verifyNoInteractions(repository);
     }
 
     // Caso de prueba.
-    @Test void actualizaReservaExistenteSinConflicto() {
+    @Test void actualizaReservaExistenteYRechazaConflictoAlActualizar() {
         // Prepara una reserva existente almacenada.
         Reserva existente = new ReservaMapper().toEntity(dtoValido());
         existente.setReservaId(7L);
@@ -128,17 +160,21 @@ class ReservaServiceTest {
         when(repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(1L, "2027-05-20", "15:00", 7L))
                 .thenReturn(false);
         when(repository.save(any(Reserva.class))).thenAnswer(i -> i.getArgument(0));
-        // Prepara los nuevos datos de la reserva.
+        // Prepara los nuevos datos de la reserva incluyendo estado explícito.
         ReservaDTO cambios = dtoValido();
         cambios.setFecha("2027-05-20");
         cambios.setHora("15:00");
         cambios.setMotivo("Control nutricional mensual");
-        // Ejecuta la actualización.
+        cambios.setEstado("REPROGRAMADA");
+        // Ejecuta la actualización sin conflicto.
         ReservaDTO actualizada = service.actualizar(7L, cambios);
-        // Comprueba que se hayan aplicado los nuevos valores.
         assertEquals("2027-05-20", actualizada.getFecha());
         assertEquals("15:00", actualizada.getHora());
-        assertEquals("Control nutricional mensual", actualizada.getMotivo());
+        assertEquals("REPROGRAMADA", actualizada.getEstado());
+        // Simula ahora un conflicto de horario al intentar actualizar.
+        when(repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(1L, "2027-05-20", "15:00", 7L))
+                .thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(7L, cambios));
     }
 
     // Caso de prueba.
@@ -163,4 +199,3 @@ class ReservaServiceTest {
         assertThrows(RecursoNoEncontradoException.class, () -> service.obtenerPorId(99L));
     }
 }
-
