@@ -73,6 +73,7 @@ spring:
     create-schemas: true
     # Carpeta de recursos donde se buscan las migraciones SQL versionadas.
     locations: classpath:db/migration
+    baseline-on-migrate: true
     # Impide utilizar clean para borrar los objetos del esquema.
     clean-disabled: true
 
