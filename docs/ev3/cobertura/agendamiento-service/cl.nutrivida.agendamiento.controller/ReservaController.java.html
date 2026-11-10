@@ -2,8 +2,15 @@
 
 import cl.nutrivida.agendamiento.dto.ReservaDTO;
 import cl.nutrivida.agendamiento.service.ReservaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,39 +18,107 @@ import java.util.List;
 @RestController
 @RequestMapping(&quot;/api/v1/agendamiento&quot;)
 @CrossOrigin(origins = &quot;*&quot;)
+@Tag(
+        name = &quot;Agendamiento y Reservas&quot;,
+        description = &quot;Endpoints CRUD para gestionar la disponibilidad y reservas de consultas nutricionales&quot;
+)
+@SecurityRequirement(name = &quot;bearerAuth&quot;)
 public class ReservaController {
 
     private final ReservaService service;
 
-<span class="fc" id="L18">    public ReservaController(ReservaService service) {</span>
-<span class="fc" id="L19">        this.service = service;</span>
-<span class="fc" id="L20">    }</span>
+<span class="fc" id="L30">    public ReservaController(ReservaService service) {</span>
+<span class="fc" id="L31">        this.service = service;</span>
+<span class="fc" id="L32">    }</span>
 
     @GetMapping
+    @Operation(
+            summary = &quot;Listar reservas activas&quot;,
+            description = &quot;Obtiene el listado de todas las reservas activas para el administrador, o solo las reservas propias para el cliente autenticado&quot;
+    )
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Listado de reservas obtenido correctamente&quot;)
+    public List&lt;ReservaDTO&gt; listarActivas(@AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L41">        return service.listarActivas(jwt);</span>
+    }
+
     public List&lt;ReservaDTO&gt; listarActivas() {
-<span class="fc" id="L24">        return service.listarActivas();</span>
+<span class="fc" id="L45">        return service.listarActivas();</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
-    public ReservaDTO obtenerPorId(@PathVariable Long id) {
-<span class="fc" id="L29">        return service.obtenerPorId(id);</span>
+    @Operation(
+            summary = &quot;Obtener reserva por ID&quot;,
+            description = &quot;Busca y retorna el detalle de una reserva específica verificando que pertenezca al paciente autenticado o sea administrador&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Reserva encontrada correctamente&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Sin permisos para consultar la reserva de otro paciente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Reserva no encontrada con el ID indicado&quot;)
+    })
+    public ReservaDTO obtenerPorId(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L59">        return service.obtenerPorId(id, jwt);</span>
+    }
+
+    public ReservaDTO obtenerPorId(Long id) {
+<span class="fc" id="L63">        return service.obtenerPorId(id);</span>
     }
 
     @PostMapping
-    public ResponseEntity&lt;ReservaDTO&gt; crear(@RequestBody ReservaDTO dto) {
-<span class="fc" id="L34">        ReservaDTO creada = service.crear(dto);</span>
-<span class="fc" id="L35">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
+    @Operation(
+            summary = &quot;Crear nueva reserva&quot;,
+            description = &quot;Registra una nueva cita nutricional identificando al paciente desde su sesión JWT y validando que no exista conflicto de fecha y horario con el profesional&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Reserva creada exitosamente&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos inválidos o conflicto de horario con el nutricionista&quot;)
+    })
+    public ResponseEntity&lt;ReservaDTO&gt; crear(@RequestBody ReservaDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L76">        ReservaDTO creada = service.crear(dto, jwt);</span>
+<span class="nc" id="L77">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
+    }
+
+    public ResponseEntity&lt;ReservaDTO&gt; crear(ReservaDTO dto) {
+<span class="fc" id="L81">        ReservaDTO creada = service.crear(dto);</span>
+<span class="fc" id="L82">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
-    public ReservaDTO actualizar(@PathVariable Long id, @RequestBody ReservaDTO dto) {
-<span class="fc" id="L40">        return service.actualizar(id, dto);</span>
+    @Operation(
+            summary = &quot;Actualizar reserva existente&quot;,
+            description = &quot;Modifica los datos de una reserva activa verificando pertenencia y disponibilidad horaria del nutricionista&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Reserva actualizada correctamente&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos inválidos o conflicto de horario&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Sin permisos para modificar la reserva de otro paciente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Reserva no encontrada&quot;)
+    })
+    public ReservaDTO actualizar(@PathVariable Long id, @RequestBody ReservaDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L97">        return service.actualizar(id, dto, jwt);</span>
+    }
+
+    public ReservaDTO actualizar(Long id, ReservaDTO dto) {
+<span class="fc" id="L101">        return service.actualizar(id, dto);</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
-    public ResponseEntity&lt;Void&gt; cancelar(@PathVariable Long id) {
-<span class="fc" id="L45">        service.cancelar(id);</span>
-<span class="fc" id="L46">        return ResponseEntity.noContent().build();</span>
+    @Operation(
+            summary = &quot;Cancelar reserva&quot;,
+            description = &quot;Realiza la baja lógica de una reserva cambiando su estado a CANCELADA y liberando el bloque horario&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Reserva cancelada correctamente&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Sin permisos para cancelar la reserva de otro paciente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Reserva no encontrada&quot;)
+    })
+    public ResponseEntity&lt;Void&gt; cancelar(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L115">        service.cancelar(id, jwt);</span>
+<span class="nc" id="L116">        return ResponseEntity.noContent().build();</span>
+    }
+
+    public ResponseEntity&lt;Void&gt; cancelar(Long id) {
+<span class="fc" id="L120">        service.cancelar(id);</span>
+<span class="fc" id="L121">        return ResponseEntity.noContent().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

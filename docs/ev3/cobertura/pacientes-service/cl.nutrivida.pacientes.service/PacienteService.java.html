@@ -1,118 +1,238 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PacienteService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">pacientes-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.pacientes.service</a> &gt; <span class="el_source">PacienteService.java</span></div><h1>PacienteService.java</h1><pre class="source lang-java linenums">package cl.nutrivida.pacientes.service;
 
 import cl.nutrivida.pacientes.dto.PacienteDTO;
+import cl.nutrivida.pacientes.exceptions.AccesoDenegadoException;
 import cl.nutrivida.pacientes.exceptions.RecursoNoEncontradoException;
 import cl.nutrivida.pacientes.mapper.PacienteMapper;
 import cl.nutrivida.pacientes.model.Paciente;
 import cl.nutrivida.pacientes.repository.PacienteRepository;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class PacienteService {
+<span class="fc" id="L20">    @Value(&quot;${app.security.roles-claim:roles}&quot;)</span>
+    private String claimRoles = &quot;roles&quot;;
 
     private final PacienteRepository repository;
     private final PacienteMapper mapper;
 
-<span class="fc" id="L19">    public PacienteService(PacienteRepository repository, PacienteMapper mapper) {</span>
-<span class="fc" id="L20">        this.repository = repository;</span>
-<span class="fc" id="L21">        this.mapper = mapper;</span>
-<span class="fc" id="L22">    }</span>
+<span class="fc" id="L26">    public PacienteService(PacienteRepository repository, PacienteMapper mapper) {</span>
+<span class="fc" id="L27">        this.repository = repository;</span>
+<span class="fc" id="L28">        this.mapper = mapper;</span>
+<span class="fc" id="L29">    }</span>
 
     // GET / -&gt; solo activos
     public List&lt;PacienteDTO&gt; listarActivos() {
-<span class="fc" id="L26">        return repository.findByActivoTrue().stream()</span>
-<span class="fc" id="L27">                .map(mapper::toDTO)</span>
-<span class="fc" id="L28">                .collect(Collectors.toList());</span>
+<span class="fc" id="L33">        return repository.findByActivoTrue().stream()</span>
+<span class="fc" id="L34">                .map(mapper::toDTO)</span>
+<span class="fc" id="L35">                .collect(Collectors.toList());</span>
+    }
+
+    // GET /me -&gt; obtener perfil propio desde el sub del JWT
+    public PacienteDTO obtenerPerfilPropio(Jwt jwt) {
+<span class="fc" id="L40">        UUID usuarioId = extraerUsuarioId(jwt);</span>
+<span class="fc" id="L41">        Paciente p = repository.findByUsuarioId(usuarioId)</span>
+<span class="fc" id="L42">                .filter( pac -&gt; Boolean.TRUE.equals(pac.getActivo()))</span>
+<span class="pc" id="L43">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Perfil de paciente no encontrado para la cuenta actual&quot;));</span>
+<span class="fc" id="L44">        return mapper.toDTO(p);</span>
+    }
+
+    // PUT /me -&gt; crear o actualizar de forma idempotente el perfil propio vinculado al sub del JWT
+    public PacienteDTO guardarPerfilPropio(PacienteDTO dto, Jwt jwt) {
+<span class="fc" id="L49">        UUID usuarioId = extraerUsuarioId(jwt);</span>
+<span class="fc" id="L50">        validarDatosBasicos(dto);</span>
+
+<span class="fc" id="L52">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
+<span class="fc" id="L53">        String correoNormalizado = normalizarCorreoOpcional(dto.getCorreo());</span>
+
+<span class="fc" id="L55">        Optional&lt;Paciente&gt; previo = repository.findByUsuarioId(usuarioId);</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (previo.isPresent()) {</span>
+<span class="fc" id="L57">            Paciente existente = previo.get();</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">            if (!Boolean.TRUE.equals(existente.getActivo())) {</span>
+<span class="fc" id="L59">                throw new AccesoDenegadoException(&quot;El perfil fue dado de baja&quot;);</span>
+            }
+<span class="fc" id="L61">            Long id = existente.getPacienteId();</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">            if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {</span>
+<span class="nc" id="L63">                throw new IllegalArgumentException(&quot;El RUN ya está registrado por otro paciente&quot;);</span>
+            }
+<span class="pc bpc" id="L65" title="2 of 4 branches missed.">            if (correoNormalizado != null &amp;&amp; repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(correoNormalizado, id)) {</span>
+<span class="nc" id="L66">                throw new IllegalArgumentException(&quot;El correo ya está registrado por otro paciente&quot;);</span>
+            }
+<span class="fc" id="L68">            existente.setUsuarioId(usuarioId);</span>
+<span class="fc" id="L69">            existente.setRun(runNormalizado);</span>
+<span class="fc" id="L70">            existente.setNombre(dto.getNombre().trim());</span>
+<span class="fc" id="L71">            existente.setApellidos(dto.getApellidos().trim());</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">            if (correoNormalizado != null) {</span>
+<span class="fc" id="L73">                existente.setCorreo(correoNormalizado);</span>
+            }
+<span class="fc" id="L75">            existente.setTelefono(dto.getTelefono());</span>
+<span class="fc" id="L76">            existente.setDireccion(dto.getDireccion());</span>
+<span class="fc" id="L77">            existente.setFechaNacimiento(dto.getFechaNacimiento());</span>
+<span class="fc" id="L78">            existente.setRegion(dto.getRegion());</span>
+<span class="fc" id="L79">            existente.setComuna(dto.getComuna());</span>
+<span class="fc" id="L80">            return mapper.toDTO(repository.save(existente));</span>
+        }
+
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (repository.existsByRunAndActivoTrue(runNormalizado)) {</span>
+<span class="nc" id="L84">            throw new IllegalArgumentException(&quot;El RUN ya está registrado&quot;);</span>
+        }
+<span class="pc bpc" id="L86" title="2 of 4 branches missed.">        if (correoNormalizado != null &amp;&amp; repository.existsByCorreoIgnoreCaseAndActivoTrue(correoNormalizado)) {</span>
+<span class="nc" id="L87">            throw new IllegalArgumentException(&quot;El correo ya está registrado&quot;);</span>
+        }
+
+<span class="fc" id="L90">        Paciente nuevo = mapper.toEntity(dto);</span>
+<span class="fc" id="L91">        nuevo.setPacienteId(null);</span>
+<span class="fc" id="L92">        nuevo.setUsuarioId(usuarioId);</span>
+<span class="fc" id="L93">        nuevo.setRun(runNormalizado);</span>
+<span class="fc" id="L94">        nuevo.setNombre(dto.getNombre().trim());</span>
+<span class="fc" id="L95">        nuevo.setApellidos(dto.getApellidos().trim());</span>
+<span class="fc" id="L96">        nuevo.setCorreo(correoNormalizado);</span>
+<span class="fc" id="L97">        nuevo.setActivo(true);</span>
+<span class="fc" id="L98">        return mapper.toDTO(repository.save(nuevo));</span>
     }
 
     // GET /{id}
     public PacienteDTO obtenerPorId(Long id) {
-<span class="fc" id="L33">        Paciente p = repository.findById(id)</span>
-<span class="fc" id="L34">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
-<span class="fc" id="L35">        return mapper.toDTO(p);</span>
+<span class="fc" id="L103">        return obtenerPorId(id, null);</span>
+    }
+
+    public PacienteDTO obtenerPorId(Long id, Jwt jwt) {
+<span class="fc" id="L107">        Paciente p = repository.findById(id)</span>
+<span class="fc" id="L108">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L109">        verificarPropietarioOAdmin(p, jwt);</span>
+<span class="fc" id="L110">        return mapper.toDTO(p);</span>
     }
 
     // POST /
     public PacienteDTO crear(PacienteDTO dto) {
-<span class="fc" id="L40">        validar(dto);</span>
+<span class="fc" id="L115">        validar(dto);</span>
 
-<span class="fc" id="L42">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
-<span class="fc" id="L43">        String correoNormalizado = dto.getCorreo().trim().toLowerCase();</span>
+<span class="fc" id="L117">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
+<span class="fc" id="L118">        String correoNormalizado = dto.getCorreo().trim().toLowerCase();</span>
 
-<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrue(runNormalizado)) {</span>
-<span class="fc" id="L46">            throw new IllegalArgumentException(&quot;El RUN ya está registrado&quot;);</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrue(runNormalizado)) {</span>
+<span class="fc" id="L121">            throw new IllegalArgumentException(&quot;El RUN ya está registrado&quot;);</span>
         }
-<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (repository.existsByCorreoIgnoreCaseAndActivoTrue(correoNormalizado)) {</span>
-<span class="fc" id="L49">            throw new IllegalArgumentException(&quot;El correo ya está registrado&quot;);</span>
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (repository.existsByCorreoIgnoreCaseAndActivoTrue(correoNormalizado)) {</span>
+<span class="fc" id="L124">            throw new IllegalArgumentException(&quot;El correo ya está registrado&quot;);</span>
         }
 
-<span class="fc" id="L52">        Paciente p = mapper.toEntity(dto);</span>
-<span class="fc" id="L53">        p.setPacienteId(null);</span>
-<span class="fc" id="L54">        p.setRun(runNormalizado);</span>
-<span class="fc" id="L55">        p.setNombre(dto.getNombre().trim());</span>
-<span class="fc" id="L56">        p.setApellidos(dto.getApellidos().trim());</span>
-<span class="fc" id="L57">        p.setCorreo(correoNormalizado);</span>
-<span class="fc" id="L58">        p.setActivo(true);</span>
+<span class="fc" id="L127">        Paciente p = mapper.toEntity(dto);</span>
+<span class="fc" id="L128">        p.setPacienteId(null);</span>
+<span class="fc" id="L129">        p.setRun(runNormalizado);</span>
+<span class="fc" id="L130">        p.setNombre(dto.getNombre().trim());</span>
+<span class="fc" id="L131">        p.setApellidos(dto.getApellidos().trim());</span>
+<span class="fc" id="L132">        p.setCorreo(correoNormalizado);</span>
+<span class="fc" id="L133">        p.setActivo(true);</span>
 
-<span class="fc" id="L60">        Paciente guardado = repository.save(p);</span>
-<span class="fc" id="L61">        return mapper.toDTO(guardado);</span>
+<span class="fc" id="L135">        Paciente guardado = repository.save(p);</span>
+<span class="fc" id="L136">        return mapper.toDTO(guardado);</span>
     }
 
     // PUT /{id}
     public PacienteDTO actualizar(Long id, PacienteDTO dto) {
-<span class="fc" id="L66">        Paciente existente = repository.findById(id)</span>
-<span class="pc" id="L67">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
-<span class="fc" id="L68">        validar(dto);</span>
+<span class="fc" id="L141">        return actualizar(id, dto, null);</span>
+    }
 
-<span class="fc" id="L70">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
-<span class="fc" id="L71">        String correoNormalizado = dto.getCorreo().trim().toLowerCase();</span>
+    public PacienteDTO actualizar(Long id, PacienteDTO dto, Jwt jwt) {
+<span class="fc" id="L145">        Paciente existente = repository.findById(id)</span>
+<span class="pc" id="L146">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L147">        verificarPropietarioOAdmin(existente, jwt);</span>
+<span class="fc" id="L148">        validar(dto);</span>
 
-<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {</span>
-<span class="fc" id="L74">            throw new IllegalArgumentException(&quot;El RUN ya está registrado por otro paciente&quot;);</span>
+<span class="fc" id="L150">        String runNormalizado = dto.getRun().trim().toUpperCase();</span>
+<span class="fc" id="L151">        String correoNormalizado = dto.getCorreo().trim().toLowerCase();</span>
+
+<span class="fc bfc" id="L153" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {</span>
+<span class="fc" id="L154">            throw new IllegalArgumentException(&quot;El RUN ya está registrado por otro paciente&quot;);</span>
         }
-<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(correoNormalizado, id)) {</span>
-<span class="fc" id="L77">            throw new IllegalArgumentException(&quot;El correo ya está registrado por otro paciente&quot;);</span>
+<span class="fc bfc" id="L156" title="All 2 branches covered.">        if (repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(correoNormalizado, id)) {</span>
+<span class="fc" id="L157">            throw new IllegalArgumentException(&quot;El correo ya está registrado por otro paciente&quot;);</span>
         }
 
-<span class="fc" id="L80">        existente.setRun(runNormalizado);</span>
-<span class="fc" id="L81">        existente.setNombre(dto.getNombre().trim());</span>
-<span class="fc" id="L82">        existente.setApellidos(dto.getApellidos().trim());</span>
-<span class="fc" id="L83">        existente.setCorreo(correoNormalizado);</span>
-<span class="fc" id="L84">        existente.setTelefono(dto.getTelefono());</span>
-<span class="fc" id="L85">        existente.setDireccion(dto.getDireccion());</span>
-<span class="fc" id="L86">        existente.setFechaNacimiento(dto.getFechaNacimiento());</span>
-<span class="fc" id="L87">        existente.setRegion(dto.getRegion());</span>
-<span class="fc" id="L88">        existente.setComuna(dto.getComuna());</span>
+<span class="fc" id="L160">        existente.setRun(runNormalizado);</span>
+<span class="fc" id="L161">        existente.setNombre(dto.getNombre().trim());</span>
+<span class="fc" id="L162">        existente.setApellidos(dto.getApellidos().trim());</span>
+<span class="fc" id="L163">        existente.setCorreo(correoNormalizado);</span>
+<span class="fc" id="L164">        existente.setTelefono(dto.getTelefono());</span>
+<span class="fc" id="L165">        existente.setDireccion(dto.getDireccion());</span>
+<span class="fc" id="L166">        existente.setFechaNacimiento(dto.getFechaNacimiento());</span>
+<span class="fc" id="L167">        existente.setRegion(dto.getRegion());</span>
+<span class="fc" id="L168">        existente.setComuna(dto.getComuna());</span>
 
-<span class="fc" id="L90">        Paciente guardado = repository.save(existente);</span>
-<span class="fc" id="L91">        return mapper.toDTO(guardado);</span>
+<span class="fc" id="L170">        Paciente guardado = repository.save(existente);</span>
+<span class="fc" id="L171">        return mapper.toDTO(guardado);</span>
     }
 
     // DELETE /{id} -&gt; baja controlada
     public void darDeBaja(Long id) {
-<span class="fc" id="L96">        Paciente existente = repository.findById(id)</span>
-<span class="pc" id="L97">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
-<span class="fc" id="L98">        existente.setActivo(false);</span>
-<span class="fc" id="L99">        repository.save(existente);</span>
-<span class="fc" id="L100">    }</span>
+<span class="fc" id="L176">        Paciente existente = repository.findById(id)</span>
+<span class="pc" id="L177">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Paciente no encontrado con id: &quot; + id));</span>
+<span class="fc" id="L178">        existente.setActivo(false);</span>
+<span class="fc" id="L179">        repository.save(existente);</span>
+<span class="fc" id="L180">    }</span>
+
+    private void verificarPropietarioOAdmin(Paciente paciente, Jwt jwt) {
+<span class="pc bpc" id="L183" title="1 of 4 branches missed.">        if (jwt == null || esAdministrador(jwt)) {</span>
+<span class="fc" id="L184">            return;</span>
+        }
+<span class="fc" id="L186">        UUID usuarioId = extraerUsuarioId(jwt);</span>
+<span class="pc bpc" id="L187" title="2 of 4 branches missed.">        if (paciente.getUsuarioId() == null || !paciente.getUsuarioId().equals(usuarioId)) {</span>
+<span class="fc" id="L188">            throw new AccesoDenegadoException(&quot;No tienes permiso para acceder o modificar el perfil de otro paciente&quot;);</span>
+        }
+<span class="nc" id="L190">    }</span>
+
+    private boolean esAdministrador(Jwt jwt) {
+<span class="fc" id="L193">        List&lt;String&gt; roles = jwt.getClaimAsStringList(claimRoles);</span>
+<span class="pc bpc" id="L194" title="2 of 4 branches missed.">        return roles != null &amp;&amp; roles.contains(&quot;ADMINISTRADOR&quot;);</span>
+    }
+
+    private UUID extraerUsuarioId(Jwt jwt) {
+<span class="pc bpc" id="L198" title="3 of 6 branches missed.">        if (jwt == null || jwt.getSubject() == null || jwt.getSubject().isBlank()) {</span>
+<span class="nc" id="L199">            throw new AccesoDenegadoException(&quot;Token de sesión inválido o sin identificador de usuario&quot;);</span>
+        }
+        try {
+<span class="fc" id="L202">            return UUID.fromString(jwt.getSubject());</span>
+<span class="nc" id="L203">        } catch (IllegalArgumentException ex) {</span>
+<span class="nc" id="L204">            throw new AccesoDenegadoException(&quot;El identificador de la cuenta en el token no es un UUID válido&quot;);</span>
+        }
+    }
+
+    private String normalizarCorreoOpcional(String correo) {
+<span class="pc bpc" id="L209" title="2 of 4 branches missed.">        if (correo == null || correo.isBlank()) {</span>
+<span class="nc" id="L210">            return null;</span>
+        }
+<span class="fc" id="L212">        String limpio = correo.trim().toLowerCase();</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">        if (!limpio.contains(&quot;@&quot;)) {</span>
+<span class="nc" id="L214">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
+        }
+<span class="fc" id="L216">        return limpio;</span>
+    }
+
+    private void validarDatosBasicos(PacienteDTO dto) {
+<span class="pc bpc" id="L220" title="1 of 4 branches missed.">        if (dto.getRun() == null || dto.getRun().isBlank()) {</span>
+<span class="fc" id="L221">            throw new IllegalArgumentException(&quot;El RUN es obligatorio&quot;);</span>
+        }
+<span class="pc bpc" id="L223" title="1 of 4 branches missed.">        if (dto.getNombre() == null || dto.getNombre().trim().length() &lt; 2) {</span>
+<span class="fc" id="L224">            throw new IllegalArgumentException(&quot;El nombre debe tener al menos 2 caracteres&quot;);</span>
+        }
+<span class="pc bpc" id="L226" title="1 of 4 branches missed.">        if (dto.getApellidos() == null || dto.getApellidos().trim().length() &lt; 2) {</span>
+<span class="fc" id="L227">            throw new IllegalArgumentException(&quot;Los apellidos deben tener al menos 2 caracteres&quot;);</span>
+        }
+<span class="fc" id="L229">    }</span>
 
     private void validar(PacienteDTO dto) {
-<span class="pc bpc" id="L103" title="1 of 4 branches missed.">        if (dto.getRun() == null || dto.getRun().isBlank()) {</span>
-<span class="fc" id="L104">            throw new IllegalArgumentException(&quot;El RUN es obligatorio&quot;);</span>
+<span class="fc" id="L232">        validarDatosBasicos(dto);</span>
+<span class="pc bpc" id="L233" title="2 of 6 branches missed.">        if (dto.getCorreo() == null || dto.getCorreo().isBlank() || !dto.getCorreo().contains(&quot;@&quot;)) {</span>
+<span class="fc" id="L234">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
         }
-<span class="pc bpc" id="L106" title="1 of 4 branches missed.">        if (dto.getNombre() == null || dto.getNombre().trim().length() &lt; 2) {</span>
-<span class="fc" id="L107">            throw new IllegalArgumentException(&quot;El nombre debe tener al menos 2 caracteres&quot;);</span>
-        }
-<span class="pc bpc" id="L109" title="1 of 4 branches missed.">        if (dto.getApellidos() == null || dto.getApellidos().trim().length() &lt; 2) {</span>
-<span class="fc" id="L110">            throw new IllegalArgumentException(&quot;Los apellidos deben tener al menos 2 caracteres&quot;);</span>
-        }
-<span class="pc bpc" id="L112" title="2 of 6 branches missed.">        if (dto.getCorreo() == null || dto.getCorreo().isBlank() || !dto.getCorreo().contains(&quot;@&quot;)) {</span>
-<span class="fc" id="L113">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
-        }
-<span class="fc" id="L115">    }</span>
+<span class="fc" id="L236">    }</span>
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

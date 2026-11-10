@@ -1,12 +1,12 @@
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
   useState,
 } from 'react'
 
 import iniciales from '../data/nutricionistas'
+import { AuthContext } from './AuthContext'
 import { darDeBajaPaciente, guardarPacienteRemoto, listarPacientes } from '../services/pacientes'
 import { darDeBajaProfesional, guardarProfesional, listarProfesionales } from '../services/profesionales'
 import { regionesComunas } from '../data/regionesComunas'
@@ -63,15 +63,6 @@ function texto(valor) {
   return String(valor ?? '')
     .trim()
     .replace(/\s+/g, ' ')
-}
-
-function crearId() {
-  return (
-    globalThis.crypto?.randomUUID?.() ||
-    `registro-${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2)}`
-  )
 }
 
 // ========================================
@@ -131,14 +122,6 @@ function validarPaciente(datos, lista, id) {
     return 'Selecciona una región y comuna válidas.'
   }
 
-  if (
-    !id &&
-    (datos.password.length < 6 ||
-      !datos.password.trim())
-  ) {
-    return 'La contraseña debe tener al menos 6 caracteres.'
-  }
-
   const otros = lista.filter(
     (item) => String(item.id) !== String(id),
   )
@@ -172,7 +155,8 @@ function validarPaciente(datos, lista, id) {
 // ========================================
 
 export function DatosProvider({ children }) {
-  const [cargando, setCargando] = useState(true)
+  const cuenta = useContext(AuthContext)?.usuario
+  const adminId = cuenta?.rol === 'ADMINISTRADOR' ? cuenta.id : null
   const [pacientes, setPacientes] = useState([])
   const [nutricionistas, setNutricionistas] =
     useState([])
@@ -186,95 +170,34 @@ export function DatosProvider({ children }) {
     }).catch(error => {
       if (activo) setErrorProfesionales(error.message || 'No se pudieron consultar los profesionales.')
     })
-    listarPacientes().then(lista => {
-      if (activo && Array.isArray(lista) && (lista.length > 0 || leerLista(CLAVE_PACIENTES).length === 0)) {
-        setPacientes(lista)
-      }
-    }).catch(() => {})
     return () => { activo = false }
   }, [])
 
-  // ========================================
-  // 5. CARGAR Y SINCRONIZAR LOS DATOS
-  // ========================================
-
-  const recargarDatos = useCallback(() => {
-    try {
-      const pacientesGuardados =
-        leerLista(CLAVE_PACIENTES)
-
-      setPacientes(pacientesGuardados)
-      setErrorDatos('')
-    } catch (error) {
-      setErrorDatos(
-        error.message ||
-          'No fue posible leer los datos del navegador.',
-      )
-    } finally {
-      setCargando(false)
-    }
+  useEffect(() => {
+    // Retira la cache antigua de fichas.
+    try { localStorage.removeItem(CLAVE_PACIENTES) } catch { /* Solo se usa la API. */ }
   }, [])
 
   useEffect(() => {
-    recargarDatos()
-
-    window.addEventListener(
-      'storage',
-      recargarDatos,
-    )
-
-    window.addEventListener(
-      'nutrivida:datos',
-      recargarDatos,
-    )
-
-    return () => {
-      window.removeEventListener(
-        'storage',
-        recargarDatos,
-      )
-
-      window.removeEventListener(
-        'nutrivida:datos',
-        recargarDatos,
-      )
-    }
-  }, [recargarDatos])
-
-  // ========================================
-  // 6. CREAR O ACTUALIZAR PACIENTES
-  // ========================================
+    setPacientes([])
+    setErrorDatos('')
+    if (!adminId) return
+    let activo = true
+    listarPacientes().then(lista => {
+      if (activo) setPacientes(lista)
+    }).catch(error => {
+      if (activo) setErrorDatos(error.message)
+    })
+    return () => { activo = false }
+  }, [adminId])
 
   async function guardarPaciente(valores, id = null) {
     try {
-      const listaLocal = leerLista(CLAVE_PACIENTES)
-      const lista = pacientes.length > 0 ? pacientes : listaLocal
-
-      const anterior = id
-        ? lista.find(
-            (item) =>
-              String(item.id) === String(id),
-          )
-        : null
-
-      if (id && !anterior) {
-        return {
-          exito: false,
-          mensaje: 'El paciente ya no existe.',
-        }
+      if (id && !pacientes.some(item => String(item.id) === String(id))) {
+        return { exito: false, mensaje: 'El paciente ya no existe.' }
       }
 
-      // Una contraseña vacía al editar conserva la anterior.
-      const password =
-        valores.password ||
-        anterior?.contrasena ||
-        anterior?.password ||
-        anterior?.clave ||
-        ''
-
       const datos = {
-        ...anterior,
-        id: anterior?.id || crearId(),
         nombre: texto(valores.nombre),
         apellidos: texto(valores.apellidos),
         run: limpiarRun(valores.run),
@@ -288,14 +211,11 @@ export function DatosProvider({ children }) {
           valores.fechaNacimiento || '',
         region: valores.region,
         comuna: valores.comuna,
-        password,
-        contrasena: password,
-        rol: 'paciente',
       }
 
       const error = validarPaciente(
         datos,
-        lista,
+        pacientes,
         id,
       )
 
@@ -306,23 +226,10 @@ export function DatosProvider({ children }) {
         }
       }
 
-      const guardadoRemoto = await guardarPacienteRemoto(datos, id)
-      const registroFinal = { ...datos, ...guardadoRemoto, password, contrasena: password }
-
-      const actualizada = id
-        ? lista.map((item) =>
-            String(item.id) === String(id)
-              ? registroFinal
-              : item,
-          )
-        : [...lista, registroFinal]
-
-      localStorage.setItem(
-        CLAVE_PACIENTES,
-        JSON.stringify(actualizada),
-      )
-
-      setPacientes(actualizada)
+      const guardado = await guardarPacienteRemoto(datos, id)
+      setPacientes(lista => id
+        ? lista.map(item => String(item.id) === String(id) ? guardado : item)
+        : [...lista, guardado])
 
       return { exito: true }
     } catch (error) {
@@ -453,7 +360,7 @@ export function DatosProvider({ children }) {
       const esPaciente = tipo === 'pacientes'
 
       const lista = esPaciente
-        ? (pacientes.length > 0 ? pacientes : leerLista(CLAVE_PACIENTES))
+        ? pacientes
         : nutricionistas
 
       const registro = lista.find(
@@ -496,7 +403,6 @@ export function DatosProvider({ children }) {
 
       if (esPaciente) {
         await darDeBajaPaciente(id)
-        localStorage.setItem(CLAVE_PACIENTES, JSON.stringify(actualizada))
         setPacientes(actualizada)
       } else {
         await darDeBajaProfesional(id)
@@ -524,17 +430,12 @@ export function DatosProvider({ children }) {
         nutricionistas,
         errorDatos,
         errorProfesionales,
-        recargarDatos,
         guardarPaciente,
         guardarNutricionista,
         eliminarRegistro,
       }}
     >
-      {cargando ? (
-        <p role="status">Cargando datos...</p>
-      ) : (
-        children
-      )}
+      {children}
     </DatosContext.Provider>
   )
 }

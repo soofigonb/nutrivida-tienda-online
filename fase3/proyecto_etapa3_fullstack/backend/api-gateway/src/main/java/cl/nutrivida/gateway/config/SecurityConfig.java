@@ -76,6 +76,8 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.GET, "/api/v1/ordenes/**").hasAnyRole("ADMINISTRADOR", "VENDEDOR", "CLIENTE")
                 .pathMatchers("/api/v1/ordenes/**").hasAnyRole("ADMINISTRADOR", "CLIENTE")
                 .pathMatchers("/api/v1/catalogo/**", "/api/v1/profesionales/**").hasRole("ADMINISTRADOR")
+                .pathMatchers("/api/v1/pacientes", "/api/v1/pacientes/").hasRole("ADMINISTRADOR")
+                .pathMatchers(HttpMethod.DELETE, "/api/v1/pacientes/**").hasRole("ADMINISTRADOR")
                 .pathMatchers("/api/v1/pacientes/**", "/api/v1/agendamiento/**").hasAnyRole("ADMINISTRADOR", "CLIENTE")
                 // Bloquea rutas sin regla.
                 .anyExchange().denyAll())

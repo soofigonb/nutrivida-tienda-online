@@ -20,13 +20,8 @@ export function aPaciente(datos) {
 }
 
 export async function listarPacientes() {
-  if (typeof api.solicitar !== 'function') return null
   const respuesta = await api.solicitar('pacientes')
-  if (!Array.isArray(respuesta)) return null
-  // Verifica que los elementos correspondan a pacientes (con pacienteId o run)
-  if (respuesta.length > 0 && !('pacienteId' in respuesta[0]) && !('run' in respuesta[0])) {
-    return null
-  }
+  if (!Array.isArray(respuesta)) throw new Error('La API no devolvió el listado de pacientes.')
   return respuesta.map(aPaciente)
 }
 
@@ -45,7 +40,8 @@ export async function guardarPacienteRemoto(datos, id) {
       comuna: datos.comuna,
     },
   })
-  return aPaciente({ ...datos, ...paciente, pacienteId: paciente?.pacienteId ?? id })
+  if (paciente?.pacienteId == null) throw new Error('La API no devolvió el identificador del paciente.')
+  return aPaciente(paciente)
 }
 
 export function darDeBajaPaciente(id) {

@@ -2,8 +2,15 @@
 
 import cl.nutrivida.pacientes.dto.PacienteDTO;
 import cl.nutrivida.pacientes.service.PacienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,40 +18,118 @@ import java.util.List;
 @RestController
 @RequestMapping(&quot;/api/v1/pacientes&quot;)
 @CrossOrigin(origins = &quot;*&quot;)
+@Tag(
+        name = &quot;Pacientes&quot;,
+        description = &quot;Endpoints CRUD para la gestión de fichas y perfiles de pacientes de NutriVida&quot;
+)
+@SecurityRequirement(name = &quot;bearerAuth&quot;)
 public class PacienteController {
 
     private final PacienteService service;
 
-<span class="fc" id="L18">    public PacienteController(PacienteService service) {</span>
-<span class="fc" id="L19">        this.service = service;</span>
-<span class="fc" id="L20">    }</span>
+<span class="fc" id="L30">    public PacienteController(PacienteService service) {</span>
+<span class="fc" id="L31">        this.service = service;</span>
+<span class="fc" id="L32">    }</span>
 
     @GetMapping
+    @Operation(
+            summary = &quot;Listar pacientes activos&quot;,
+            description = &quot;Obtiene el listado de todos los pacientes con perfil activo en el sistema&quot;
+    )
+    @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Listado de pacientes obtenido correctamente&quot;)
     public List&lt;PacienteDTO&gt; listarActivos() {
-<span class="fc" id="L24">        return service.listarActivos();</span>
+<span class="fc" id="L41">        return service.listarActivos();</span>
+    }
+
+    @GetMapping(&quot;/me&quot;)
+    @Operation(
+            summary = &quot;Consultar perfil propio del paciente autenticado&quot;,
+            description = &quot;Obtiene el perfil del paciente vinculado al UUID del sub del JWT validado&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Perfil propio obtenido correctamente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;La cuenta actual aún no tiene perfil de paciente&quot;)
+    })
+    public PacienteDTO obtenerPerfilPropio(@AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L54">        return service.obtenerPerfilPropio(jwt);</span>
+    }
+
+    @PutMapping(&quot;/me&quot;)
+    @Operation(
+            summary = &quot;Crear o actualizar el perfil propio del paciente autenticado&quot;,
+            description = &quot;Vincula el perfil con el UUID del sub del JWT. Repetir la solicitud actualiza el mismo perfil sin duplicarlo&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Perfil propio creado o actualizado correctamente&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos inválidos o RUN/correo ya utilizado por otro paciente&quot;)
+    })
+    public PacienteDTO guardarPerfilPropio(@RequestBody PacienteDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L67">        return service.guardarPerfilPropio(dto, jwt);</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
-    public PacienteDTO obtenerPorId(@PathVariable Long id) {
-<span class="fc" id="L29">        return service.obtenerPorId(id);</span>
+    @Operation(
+            summary = &quot;Obtener paciente por ID&quot;,
+            description = &quot;Busca y retorna los datos de un paciente específico según su identificador&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Paciente encontrado correctamente&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Sin permisos para consultar el perfil de otro paciente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Paciente no encontrado con el ID indicado&quot;)
+    })
+    public PacienteDTO obtenerPorId(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L81">        return service.obtenerPorId(id, jwt);</span>
+    }
+
+    public PacienteDTO obtenerPorId(Long id) {
+<span class="fc" id="L85">        return service.obtenerPorId(id);</span>
     }
 
     @PostMapping
+    @Operation(
+            summary = &quot;Registrar nuevo paciente&quot;,
+            description = &quot;Crea un nuevo perfil de paciente validando formato y unicidad de RUN y correo electrónico&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Paciente creado exitosamente&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos inválidos o RUN/correo ya registrado&quot;)
+    })
     public ResponseEntity&lt;PacienteDTO&gt; crear(@RequestBody PacienteDTO dto) {
-<span class="fc" id="L34">        PacienteDTO creado = service.crear(dto);</span>
-<span class="fc" id="L35">        return ResponseEntity.status(HttpStatus.CREATED).body(creado);</span>
+<span class="fc" id="L98">        PacienteDTO creado = service.crear(dto);</span>
+<span class="fc" id="L99">        return ResponseEntity.status(HttpStatus.CREATED).body(creado);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
-    public PacienteDTO actualizar(@PathVariable Long id, @RequestBody PacienteDTO dto) {
-<span class="fc" id="L40">        return service.actualizar(id, dto);</span>
+    @Operation(
+            summary = &quot;Actualizar paciente existente&quot;,
+            description = &quot;Actualiza la información personal y de contacto de un paciente registrado&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Paciente actualizado correctamente&quot;),
+            @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos inválidos o RUN/correo duplicado en otro paciente&quot;),
+            @ApiResponse(responseCode = &quot;403&quot;, description = &quot;Sin permisos para modificar el perfil de otro paciente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Paciente no encontrado&quot;)
+    })
+    public PacienteDTO actualizar(@PathVariable Long id, @RequestBody PacienteDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L114">        return service.actualizar(id, dto, jwt);</span>
+    }
+
+    public PacienteDTO actualizar(Long id, PacienteDTO dto) {
+<span class="fc" id="L118">        return service.actualizar(id, dto);</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
+    @Operation(
+            summary = &quot;Dar de baja paciente&quot;,
+            description = &quot;Realiza la desactivación lógica del perfil del paciente sin eliminar su historial&quot;
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Paciente dado de baja correctamente&quot;),
+            @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Paciente no encontrado&quot;)
+    })
     public ResponseEntity&lt;Void&gt; darDeBaja(@PathVariable Long id) {
-<span class="fc" id="L45">        service.darDeBaja(id);</span>
-<span class="fc" id="L46">        return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L131">        service.darDeBaja(id);</span>
+<span class="fc" id="L132">        return ResponseEntity.noContent().build();</span>
     }
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

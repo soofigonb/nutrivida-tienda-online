@@ -2,16 +2,23 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { CarritoProvider, useCarrito } from './CarritoContext'
 import { crearOrdenDesdeCarrito } from '../services/ordenes'
+import { api } from '../services/api'
 
 vi.mock('../services/ordenes', () => ({ crearOrdenDesdeCarrito: vi.fn() }))
-vi.mock('../services/api', () => ({ api: { usuarioActual: () => ({ id: 'cuenta-1', rol: 'CLIENTE' }) } }))
+vi.mock('../services/api', () => ({ api: {
+  usuarioActual: () => ({ id: 'cuenta-1', rol: 'CLIENTE' }),
+  solicitar: vi.fn(),
+} }))
 const fecha = new Date(); fecha.setFullYear(fecha.getFullYear() + 1)
 const reserva = { id: 'r1', planId: 'consulta-inicial', servicio: 'Evaluación y consulta inicial', precio: 35000, nutricionistaId: '1', nutricionistaNombre: 'Profesional', fecha: fecha.toISOString().slice(0, 10), hora: '09:00', motivo: 'Control nutricional' }
 const mostrar = () => renderHook(() => useCarrito(), { wrapper: CarritoProvider })
 beforeEach(() => {
   localStorage.clear(); vi.resetAllMocks()
   localStorage.setItem('carritoNutriVida', JSON.stringify([reserva]))
-  crearOrdenDesdeCarrito.mockResolvedValue({ id: 'orden-1', estado: 'PENDIENTE', total: 35000 })
+  crearOrdenDesdeCarrito.mockResolvedValue({
+    id: 'orden-1', estado: 'PENDIENTE', total: 35000, unidades: [{ idItem: 17, unidad: 1 }],
+  })
+  api.solicitar.mockResolvedValue({ reservaId: 4 })
 })
 it('crea una orden real y conserva los borradores sin crear citas locales', async () => {
   const { result } = mostrar(); let respuesta
@@ -27,6 +34,17 @@ it('un fallo conserva el carrito y muestra el error', async () => {
   expect(respuesta.exito).toBe(false)
   expect(result.current.errorCarrito).toBe('Catálogo inaccesible')
   expect(result.current.reservas).toHaveLength(1)
+})
+it('muestra la cita pendiente y reintenta la misma unidad de la orden', async () => {
+  api.solicitar.mockRejectedValueOnce(new Error('Horario ocupado'))
+  const { result } = mostrar()
+  let respuesta
+  await act(async () => { respuesta = await result.current.confirmarReservas() })
+  expect(respuesta.pendientes).toEqual([{ id: 'r1', servicio: reserva.servicio, motivo: 'Horario ocupado' }])
+  await act(async () => { respuesta = await result.current.confirmarReservas() })
+  expect(respuesta.citas).toEqual([{ reservaId: 4 }])
+  expect(respuesta.pendientes).toEqual([])
+  expect(api.solicitar.mock.calls[0][1].body).toEqual(api.solicitar.mock.calls[1][1].body)
 })
 it('rechaza un carrito cambiado antes de llamar al backend', async () => {
   const { result } = mostrar()

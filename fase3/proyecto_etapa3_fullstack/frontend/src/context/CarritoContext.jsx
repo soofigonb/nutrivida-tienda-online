@@ -381,6 +381,17 @@ export function CarritoProvider({ children }) {
   // 7. CONFIRMAR LAS RESERVAS
   // ========================================
 
+  function ajustarHorarioPendiente(id, fecha, hora) {
+    try {
+      if (!esFechaHoraFutura(fecha, hora)) throw new Error('Elige un horario futuro.')
+      const carrito = leerLista(CLAVE_CARRITO)
+      guardarCarrito(carrito.map(reserva => reserva.id === id ? { ...reserva, fecha, hora } : reserva))
+      return { exito: true }
+    } catch (error) {
+      return informarError(error.message)
+    }
+  }
+
   async function confirmarReservas() {
     try {
       const actuales = leerLista(CLAVE_CARRITO)
@@ -389,13 +400,8 @@ export function CarritoProvider({ children }) {
         return { exito: false, mensaje: 'El carrito cambió. Revisa sus datos antes de reintentar.' }
       }
       const orden = await crearOrdenDesdeCarrito(actuales, api.usuarioActual())
-      let citas = []
-      try {
-        citas = await registrarCitasDesdeCarrito(actuales)
-      } catch (errorCitas) {
-        console.warn('No se pudo registrar la cita en agendamiento:', errorCitas)
-      }
-      return { exito: true, orden, citas }
+      const { citas, pendientes } = await registrarCitasDesdeCarrito(actuales, orden)
+      return { exito: true, orden, citas, pendientes }
     } catch (error) { return informarError(error.message) }
   }
 
@@ -414,6 +420,7 @@ export function CarritoProvider({ children }) {
         eliminarReserva,
         vaciarCarrito,
         confirmarReservas,
+        ajustarHorarioPendiente,
         existeConflictoHorario,
       }}
     >

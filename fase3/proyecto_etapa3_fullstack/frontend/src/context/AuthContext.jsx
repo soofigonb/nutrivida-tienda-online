@@ -67,9 +67,11 @@ export function AuthProvider({ children }) {
     let cuenta = api.usuarioActual()
     if (!cuenta) {
       const registro = await registrarCuenta(datos.correo, datos.password)
-      if (!registro.exito) return registro
+      if (!registro.exito && registro.campo !== 'correo') return registro
       const ingreso = await iniciarSesion(datos.correo, datos.password)
-      if (!ingreso.exito) return { exito: false, mensaje: 'La cuenta fue creada. Inicia sesión para completar el perfil.' }
+      if (!ingreso.exito) return registro.exito
+        ? { exito: false, mensaje: 'La cuenta fue creada. Inicia sesión para completar el perfil.' }
+        : registro
       cuenta = ingreso.usuario
     }
     if (cuenta.correo !== datos.correo.trim().toLowerCase() || cuenta.rol !== 'CLIENTE') {

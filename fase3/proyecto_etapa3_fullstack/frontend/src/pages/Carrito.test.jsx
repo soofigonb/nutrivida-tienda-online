@@ -26,7 +26,7 @@ it('revisa sin crear y después muestra la orden pendiente real', async () => {
   await user.click(screen.getByRole('button', { name: 'Crear orden pendiente' }))
   expect(await screen.findByRole('heading', { name: 'Orden registrada' })).toBeInTheDocument()
   expect(screen.getByRole('link', { name: 'Ver mi orden' })).toHaveAttribute('href', '/mis-ordenes/orden-1')
-  expect(screen.getByText(/crear una orden no confirma citas/i)).toBeInTheDocument()
+  expect(screen.getByText(/se registra la orden y luego se solicitan las citas/i)).toBeInTheDocument()
 })
 it('un fallo mantiene la revisión disponible para reintentar', async () => {
   confirmar.mockResolvedValueOnce({ exito: false, mensaje: 'Servidor no disponible' })

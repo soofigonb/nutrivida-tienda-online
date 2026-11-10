@@ -1,140 +1,255 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservaService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">agendamiento-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.agendamiento.service</a> &gt; <span class="el_source">ReservaService.java</span></div><h1>ReservaService.java</h1><pre class="source lang-java linenums">package cl.nutrivida.agendamiento.service;
 
 import cl.nutrivida.agendamiento.dto.ReservaDTO;
+import cl.nutrivida.agendamiento.client.ReservaReferencias;
+import cl.nutrivida.agendamiento.exceptions.AccesoDenegadoException;
 import cl.nutrivida.agendamiento.exceptions.RecursoNoEncontradoException;
 import cl.nutrivida.agendamiento.mapper.ReservaMapper;
 import cl.nutrivida.agendamiento.model.Reserva;
 import cl.nutrivida.agendamiento.repository.ReservaRepository;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class ReservaService {
 
-<span class="fc" id="L17">    private static final Set&lt;String&gt; HORARIOS_PERMITIDOS = Set.of(&quot;09:00&quot;, &quot;11:00&quot;, &quot;15:00&quot;, &quot;17:00&quot;);</span>
+<span class="fc" id="L25">    private static final Set&lt;String&gt; HORARIOS_PERMITIDOS = Set.of(&quot;09:00&quot;, &quot;11:00&quot;, &quot;15:00&quot;, &quot;17:00&quot;);</span>
 
     private final ReservaRepository repository;
     private final ReservaMapper mapper;
+    private final ReservaReferencias referencias;
+<span class="fc" id="L30">    @Value(&quot;${app.security.roles-claim:roles}&quot;)</span>
+    private String claimRoles = &quot;roles&quot;;
 
-<span class="fc" id="L22">    public ReservaService(ReservaRepository repository, ReservaMapper mapper) {</span>
-<span class="fc" id="L23">        this.repository = repository;</span>
-<span class="fc" id="L24">        this.mapper = mapper;</span>
-<span class="fc" id="L25">    }</span>
+<span class="fc" id="L33">    public ReservaService(ReservaRepository repository, ReservaMapper mapper, ReservaReferencias referencias) {</span>
+<span class="fc" id="L34">        this.repository = repository;</span>
+<span class="fc" id="L35">        this.mapper = mapper;</span>
+<span class="fc" id="L36">        this.referencias = referencias;</span>
+<span class="fc" id="L37">    }</span>
 
-    // GET / -&gt; listar reservas activas
+    // GET / -&gt; listar reservas activas (todas para ADMINISTRADOR, propias para CLIENTE)
     public List&lt;ReservaDTO&gt; listarActivas() {
-<span class="fc" id="L29">        return repository.findByActivoTrue().stream()</span>
-<span class="fc" id="L30">                .map(mapper::toDTO)</span>
-<span class="fc" id="L31">                .collect(Collectors.toList());</span>
+<span class="fc" id="L41">        return listarActivas(null);</span>
     }
 
-    // GET /{id} -&gt; obtener reserva por id
+    public List&lt;ReservaDTO&gt; listarActivas(Jwt jwt) {
+<span class="pc bpc" id="L45" title="1 of 4 branches missed.">        List&lt;Reserva&gt; reservas = (jwt != null &amp;&amp; !esAdministrador(jwt))</span>
+<span class="fc" id="L46">                ? repository.findByUsuarioIdAndActivoTrue(extraerUsuarioId(jwt))</span>
+<span class="fc" id="L47">                : repository.findByActivoTrue();</span>
+<span class="fc" id="L48">        return reservas.stream()</span>
+<span class="fc" id="L49">                .map(mapper::toDTO)</span>
+<span class="fc" id="L50">                .collect(Collectors.toList());</span>
+    }
+
+    // GET /{id} -&gt; obtener reserva por id verificando pertenencia
     public ReservaDTO obtenerPorId(Long id) {
-<span class="fc" id="L36">        Reserva r = repository.findById(id)</span>
-<span class="fc" id="L37">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Reserva no encontrada con id: &quot; + id));</span>
-<span class="fc" id="L38">        return mapper.toDTO(r);</span>
+<span class="fc" id="L55">        return obtenerPorId(id, null);</span>
     }
 
-    // POST / -&gt; crear nueva reserva validando conflicto de horario
-    public ReservaDTO crear(ReservaDTO dto) {
-<span class="fc" id="L43">        validar(dto);</span>
+    public ReservaDTO obtenerPorId(Long id, Jwt jwt) {
+<span class="fc" id="L59">        Reserva r = repository.findById(id)</span>
+<span class="fc" id="L60">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Reserva no encontrada con id: &quot; + id));</span>
+<span class="fc" id="L61">        verificarPropietarioOAdmin(r, jwt);</span>
+<span class="fc" id="L62">        return mapper.toDTO(r);</span>
+    }
 
-<span class="fc" id="L45">        boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(</span>
-<span class="fc" id="L46">                dto.getNutricionistaId(),</span>
-<span class="fc" id="L47">                dto.getFecha().trim(),</span>
-<span class="fc" id="L48">                dto.getHora().trim()</span>
+    // POST / -&gt; crear nueva reserva identificando al paciente desde su sesión y validando conflicto de horario
+    public ReservaDTO crear(ReservaDTO dto) {
+<span class="fc" id="L67">        return crear(dto, null);</span>
+    }
+
+    public ReservaDTO crear(ReservaDTO dto, Jwt jwt) {
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        UUID usuario = jwt == null ? null : extraerUsuarioId(jwt);</span>
+<span class="pc bpc" id="L72" title="3 of 6 branches missed.">        if (jwt != null &amp;&amp; (!esAdministrador(jwt) || dto.getOrdenId() != null)) {</span>
+<span class="pc bpc" id="L73" title="3 of 8 branches missed.">            if (dto.getOrdenId() == null || dto.getItemId() == null || dto.getUnidad() == null || dto.getUnidad() &lt; 1) {</span>
+<span class="fc" id="L74">                throw new IllegalArgumentException(&quot;Identifica la unidad de la orden que quieres agendar&quot;);</span>
+            }
+<span class="fc" id="L76">            var previa = repository.findByOrdenIdAndItemIdAndUnidad(dto.getOrdenId(), dto.getItemId(), dto.getUnidad());</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">            if (previa.isPresent()) {</span>
+<span class="fc" id="L78">                Reserva guardada = previa.get();</span>
+<span class="fc" id="L79">                verificarPropietarioOAdmin(guardada, jwt);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">                if (!Boolean.TRUE.equals(guardada.getActivo())) {</span>
+<span class="fc" id="L81">                    throw new IllegalArgumentException(&quot;La cita de esa unidad está cancelada&quot;);</span>
+                }
+<span class="fc" id="L83">                return mapper.toDTO(guardada);</span>
+            }
+<span class="fc" id="L85">            var item = referencias.consultarItem(dto.getOrdenId(), dto.getItemId(), dto.getUnidad(), usuario, jwt);</span>
+<span class="fc" id="L86">            dto.setPlanId(String.valueOf(item.idItem()));</span>
+<span class="fc" id="L87">            dto.setServicio(item.nombreItem());</span>
+<span class="fc" id="L88">            dto.setPrecio(item.precioUnitario());</span>
+<span class="fc" id="L89">            dto.setPacienteId(referencias.consultarPaciente(jwt));</span>
+<span class="fc" id="L90">            dto.setNutricionistaNombre(referencias.consultarProfesional(dto.getNutricionistaId()));</span>
+<span class="fc" id="L91">            dto.setEstado(&quot;CONFIRMADA&quot;);</span>
+        }
+<span class="fc" id="L93">        validar(dto);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (jwt != null) validarHorarioFuturo(dto);</span>
+
+<span class="fc" id="L96">        boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(</span>
+<span class="fc" id="L97">                dto.getNutricionistaId(),</span>
+<span class="fc" id="L98">                dto.getFecha().trim(),</span>
+<span class="fc" id="L99">                dto.getHora().trim()</span>
         );
-<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (conflicto) {</span>
-<span class="fc" id="L51">            throw new IllegalArgumentException(</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (conflicto) {</span>
+<span class="fc" id="L102">            throw new IllegalArgumentException(</span>
                     &quot;El nutricionista seleccionado ya tiene una reserva en esa fecha y horario.&quot;
             );
         }
 
-<span class="fc" id="L56">        Reserva r = mapper.toEntity(dto);</span>
-<span class="fc" id="L57">        r.setReservaId(null);</span>
-<span class="fc" id="L58">        r.setFecha(dto.getFecha().trim());</span>
-<span class="fc" id="L59">        r.setHora(dto.getHora().trim());</span>
-<span class="fc" id="L60">        r.setMotivo(dto.getMotivo().trim());</span>
-<span class="pc bpc" id="L61" title="3 of 4 branches missed.">        r.setEstado(dto.getEstado() != null &amp;&amp; !dto.getEstado().isBlank() ? dto.getEstado().trim() : &quot;CONFIRMADA&quot;);</span>
-<span class="fc" id="L62">        r.setActivo(true);</span>
+<span class="fc" id="L107">        Reserva r = mapper.toEntity(dto);</span>
+<span class="fc" id="L108">        r.setReservaId(null);</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (jwt != null) {</span>
+<span class="fc" id="L110">            r.setUsuarioId(usuario);</span>
+        }
+<span class="fc" id="L112">        r.setFecha(dto.getFecha().trim());</span>
+<span class="fc" id="L113">        r.setHora(dto.getHora().trim());</span>
+<span class="fc" id="L114">        r.setMotivo(dto.getMotivo().trim());</span>
+<span class="pc bpc" id="L115" title="1 of 4 branches missed.">        r.setEstado(dto.getEstado() != null &amp;&amp; !dto.getEstado().isBlank() ? dto.getEstado().trim() : &quot;CONFIRMADA&quot;);</span>
+<span class="fc" id="L116">        r.setActivo(true);</span>
 
-<span class="fc" id="L64">        Reserva guardada = repository.save(r);</span>
-<span class="fc" id="L65">        return mapper.toDTO(guardada);</span>
+<span class="fc" id="L118">        Reserva guardada = repository.save(r);</span>
+<span class="fc" id="L119">        return mapper.toDTO(guardada);</span>
     }
 
-    // PUT /{id} -&gt; actualizar reserva existente
+    // PUT /{id} -&gt; actualizar reserva existente verificando pertenencia
     public ReservaDTO actualizar(Long id, ReservaDTO dto) {
-<span class="fc" id="L70">        Reserva existente = repository.findById(id)</span>
-<span class="pc" id="L71">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Reserva no encontrada con id: &quot; + id));</span>
-<span class="fc" id="L72">        validar(dto);</span>
+<span class="fc" id="L124">        return actualizar(id, dto, null);</span>
+    }
 
-<span class="fc" id="L74">        boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(</span>
-<span class="fc" id="L75">                dto.getNutricionistaId(),</span>
-<span class="fc" id="L76">                dto.getFecha().trim(),</span>
-<span class="fc" id="L77">                dto.getHora().trim(),</span>
+    public ReservaDTO actualizar(Long id, ReservaDTO dto, Jwt jwt) {
+<span class="fc" id="L128">        Reserva existente = repository.findById(id)</span>
+<span class="pc" id="L129">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Reserva no encontrada con id: &quot; + id));</span>
+<span class="fc" id="L130">        verificarPropietarioOAdmin(existente, jwt);</span>
+<span class="pc bpc" id="L131" title="1 of 2 branches missed.">        if (!Boolean.TRUE.equals(existente.getActivo())) {</span>
+<span class="nc" id="L132">            throw new IllegalArgumentException(&quot;La cita está cancelada&quot;);</span>
+        }
+<span class="pc bpc" id="L134" title="3 of 6 branches missed.">        if (jwt != null &amp;&amp; (!esAdministrador(jwt) || existente.getOrdenId() != null)) {</span>
+            // Conserva los datos de la compra.
+<span class="fc" id="L136">            dto.setPacienteId(existente.getPacienteId());</span>
+<span class="fc" id="L137">            dto.setPlanId(existente.getPlanId());</span>
+<span class="fc" id="L138">            dto.setServicio(existente.getServicio());</span>
+<span class="fc" id="L139">            dto.setPrecio(existente.getPrecio());</span>
+<span class="fc" id="L140">            dto.setEstado(existente.getEstado());</span>
+<span class="fc" id="L141">            dto.setNutricionistaNombre(referencias.consultarProfesional(dto.getNutricionistaId()));</span>
+        }
+<span class="fc" id="L143">        validar(dto);</span>
+<span class="fc bfc" id="L144" title="All 2 branches covered.">        if (jwt != null) validarHorarioFuturo(dto);</span>
+
+<span class="fc" id="L146">        boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(</span>
+<span class="fc" id="L147">                dto.getNutricionistaId(),</span>
+<span class="fc" id="L148">                dto.getFecha().trim(),</span>
+<span class="fc" id="L149">                dto.getHora().trim(),</span>
                 id
         );
-<span class="fc bfc" id="L80" title="All 2 branches covered.">        if (conflicto) {</span>
-<span class="fc" id="L81">            throw new IllegalArgumentException(</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (conflicto) {</span>
+<span class="fc" id="L153">            throw new IllegalArgumentException(</span>
                     &quot;El nutricionista seleccionado ya tiene una reserva en esa fecha y horario.&quot;
             );
         }
 
-<span class="fc" id="L86">        existente.setPacienteId(dto.getPacienteId());</span>
-<span class="fc" id="L87">        existente.setPlanId(dto.getPlanId());</span>
-<span class="fc" id="L88">        existente.setServicio(dto.getServicio());</span>
-<span class="fc" id="L89">        existente.setPrecio(dto.getPrecio());</span>
-<span class="fc" id="L90">        existente.setNutricionistaId(dto.getNutricionistaId());</span>
-<span class="fc" id="L91">        existente.setNutricionistaNombre(dto.getNutricionistaNombre());</span>
-<span class="fc" id="L92">        existente.setFecha(dto.getFecha().trim());</span>
-<span class="fc" id="L93">        existente.setHora(dto.getHora().trim());</span>
-<span class="fc" id="L94">        existente.setMotivo(dto.getMotivo().trim());</span>
-<span class="pc bpc" id="L95" title="1 of 4 branches missed.">        if (dto.getEstado() != null &amp;&amp; !dto.getEstado().isBlank()) {</span>
-<span class="fc" id="L96">            existente.setEstado(dto.getEstado().trim());</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if (dto.getPacienteId() != null) {</span>
+<span class="fc" id="L159">            existente.setPacienteId(dto.getPacienteId());</span>
+        }
+<span class="fc" id="L161">        existente.setPlanId(dto.getPlanId());</span>
+<span class="fc" id="L162">        existente.setServicio(dto.getServicio());</span>
+<span class="fc" id="L163">        existente.setPrecio(dto.getPrecio());</span>
+<span class="fc" id="L164">        existente.setNutricionistaId(dto.getNutricionistaId());</span>
+<span class="fc" id="L165">        existente.setNutricionistaNombre(dto.getNutricionistaNombre());</span>
+<span class="fc" id="L166">        existente.setFecha(dto.getFecha().trim());</span>
+<span class="fc" id="L167">        existente.setHora(dto.getHora().trim());</span>
+<span class="fc" id="L168">        existente.setMotivo(dto.getMotivo().trim());</span>
+<span class="pc bpc" id="L169" title="2 of 4 branches missed.">        if (dto.getEstado() != null &amp;&amp; !dto.getEstado().isBlank()) {</span>
+<span class="fc" id="L170">            existente.setEstado(dto.getEstado().trim());</span>
         }
 
-<span class="fc" id="L99">        Reserva guardada = repository.save(existente);</span>
-<span class="fc" id="L100">        return mapper.toDTO(guardada);</span>
+<span class="fc" id="L173">        Reserva guardada = repository.save(existente);</span>
+<span class="fc" id="L174">        return mapper.toDTO(guardada);</span>
     }
 
-    // DELETE /{id} -&gt; cancelar / dar de baja una reserva
+    // DELETE /{id} -&gt; cancelar / dar de baja una reserva verificando pertenencia
     public void cancelar(Long id) {
-<span class="fc" id="L105">        Reserva existente = repository.findById(id)</span>
-<span class="pc" id="L106">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Reserva no encontrada con id: &quot; + id));</span>
-<span class="fc" id="L107">        existente.setEstado(&quot;CANCELADA&quot;);</span>
-<span class="fc" id="L108">        existente.setActivo(false);</span>
-<span class="fc" id="L109">        repository.save(existente);</span>
-<span class="fc" id="L110">    }</span>
+<span class="fc" id="L179">        cancelar(id, null);</span>
+<span class="fc" id="L180">    }</span>
+
+    public void cancelar(Long id, Jwt jwt) {
+<span class="fc" id="L183">        Reserva existente = repository.findById(id)</span>
+<span class="pc" id="L184">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Reserva no encontrada con id: &quot; + id));</span>
+<span class="fc" id="L185">        verificarPropietarioOAdmin(existente, jwt);</span>
+<span class="fc" id="L186">        existente.setEstado(&quot;CANCELADA&quot;);</span>
+<span class="fc" id="L187">        existente.setActivo(false);</span>
+<span class="fc" id="L188">        repository.save(existente);</span>
+<span class="fc" id="L189">    }</span>
+
+    private void verificarPropietarioOAdmin(Reserva reserva, Jwt jwt) {
+<span class="pc bpc" id="L192" title="1 of 4 branches missed.">        if (jwt == null || esAdministrador(jwt)) {</span>
+<span class="fc" id="L193">            return;</span>
+        }
+<span class="fc" id="L195">        UUID usuarioId = extraerUsuarioId(jwt);</span>
+<span class="pc bpc" id="L196" title="1 of 4 branches missed.">        if (reserva.getUsuarioId() == null || !reserva.getUsuarioId().equals(usuarioId)) {</span>
+<span class="fc" id="L197">            throw new AccesoDenegadoException(&quot;No tienes permiso para acceder o modificar una cita de otro paciente&quot;);</span>
+        }
+<span class="fc" id="L199">    }</span>
+
+    private boolean esAdministrador(Jwt jwt) {
+<span class="fc" id="L202">        List&lt;String&gt; roles = jwt.getClaimAsStringList(claimRoles);</span>
+<span class="pc bpc" id="L203" title="2 of 4 branches missed.">        return roles != null &amp;&amp; roles.contains(&quot;ADMINISTRADOR&quot;);</span>
+    }
+
+    private UUID extraerUsuarioId(Jwt jwt) {
+<span class="pc bpc" id="L207" title="3 of 6 branches missed.">        if (jwt == null || jwt.getSubject() == null || jwt.getSubject().isBlank()) {</span>
+<span class="nc" id="L208">            throw new AccesoDenegadoException(&quot;Token de sesión inválido o sin identificador de usuario&quot;);</span>
+        }
+        try {
+<span class="fc" id="L211">            return UUID.fromString(jwt.getSubject());</span>
+<span class="nc" id="L212">        } catch (IllegalArgumentException ex) {</span>
+<span class="nc" id="L213">            throw new AccesoDenegadoException(&quot;El identificador de la cuenta en el token no es un UUID válido&quot;);</span>
+        }
+    }
 
     private void validar(ReservaDTO dto) {
-<span class="pc bpc" id="L113" title="1 of 4 branches missed.">        if (dto.getPlanId() == null || dto.getPlanId().isBlank()) {</span>
-<span class="fc" id="L114">            throw new IllegalArgumentException(&quot;Debes seleccionar un plan o servicio&quot;);</span>
+<span class="pc bpc" id="L218" title="1 of 4 branches missed.">        if (dto.getPlanId() == null || dto.getPlanId().isBlank()) {</span>
+<span class="fc" id="L219">            throw new IllegalArgumentException(&quot;Debes seleccionar un plan o servicio&quot;);</span>
         }
-<span class="pc bpc" id="L116" title="1 of 4 branches missed.">        if (dto.getServicio() == null || dto.getServicio().isBlank()) {</span>
-<span class="fc" id="L117">            throw new IllegalArgumentException(&quot;El nombre del servicio es obligatorio&quot;);</span>
+<span class="pc bpc" id="L221" title="1 of 4 branches missed.">        if (dto.getServicio() == null || dto.getServicio().isBlank()) {</span>
+<span class="fc" id="L222">            throw new IllegalArgumentException(&quot;El nombre del servicio es obligatorio&quot;);</span>
         }
-<span class="pc bpc" id="L119" title="1 of 4 branches missed.">        if (dto.getPrecio() == null || dto.getPrecio() &lt;= 0) {</span>
-<span class="fc" id="L120">            throw new IllegalArgumentException(&quot;El precio debe ser mayor a 0&quot;);</span>
+<span class="pc bpc" id="L224" title="1 of 4 branches missed.">        if (dto.getPrecio() == null || dto.getPrecio() &lt;= 0) {</span>
+<span class="fc" id="L225">            throw new IllegalArgumentException(&quot;El precio debe ser mayor a 0&quot;);</span>
         }
-<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (dto.getNutricionistaId() == null) {</span>
-<span class="fc" id="L123">            throw new IllegalArgumentException(&quot;Debes seleccionar un profesional nutricionista&quot;);</span>
+<span class="fc bfc" id="L227" title="All 2 branches covered.">        if (dto.getNutricionistaId() == null) {</span>
+<span class="fc" id="L228">            throw new IllegalArgumentException(&quot;Debes seleccionar un profesional nutricionista&quot;);</span>
         }
-<span class="pc bpc" id="L125" title="1 of 4 branches missed.">        if (dto.getNutricionistaNombre() == null || dto.getNutricionistaNombre().isBlank()) {</span>
-<span class="fc" id="L126">            throw new IllegalArgumentException(&quot;El nombre del nutricionista es obligatorio&quot;);</span>
+<span class="pc bpc" id="L230" title="1 of 4 branches missed.">        if (dto.getNutricionistaNombre() == null || dto.getNutricionistaNombre().isBlank()) {</span>
+<span class="fc" id="L231">            throw new IllegalArgumentException(&quot;El nombre del nutricionista es obligatorio&quot;);</span>
         }
-<span class="pc bpc" id="L128" title="1 of 4 branches missed.">        if (dto.getFecha() == null || !dto.getFecha().trim().matches(&quot;^\\d{4}-\\d{2}-\\d{2}$&quot;)) {</span>
-<span class="fc" id="L129">            throw new IllegalArgumentException(&quot;La fecha debe tener formato YYYY-MM-DD&quot;);</span>
+<span class="pc bpc" id="L233" title="1 of 4 branches missed.">        if (dto.getFecha() == null || !dto.getFecha().trim().matches(&quot;^\\d{4}-\\d{2}-\\d{2}$&quot;)) {</span>
+<span class="fc" id="L234">            throw new IllegalArgumentException(&quot;La fecha debe tener formato YYYY-MM-DD&quot;);</span>
         }
-<span class="pc bpc" id="L131" title="1 of 4 branches missed.">        if (dto.getHora() == null || !HORARIOS_PERMITIDOS.contains(dto.getHora().trim())) {</span>
-<span class="fc" id="L132">            throw new IllegalArgumentException(&quot;El horario debe ser 09:00, 11:00, 15:00 o 17:00&quot;);</span>
+<span class="pc bpc" id="L236" title="1 of 4 branches missed.">        if (dto.getHora() == null || !HORARIOS_PERMITIDOS.contains(dto.getHora().trim())) {</span>
+<span class="fc" id="L237">            throw new IllegalArgumentException(&quot;El horario debe ser 09:00, 11:00, 15:00 o 17:00&quot;);</span>
         }
-<span class="pc bpc" id="L134" title="2 of 6 branches missed.">        if (dto.getMotivo() == null || dto.getMotivo().trim().length() &lt; 5 || dto.getMotivo().trim().length() &gt; 100) {</span>
-<span class="fc" id="L135">            throw new IllegalArgumentException(&quot;El motivo debe tener entre 5 y 100 caracteres&quot;);</span>
+<span class="pc bpc" id="L239" title="2 of 6 branches missed.">        if (dto.getMotivo() == null || dto.getMotivo().trim().length() &lt; 5 || dto.getMotivo().trim().length() &gt; 100) {</span>
+<span class="fc" id="L240">            throw new IllegalArgumentException(&quot;El motivo debe tener entre 5 y 100 caracteres&quot;);</span>
         }
-<span class="fc" id="L137">    }</span>
-}
+<span class="fc" id="L242">    }</span>
 
+    private void validarHorarioFuturo(ReservaDTO dto) {
+        try {
+<span class="fc" id="L246">            var horario = LocalDateTime.parse(dto.getFecha().trim() + &quot;T&quot; + dto.getHora());</span>
+<span class="fc bfc" id="L247" title="All 2 branches covered.">            if (!horario.isAfter(LocalDateTime.now(ZoneId.of(&quot;America/Santiago&quot;)))) {</span>
+<span class="fc" id="L248">                throw new IllegalArgumentException(&quot;El horario debe ser futuro&quot;);</span>
+            }
+<span class="fc" id="L250">        } catch (DateTimeParseException error) {</span>
+<span class="fc" id="L251">            throw new IllegalArgumentException(&quot;La fecha de la cita no es válida&quot;);</span>
+<span class="fc" id="L252">        }</span>
+<span class="fc" id="L253">    }</span>
+}
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -65,6 +65,37 @@ proyecto_etapa3_fullstack/
 └── frontend/
 ```
 
+## 🐳 Ejecución con Docker Compose
+
+Desde esta carpeta, copia la plantilla de variables y completa `.env` con las conexiones JDBC, los usuarios y las contraseñas de Supabase.
+
+```bash
+cp .env.example .env
+```
+
+Para una instalación nueva, genera las claves RSA. Si ya tienes claves de NutriVida, reutilízalas y ajusta `JWT_PRIVATE_KEY_FILE` y `JWT_PUBLIC_KEY_FILE` en `.env`.
+
+```bash
+node backend/scripts/generar-claves.mjs ./secrets
+```
+
+Con Docker Desktop iniciado, valida la configuración y construye los contenedores. Docker compila Java y React dentro de las imágenes.
+
+```bash
+docker compose config --quiet
+docker compose up --build -d
+docker compose ps
+```
+
+Abre [NutriVida](http://localhost:5173). Nginx sirve React y reenvía `/api` al Gateway. Los servicios se comunican por nombre dentro de la red de Compose y usan Supabase para persistir los datos. El Gateway queda disponible en `localhost:8080` y los servicios en los puertos `8081` a `8086` para Swagger. Libera estos puertos si hay instancias ejecutándose en terminales.
+
+Si necesitas inicializar un administrador, configura `BOOTSTRAP_ADMIN_ENABLED`, `BOOTSTRAP_ADMIN_EMAIL` y `BOOTSTRAP_ADMIN_PASSWORD` en `.env`. Para un dominio HTTPS, ajusta `FRONTEND_URL` al origen público y activa `SESSION_COOKIE_SECURE=true`. Si cambias el puerto local, actualiza también `FRONTEND_URL`.
+
+```bash
+docker compose logs -f api-gateway agendamiento-service
+docker compose down
+```
+
 ## 🚀 Ejecución local
 
 Se requiere Java 17, Node.js y acceso a las bases de Supabase. Configura la URL JDBC, el usuario y la contraseña de cada servicio mediante variables de entorno. Para catálogo usa `CATALOGO_DB_URL`, `CATALOGO_DB_USERNAME` y `CATALOGO_DB_PASSWORD`. Para profesionales usa `PROFESIONALES_DB_URL`, `PROFESIONALES_DB_USERNAME` y `PROFESIONALES_DB_PASSWORD`. Autenticación también requiere `JWT_PRIVATE_KEY_LOCATION` y `JWT_PUBLIC_KEY_LOCATION`. Los scripts de `backend/scripts/` permiten generar las claves e iniciar autenticación u órdenes solicitando la contraseña en la terminal.
@@ -94,7 +125,7 @@ Cada servicio puede arrancar directamente con su configuración de PostgreSQL y 
 
 - Configura `JWT_ISSUER`, `JWT_JWK_SET_URI` y, si corresponde, `JWT_ROLES_CLAIM` (por defecto `roles`). El rol de escritura se configura con `CATALOGO_WRITE_ROLE` o `PROFESIONALES_WRITE_ROLE`.
 - En un catálogo vacío, crea la primera categoría con `POST /api/v1/catalogo/categorias` antes de registrar productos. El perfil genérico admite hasta dos decimales y el de NutriVida usa pesos enteros.
-- Desde la carpeta de cada servicio, puedes empaquetar con `./mvnw clean package` y construir su imagen con `docker build -t nombre-del-servicio .`. Pasa las variables de base de datos y JWT al ejecutar el contenedor. `JWT_JWK_SET_URI` debe ser accesible desde el contenedor.
+- Desde la carpeta de cada servicio, puedes construir su imagen independiente con `docker build -t nombre-del-servicio .`. Pasa las variables de base de datos y JWT al ejecutar el contenedor. `JWT_JWK_SET_URI` debe ser accesible desde el contenedor.
 
 ## 🧪 Pruebas y evidencias
 
@@ -113,8 +144,13 @@ Se comprobó la conexión de autenticación y órdenes con Supabase. El registro
 
 La EV3 pide los enlaces de GitHub y los archivos comprimidos del frontend y backend, la ERS actualizada, la documentación de las APIs, el informe de integración y el manual de usuario con capturas. Las evidencias disponibles se guardan en [docs/ev3](../../docs/ev3/).
 
+- [Integración y escenarios de demostración](../../docs/ev3/integracion.md)
+- [APIs de Pacientes y Agendamiento](../../docs/ev3/documentacion-apis-pacientes-agendamiento.md)
+- [Documentación de APIs de todos los servicios](../../docs/ev3/documentacion-apis.md)
+- [Manual de usuario](../../docs/ev3/manual-usuario.md)
+- [Evidencia local del flujo orden–cita](../../docs/ev3/pruebas/cierre-integracion-local.md)
+
 ## 📌 Pendientes para la entrega
 
-- Conectar el registro con el perfil de paciente y el flujo de reservas con agendamiento. Verificar los permisos sobre registros propios.
 - Probar el flujo completo en el navegador con los tres roles y reunir los informes de pruebas de todos los servicios.
 - Incorporar la documentación grupal y preparar los archivos de entrega.

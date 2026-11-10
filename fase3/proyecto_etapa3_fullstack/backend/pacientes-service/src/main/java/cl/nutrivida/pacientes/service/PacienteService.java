@@ -7,6 +7,7 @@ import cl.nutrivida.pacientes.mapper.PacienteMapper;
 import cl.nutrivida.pacientes.model.Paciente;
 import cl.nutrivida.pacientes.repository.PacienteRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class PacienteService {
+    @Value("${app.security.roles-claim:roles}")
+    private String claimRoles = "roles";
 
     private final PacienteRepository repository;
     private final PacienteMapper mapper;
@@ -52,6 +55,9 @@ public class PacienteService {
         Optional<Paciente> previo = repository.findByUsuarioId(usuarioId);
         if (previo.isPresent()) {
             Paciente existente = previo.get();
+            if (!Boolean.TRUE.equals(existente.getActivo())) {
+                throw new AccesoDenegadoException("El perfil fue dado de baja");
+            }
             Long id = existente.getPacienteId();
             if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {
                 throw new IllegalArgumentException("El RUN ya está registrado por otro paciente");
@@ -71,7 +77,6 @@ public class PacienteService {
             existente.setFechaNacimiento(dto.getFechaNacimiento());
             existente.setRegion(dto.getRegion());
             existente.setComuna(dto.getComuna());
-            existente.setActivo(true);
             return mapper.toDTO(repository.save(existente));
         }
 
@@ -185,7 +190,7 @@ public class PacienteService {
     }
 
     private boolean esAdministrador(Jwt jwt) {
-        List<String> roles = jwt.getClaimAsStringList("roles");
+        List<String> roles = jwt.getClaimAsStringList(claimRoles);
         return roles != null && roles.contains("ADMINISTRADOR");
     }
 

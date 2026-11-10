@@ -11,6 +11,9 @@ public class ReservaMapper {
         ReservaDTO dto = new ReservaDTO();
         dto.setReservaId(r.getReservaId());
         dto.setUsuarioId(r.getUsuarioId());
+        dto.setOrdenId(r.getOrdenId());
+        dto.setItemId(r.getItemId());
+        dto.setUnidad(r.getUnidad());
         dto.setPacienteId(r.getPacienteId());
         dto.setPlanId(r.getPlanId());
         dto.setServicio(r.getServicio());
@@ -29,6 +32,9 @@ public class ReservaMapper {
         Reserva r = new Reserva();
         r.setReservaId(dto.getReservaId());
         r.setUsuarioId(dto.getUsuarioId());
+        r.setOrdenId(dto.getOrdenId());
+        r.setItemId(dto.getItemId());
+        r.setUnidad(dto.getUnidad());
         r.setPacienteId(dto.getPacienteId());
         r.setPlanId(dto.getPlanId());
         r.setServicio(dto.getServicio());

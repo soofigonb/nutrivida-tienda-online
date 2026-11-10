@@ -203,9 +203,9 @@ function AdminLayout() {
           )}
         </header>
 
-        {(esPaciente || esNutricionista) && <Alert role="note" variant="info">Esta sección utiliza datos de demostración mientras se completa su integración. Las cuentas de acceso se gestionan en «Cuentas de acceso».</Alert>}
+        {esPaciente && <Alert role="note" variant="info">Las fichas se guardan en Pacientes. Las cuentas de acceso se gestionan en «Cuentas de acceso».</Alert>}
 
-        {errorDatos ? (
+        {esPaciente && errorDatos ? (
           <Alert variant="danger">
             {errorDatos}
           </Alert>

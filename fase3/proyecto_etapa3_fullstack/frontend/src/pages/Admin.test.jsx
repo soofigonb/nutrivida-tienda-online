@@ -158,7 +158,14 @@ function mostrar(
 
 beforeEach(() => {
   localStorage.clear()
-  vi.spyOn(api, 'solicitar').mockImplementation(async (ruta, opciones) => {
+  vi.spyOn(api, 'solicitar').mockImplementation(async (ruta, opciones = {}) => {
+    if (ruta.startsWith('pacientes')) {
+      if (opciones.method === 'DELETE') return null
+      if (opciones.method === 'POST' || opciones.method === 'PUT') {
+        return { pacienteId: paciente.id, ...opciones.body }
+      }
+      return [{ ...paciente, pacienteId: paciente.id }]
+    }
     if (opciones.method === 'POST' || opciones.method === 'PUT') {
       return { profesionalId: opciones.method === 'POST' ? 'n2' : 'n1', ...opciones.body }
     }
@@ -206,12 +213,7 @@ describe('Administración de NutriVida', () => {
 
   test(
     'muestra el resumen al administrador',
-    () => {
-      localStorage.setItem(
-        'pacientesNutriVida',
-        JSON.stringify([paciente]),
-      )
-
+    async () => {
       mostrar('/admin')
 
       expect(
@@ -219,7 +221,7 @@ describe('Administración de NutriVida', () => {
       ).toBeInTheDocument()
 
       expect(
-        screen.getByText('1'),
+        (await screen.findAllByText('1'))[0],
       ).toBeInTheDocument()
     },
   )
@@ -229,15 +231,10 @@ describe('Administración de NutriVida', () => {
     async () => {
       const user = userEvent.setup()
 
-      localStorage.setItem(
-        'pacientesNutriVida',
-        JSON.stringify([paciente]),
-      )
-
       mostrar('/admin/pacientes')
 
       expect(
-        screen.getByText('ana@duoc.cl'),
+        await screen.findByText('ana@duoc.cl'),
       ).toBeInTheDocument()
 
       await user.type(
@@ -262,15 +259,10 @@ describe('Administración de NutriVida', () => {
     async () => {
       const user = userEvent.setup()
 
-      localStorage.setItem(
-        'pacientesNutriVida',
-        JSON.stringify([paciente]),
-      )
-
       mostrar('/admin/pacientes')
 
       await user.click(
-        screen.getByRole('button', {
+        await screen.findByRole('button', {
           name: 'Eliminar Ana',
         }),
       )
@@ -282,13 +274,8 @@ describe('Administración de NutriVida', () => {
         }),
       )
 
-      const guardados = JSON.parse(
-        localStorage.getItem(
-          'pacientesNutriVida',
-        ),
-      )
-
-      expect(guardados).toEqual([])
+      expect(api.solicitar).toHaveBeenCalledWith('pacientes/p1', { method: 'DELETE' })
+      expect(localStorage.getItem('pacientesNutriVida')).toBeNull()
     },
   )
 
@@ -296,11 +283,6 @@ describe('Administración de NutriVida', () => {
     'conserva un paciente con citas asociadas',
     async () => {
       const user = userEvent.setup()
-
-      localStorage.setItem(
-        'pacientesNutriVida',
-        JSON.stringify([paciente]),
-      )
 
       localStorage.setItem(
         'citasNutriVida',
@@ -314,7 +296,7 @@ describe('Administración de NutriVida', () => {
       mostrar('/admin/pacientes')
 
       await user.click(
-        screen.getByRole('button', {
+        await screen.findByRole('button', {
           name: 'Eliminar Ana',
         }),
       )
@@ -330,13 +312,7 @@ describe('Administración de NutriVida', () => {
         screen.getByText(/No se puede eliminar/),
       ).toBeInTheDocument()
 
-      const guardados = JSON.parse(
-        localStorage.getItem(
-          'pacientesNutriVida',
-        ),
-      )
-
-      expect(guardados).toHaveLength(1)
+      expect(screen.getByText('ana@duoc.cl')).toBeInTheDocument()
     },
   )
 
@@ -359,11 +335,7 @@ describe('Administración de NutriVida', () => {
         ),
       ).toBeInTheDocument()
 
-      expect(
-        screen.getByText(
-          'Ingresa la contraseña.',
-        ),
-      ).toBeInTheDocument()
+      expect(screen.queryByLabelText(/contrase.a/i)).not.toBeInTheDocument()
 
       expect(
         localStorage.getItem(
@@ -374,19 +346,15 @@ describe('Administración de NutriVida', () => {
   )
 
   test(
-    'edita un paciente conservando la contraseña cuando se deja vacía',
+    'edita un paciente por API sin guardar credenciales',
     async () => {
       const user = userEvent.setup()
 
-      localStorage.setItem(
-        'pacientesNutriVida',
-        JSON.stringify([paciente]),
-      )
-
+      localStorage.setItem('pacientesNutriVida', JSON.stringify([paciente]))
       mostrar('/admin/pacientes/p1/editar')
 
       const nombre =
-        screen.getByLabelText(/^Nombre/)
+        await screen.findByLabelText(/^Nombre/)
 
       await user.clear(nombre)
       await user.type(nombre, 'Anita')
@@ -401,17 +369,10 @@ describe('Administración de NutriVida', () => {
         'Registro actualizado correctamente.',
       )
 
-      const guardado = JSON.parse(
-        localStorage.getItem(
-          'pacientesNutriVida',
-        ),
-      )[0]
-
-      expect(guardado.nombre).toBe('Anita')
-
-      expect(guardado.password).toBe(
-        'clave123',
-      )
+      const llamada = api.solicitar.mock.calls.find(([, opciones]) => opciones?.method === 'PUT')
+      expect(llamada[1].body.nombre).toBe('Anita')
+      expect(llamada[1].body).not.toHaveProperty('password')
+      expect(localStorage.getItem('pacientesNutriVida')).toBeNull()
     },
   )
 
@@ -471,7 +432,7 @@ describe('Administración de NutriVida', () => {
         'Registro creado correctamente.',
       )
 
-      const creado = api.solicitar.mock.calls.find(([, opciones]) => opciones.method === 'POST')[1].body
+      const creado = api.solicitar.mock.calls.find(([, opciones]) => opciones?.method === 'POST')[1].body
 
       expect(creado.nombre).toBe(
         'Lic. Profesional Nuevo',
@@ -486,23 +447,14 @@ describe('Administración de NutriVida', () => {
   )
 
   test(
-    'no anuncia éxito ni altera los pacientes si falla el almacenamiento',
+    'no anuncia éxito ni altera los pacientes si falla la API',
     async () => {
       const user = userEvent.setup()
 
-      localStorage.setItem(
-        'pacientesNutriVida',
-        JSON.stringify([paciente]),
-      )
-
       mostrar('/admin/pacientes/p1/editar')
 
-      vi.spyOn(
-        Storage.prototype,
-        'setItem',
-      ).mockImplementation(() => {
-        throw new Error('Espacio agotado')
-      })
+      await screen.findByLabelText(/^Nombre/)
+      api.solicitar.mockRejectedValueOnce(new Error('Servicio no disponible'))
 
       await user.click(
         screen.getByRole('button', {
@@ -522,13 +474,7 @@ describe('Administración de NutriVida', () => {
         ),
       ).not.toBeInTheDocument()
 
-      const guardados = JSON.parse(
-        localStorage.getItem(
-          'pacientesNutriVida',
-        ),
-      )
-
-      expect(guardados[0].nombre).toBe('Ana')
+      expect(localStorage.getItem('pacientesNutriVida')).toBeNull()
     },
   )
 
