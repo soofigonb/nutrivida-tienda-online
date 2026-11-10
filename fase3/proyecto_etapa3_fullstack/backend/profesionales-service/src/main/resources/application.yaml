@@ -17,6 +17,7 @@ spring:
     default-schema: db_profesionales
     schemas: db_profesionales
     clean-disabled: true
+    baseline-on-migrate: true
   security:
     oauth2:
       resourceserver:
