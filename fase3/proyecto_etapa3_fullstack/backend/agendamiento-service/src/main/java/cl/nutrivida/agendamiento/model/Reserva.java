@@ -21,6 +21,12 @@ public class Reserva {
     @Column(name = "usuario_id")
     private UUID usuarioId;
 
+    @Column(name = "orden_id")
+    private UUID ordenId;
+    @Column(name = "item_id")
+    private Long itemId;
+    private Integer unidad;
+
     @Column(name = "paciente_id")
     private Long pacienteId;
 
@@ -76,6 +82,13 @@ public class Reserva {
     public Long getPacienteId() {
         return pacienteId;
     }
+
+    public UUID getOrdenId() { return ordenId; }
+    public void setOrdenId(UUID ordenId) { this.ordenId = ordenId; }
+    public Long getItemId() { return itemId; }
+    public void setItemId(Long itemId) { this.itemId = itemId; }
+    public Integer getUnidad() { return unidad; }
+    public void setUnidad(Integer unidad) { this.unidad = unidad; }
 
     public void setPacienteId(Long pacienteId) {
         this.pacienteId = pacienteId;

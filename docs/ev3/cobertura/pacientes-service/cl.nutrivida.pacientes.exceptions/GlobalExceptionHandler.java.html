@@ -13,14 +13,19 @@ import java.util.Map;
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleNoEncontrado(RecursoNoEncontradoException ex) {
 <span class="fc" id="L15">        return ResponseEntity.status(HttpStatus.NOT_FOUND)</span>
-<span class="fc" id="L16">                .body(Map.of(&quot;mensaje&quot;, ex.getMessage()));</span>
+<span class="fc" id="L16">                .body(Map.of(&quot;mensaje&quot;, ex.getMessage(), &quot;message&quot;, ex.getMessage(), &quot;detail&quot;, ex.getMessage()));</span>
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleValidacion(IllegalArgumentException ex) {
 <span class="fc" id="L21">        return ResponseEntity.status(HttpStatus.BAD_REQUEST)</span>
-<span class="fc" id="L22">                .body(Map.of(&quot;mensaje&quot;, ex.getMessage()));</span>
+<span class="fc" id="L22">                .body(Map.of(&quot;mensaje&quot;, ex.getMessage(), &quot;message&quot;, ex.getMessage(), &quot;detail&quot;, ex.getMessage()));</span>
+    }
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity&lt;Map&lt;String, String&gt;&gt; handleAccesoDenegado(AccesoDenegadoException ex) {
+<span class="nc" id="L27">        return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L28">                .body(Map.of(&quot;mensaje&quot;, ex.getMessage(), &quot;message&quot;, ex.getMessage(), &quot;detail&quot;, ex.getMessage()));</span>
     }
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

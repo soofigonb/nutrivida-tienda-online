@@ -6,6 +6,10 @@ public class ReservaDTO {
 
     private Long reservaId;
     private UUID usuarioId;
+
+    private UUID ordenId;
+    private Long itemId;
+    private Integer unidad;
     private Long pacienteId;
     private String planId;
     private String servicio;
@@ -37,6 +41,13 @@ public class ReservaDTO {
     public Long getPacienteId() {
         return pacienteId;
     }
+
+    public UUID getOrdenId() { return ordenId; }
+    public void setOrdenId(UUID ordenId) { this.ordenId = ordenId; }
+    public Long getItemId() { return itemId; }
+    public void setItemId(Long itemId) { this.itemId = itemId; }
+    public Integer getUnidad() { return unidad; }
+    public void setUnidad(Integer unidad) { this.unidad = unidad; }
 
     public void setPacienteId(Long pacienteId) {
         this.pacienteId = pacienteId;

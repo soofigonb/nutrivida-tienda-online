@@ -3,6 +3,11 @@
 // Paquete de la clase.
 package cl.nutrivida.agendamiento.service;
 
+import cl.nutrivida.agendamiento.client.ReservaReferencias;
+import cl.nutrivida.agendamiento.exceptions.AccesoDenegadoException;
+import org.springframework.security.oauth2.jwt.Jwt;
+import java.time.LocalDate;
+
 // Importa los tipos del paquete.
 import java.util.*;
 // Importa ReservaDTO.
@@ -33,8 +38,113 @@ import static org.mockito.Mockito.*;
 // Define la clase.
 class ReservaServiceTest {
 
+    @Test void validaUnidadYPrecioEnLaOrdenYRecuperaLaCitaEnUnReintento() {
+        UUID cuenta = UUID.randomUUID();
+        UUID orden = UUID.randomUUID();
+        Jwt jwt = token(cuenta);
+        ReservaDTO solicitud = dtoValido();
+        solicitud.setOrdenId(orden);
+        solicitud.setItemId(8L);
+        solicitud.setUnidad(1);
+        solicitud.setFecha(LocalDate.now().plusDays(3).toString());
+        Reserva guardada = new Reserva();
+        when(repository.findByOrdenIdAndItemIdAndUnidad(orden, 8L, 1))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(guardada));
+        when(referencias.consultarItem(orden, 8L, 1, cuenta, jwt))
+                .thenReturn(new ReservaReferencias.Item(8L, "Consulta validada", 1, 35000));
+        when(referencias.consultarPaciente(jwt)).thenReturn(13L);
+        when(referencias.consultarProfesional(1L)).thenReturn("Profesional validado");
+        when(repository.save(any())).thenAnswer(invocacion -> {
+            Reserva reserva = invocacion.getArgument(0);
+            reserva.setReservaId(9L);
+            guardada.setUsuarioId(cuenta);
+            guardada.setReservaId(9L);
+            return reserva;
+        });
+
+        ReservaDTO creada = service.crear(solicitud, jwt);
+        assertEquals(35000, creada.getPrecio());
+        assertEquals(13L, creada.getPacienteId());
+        assertEquals("Consulta validada", creada.getServicio());
+        assertEquals(9L, service.crear(solicitud, jwt).getReservaId());
+        verify(repository, times(1)).save(any());
+    }
+
+    @Test void bloqueaLaConsultaDeUnaCitaAjena() {
+        Reserva reserva = new Reserva();
+        reserva.setUsuarioId(UUID.randomUUID());
+        when(repository.findById(9L)).thenReturn(Optional.of(reserva));
+        assertThrows(AccesoDenegadoException.class, () -> service.obtenerPorId(9L, token(UUID.randomUUID())));
+    }
+
+    @Test void reprogramarCitaPropiaConservaDatosDeLaCompra() {
+        UUID cuenta = UUID.randomUUID();
+        Reserva guardada = new ReservaMapper().toEntity(dtoValido());
+        guardada.setReservaId(9L);
+        guardada.setUsuarioId(cuenta);
+        guardada.setOrdenId(UUID.randomUUID());
+        when(repository.findById(9L)).thenReturn(Optional.of(guardada));
+        when(repository.save(any())).thenAnswer(invocacion -> invocacion.getArgument(0));
+        when(referencias.consultarProfesional(1L)).thenReturn("Nombre validado");
+        ReservaDTO solicitud = dtoValido();
+        solicitud.setFecha(LocalDate.now().plusDays(3).toString());
+        solicitud.setHora("11:00");
+        solicitud.setPacienteId(999L);
+        solicitud.setPrecio(1);
+        solicitud.setEstado("CANCELADA");
+
+        ReservaDTO actualizada = service.actualizar(9L, solicitud, token(cuenta));
+        assertEquals("11:00", actualizada.getHora());
+        assertEquals(1L, actualizada.getPacienteId());
+        assertEquals(25000, actualizada.getPrecio());
+        assertEquals("CONFIRMADA", actualizada.getEstado());
+    }
+
+    @Test void rechazaUnaCompraSinUnidadOConUnaCitaCancelada() {
+        UUID cuenta = UUID.randomUUID();
+        Jwt jwt = token(cuenta);
+        ReservaDTO solicitud = dtoValido();
+        assertThrows(IllegalArgumentException.class, () -> service.crear(solicitud, jwt));
+        UUID orden = UUID.randomUUID();
+        solicitud.setOrdenId(orden);
+        solicitud.setItemId(8L);
+        solicitud.setUnidad(1);
+        Reserva cancelada = new Reserva();
+        cancelada.setUsuarioId(cuenta);
+        cancelada.setActivo(false);
+        when(repository.findByOrdenIdAndItemIdAndUnidad(orden, 8L, 1)).thenReturn(Optional.of(cancelada));
+        assertThrows(IllegalArgumentException.class, () -> service.crear(solicitud, jwt));
+        verifyNoInteractions(referencias);
+    }
+
+    @Test void consultaSoloCitasPropiasYRechazaHorariosInvalidos() {
+        UUID cuenta = UUID.randomUUID();
+        Jwt jwt = token(cuenta);
+        Reserva guardada = new ReservaMapper().toEntity(dtoValido());
+        guardada.setUsuarioId(cuenta);
+        when(repository.findByUsuarioIdAndActivoTrue(cuenta)).thenReturn(List.of(guardada));
+        when(repository.findById(9L)).thenReturn(Optional.of(guardada));
+        when(referencias.consultarProfesional(1L)).thenReturn("Profesional validado");
+
+        assertEquals(1, service.listarActivas(jwt).size());
+        verify(repository, never()).findByActivoTrue();
+        ReservaDTO solicitud = dtoValido();
+        solicitud.setFecha("2025-02-30");
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(9L, solicitud, jwt));
+        solicitud.setFecha(LocalDate.now().minusDays(2).toString());
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(9L, solicitud, jwt));
+        verify(repository, never()).save(any());
+    }
+
+    private Jwt token(UUID usuario) {
+        return Jwt.withTokenValue("prueba").header("alg", "RS256")
+                .subject(usuario.toString()).claim("roles", List.of("CLIENTE")).build();
+    }
+
     // Simula la dependencia del repositorio de reservas.
     @Mock ReservaRepository repository;
+    @Mock ReservaReferencias referencias;
 
     // Servicio que se prueba.
     ReservaService service;
@@ -42,7 +152,7 @@ class ReservaServiceTest {
     // Prepara objetos y respuestas antes de cada caso para mantener independientes las pruebas.
     @BeforeEach void preparar() {
         // Prepara el servicio con dependencias simuladas y el mapper real.
-        service = new ReservaService(repository, new ReservaMapper());
+        service = new ReservaService(repository, new ReservaMapper(), referencias);
     }
 
     // Construye un DTO válido base para reutilizar en los escenarios de prueba.

@@ -1,6 +1,7 @@
 package cl.nutrivida.agendamiento.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -8,6 +9,12 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, String>> handleConflicto() {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("detail", "El horario o la unidad de la orden ya está reservado. Revisa las citas registradas."));
+    }
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<Map<String, String>> handleNoEncontrado(RecursoNoEncontradoException ex) {

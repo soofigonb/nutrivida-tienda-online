@@ -30,6 +30,7 @@ import BlogDetalle1 from './pages/BlogDetalle1.jsx'
 import BlogDetalle2 from './pages/BlogDetalle2.jsx'
 
 import RutaAdmin from './components/RutaAdmin.jsx'
+import MisCitas from './pages/MisCitas.jsx'
 import AdminLayout from './components/AdminLayout.jsx'
 import AdminHome from './pages/AdminHome.jsx'
 import AdminPacientes from './pages/AdminPacientes.jsx'
@@ -104,6 +105,7 @@ function App() {
               <Route element={<RutaRoles roles={['CLIENTE', 'ADMINISTRADOR']} />}>
                 <Route path="mis-ordenes" element={<Ordenes />} />
                 <Route path="mis-ordenes/:id" element={<Ordenes />} />
+                <Route path="mis-citas" element={<MisCitas />} />
               </Route>
               <Route path="/" element={<Inicio />} />
 

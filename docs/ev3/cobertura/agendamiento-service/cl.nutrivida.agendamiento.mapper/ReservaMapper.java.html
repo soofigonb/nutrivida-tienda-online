@@ -10,36 +10,43 @@ import org.springframework.stereotype.Component;
     public ReservaDTO toDTO(Reserva r) {
 <span class="fc" id="L11">        ReservaDTO dto = new ReservaDTO();</span>
 <span class="fc" id="L12">        dto.setReservaId(r.getReservaId());</span>
-<span class="fc" id="L13">        dto.setPacienteId(r.getPacienteId());</span>
-<span class="fc" id="L14">        dto.setPlanId(r.getPlanId());</span>
-<span class="fc" id="L15">        dto.setServicio(r.getServicio());</span>
-<span class="fc" id="L16">        dto.setPrecio(r.getPrecio());</span>
-<span class="fc" id="L17">        dto.setNutricionistaId(r.getNutricionistaId());</span>
-<span class="fc" id="L18">        dto.setNutricionistaNombre(r.getNutricionistaNombre());</span>
-<span class="fc" id="L19">        dto.setFecha(r.getFecha());</span>
-<span class="fc" id="L20">        dto.setHora(r.getHora());</span>
-<span class="fc" id="L21">        dto.setMotivo(r.getMotivo());</span>
-<span class="fc" id="L22">        dto.setEstado(r.getEstado());</span>
-<span class="fc" id="L23">        dto.setActivo(r.getActivo());</span>
-<span class="fc" id="L24">        return dto;</span>
+<span class="fc" id="L13">        dto.setUsuarioId(r.getUsuarioId());</span>
+<span class="fc" id="L14">        dto.setOrdenId(r.getOrdenId());</span>
+<span class="fc" id="L15">        dto.setItemId(r.getItemId());</span>
+<span class="fc" id="L16">        dto.setUnidad(r.getUnidad());</span>
+<span class="fc" id="L17">        dto.setPacienteId(r.getPacienteId());</span>
+<span class="fc" id="L18">        dto.setPlanId(r.getPlanId());</span>
+<span class="fc" id="L19">        dto.setServicio(r.getServicio());</span>
+<span class="fc" id="L20">        dto.setPrecio(r.getPrecio());</span>
+<span class="fc" id="L21">        dto.setNutricionistaId(r.getNutricionistaId());</span>
+<span class="fc" id="L22">        dto.setNutricionistaNombre(r.getNutricionistaNombre());</span>
+<span class="fc" id="L23">        dto.setFecha(r.getFecha());</span>
+<span class="fc" id="L24">        dto.setHora(r.getHora());</span>
+<span class="fc" id="L25">        dto.setMotivo(r.getMotivo());</span>
+<span class="fc" id="L26">        dto.setEstado(r.getEstado());</span>
+<span class="fc" id="L27">        dto.setActivo(r.getActivo());</span>
+<span class="fc" id="L28">        return dto;</span>
     }
 
     public Reserva toEntity(ReservaDTO dto) {
-<span class="fc" id="L28">        Reserva r = new Reserva();</span>
-<span class="fc" id="L29">        r.setReservaId(dto.getReservaId());</span>
-<span class="fc" id="L30">        r.setPacienteId(dto.getPacienteId());</span>
-<span class="fc" id="L31">        r.setPlanId(dto.getPlanId());</span>
-<span class="fc" id="L32">        r.setServicio(dto.getServicio());</span>
-<span class="fc" id="L33">        r.setPrecio(dto.getPrecio());</span>
-<span class="fc" id="L34">        r.setNutricionistaId(dto.getNutricionistaId());</span>
-<span class="fc" id="L35">        r.setNutricionistaNombre(dto.getNutricionistaNombre());</span>
-<span class="fc" id="L36">        r.setFecha(dto.getFecha());</span>
-<span class="fc" id="L37">        r.setHora(dto.getHora());</span>
-<span class="fc" id="L38">        r.setMotivo(dto.getMotivo());</span>
-<span class="pc bpc" id="L39" title="1 of 2 branches missed.">        r.setEstado(dto.getEstado() != null ? dto.getEstado() : &quot;CONFIRMADA&quot;);</span>
-<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        r.setActivo(dto.getActivo() != null ? dto.getActivo() : true);</span>
-<span class="fc" id="L41">        return r;</span>
+<span class="fc" id="L32">        Reserva r = new Reserva();</span>
+<span class="fc" id="L33">        r.setReservaId(dto.getReservaId());</span>
+<span class="fc" id="L34">        r.setUsuarioId(dto.getUsuarioId());</span>
+<span class="fc" id="L35">        r.setOrdenId(dto.getOrdenId());</span>
+<span class="fc" id="L36">        r.setItemId(dto.getItemId());</span>
+<span class="fc" id="L37">        r.setUnidad(dto.getUnidad());</span>
+<span class="fc" id="L38">        r.setPacienteId(dto.getPacienteId());</span>
+<span class="fc" id="L39">        r.setPlanId(dto.getPlanId());</span>
+<span class="fc" id="L40">        r.setServicio(dto.getServicio());</span>
+<span class="fc" id="L41">        r.setPrecio(dto.getPrecio());</span>
+<span class="fc" id="L42">        r.setNutricionistaId(dto.getNutricionistaId());</span>
+<span class="fc" id="L43">        r.setNutricionistaNombre(dto.getNutricionistaNombre());</span>
+<span class="fc" id="L44">        r.setFecha(dto.getFecha());</span>
+<span class="fc" id="L45">        r.setHora(dto.getHora());</span>
+<span class="fc" id="L46">        r.setMotivo(dto.getMotivo());</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        r.setEstado(dto.getEstado() != null ? dto.getEstado() : &quot;CONFIRMADA&quot;);</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">        r.setActivo(dto.getActivo() != null ? dto.getActivo() : true);</span>
+<span class="fc" id="L49">        return r;</span>
     }
 }
-
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

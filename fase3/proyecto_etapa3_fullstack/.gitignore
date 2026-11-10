@@ -16,3 +16,7 @@
 
 .vscode/
 target/
+/.env
+/.env.*
+!/.env.example
+/secrets/

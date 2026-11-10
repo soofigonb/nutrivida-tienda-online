@@ -15,10 +15,10 @@ it('resuelve el id del catálogo, agrupa cantidades y no envía precios', async 
   expect(body).not.toHaveProperty('idUsuario')
 })
 it('conserva la clave si la red falla después del envío', async () => {
-  const cliente = { solicitar: vi.fn().mockResolvedValueOnce(catalogo).mockRejectedValueOnce(new Error('red')).mockResolvedValueOnce(catalogo).mockResolvedValueOnce({ id: 'orden-1' }) }
+  const cliente = { solicitar: vi.fn().mockResolvedValueOnce(catalogo).mockRejectedValueOnce(new Error('red')).mockResolvedValueOnce({ id: 'orden-1' }) }
   await expect(crearOrdenDesdeCarrito(carrito, cuenta, cliente)).rejects.toThrow('red')
   await crearOrdenDesdeCarrito(carrito, cuenta, cliente)
-  expect(cliente.solicitar.mock.calls[1][1].body.claveIdempotencia).toBe(cliente.solicitar.mock.calls[3][1].body.claveIdempotencia)
+  expect(cliente.solicitar.mock.calls[1][1].body.claveIdempotencia).toBe(cliente.solicitar.mock.calls[2][1].body.claveIdempotencia)
 })
 it('no crea una orden cuando no existe correspondencia con el catálogo', async () => {
   const cliente = { solicitar: vi.fn().mockResolvedValue([]) }

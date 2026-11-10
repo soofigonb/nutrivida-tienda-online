@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservaReferencias.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">agendamiento-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.agendamiento.client</a> &gt; <span class="el_source">ReservaReferencias.java</span></div><h1>ReservaReferencias.java</h1><pre class="source lang-java linenums">package cl.nutrivida.agendamiento.client;
+
+import cl.nutrivida.agendamiento.exceptions.AccesoDenegadoException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.UUID;
+
+@Component
+public class ReservaReferencias {
+<span class="fc" id="L19">    public record Item(Long idItem, String nombreItem, int cantidad, int precioUnitario) {}</span>
+<span class="nc" id="L20">    public record Orden(UUID idUsuario, String estado, List&lt;Item&gt; detalles) {}</span>
+<span class="nc" id="L21">    public record Profesional(String nombre) {}</span>
+<span class="nc" id="L22">    public record Paciente(Long pacienteId) {}</span>
+
+    private final RestClient ordenes;
+    private final RestClient profesionales;
+    private final RestClient pacientes;
+
+    public ReservaReferencias(@Value(&quot;${ORDENES_SERVICE_URL:http://localhost:8086}&quot;) String ordenesUrl,
+            @Value(&quot;${PROFESIONALES_SERVICE_URL:http://localhost:8084}&quot;) String profesionalesUrl,
+<span class="nc" id="L30">            @Value(&quot;${PACIENTES_SERVICE_URL:http://localhost:8082}&quot;) String pacientesUrl) {</span>
+<span class="nc" id="L31">        ordenes = cliente(ordenesUrl);</span>
+<span class="nc" id="L32">        profesionales = cliente(profesionalesUrl);</span>
+<span class="nc" id="L33">        pacientes = cliente(pacientesUrl);</span>
+<span class="nc" id="L34">    }</span>
+
+    public Item consultarItem(UUID ordenId, Long itemId, Integer unidad, UUID usuario, Jwt jwt) {
+<span class="nc bnc" id="L37" title="All 8 branches missed.">        if (ordenId == null || itemId == null || unidad == null || unidad &lt; 1) {</span>
+<span class="nc" id="L38">            throw new IllegalArgumentException(&quot;Identifica la unidad de la orden que quieres agendar&quot;);</span>
+        }
+<span class="nc" id="L40">        Orden orden = consultar(ordenes, &quot;/api/v1/ordenes/&quot; + ordenId, Orden.class, jwt);</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (!usuario.equals(orden.idUsuario())) {</span>
+<span class="nc" id="L42">            throw new AccesoDenegadoException(&quot;La orden pertenece a otra cuenta&quot;);</span>
+        }
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (&quot;CANCELADA&quot;.equals(orden.estado())) {</span>
+<span class="nc" id="L45">            throw new IllegalArgumentException(&quot;La orden está cancelada&quot;);</span>
+        }
+<span class="nc" id="L47">        return orden.detalles().stream()</span>
+<span class="nc bnc" id="L48" title="All 4 branches missed.">                .filter(item -&gt; itemId.equals(item.idItem()) &amp;&amp; unidad &lt;= item.cantidad())</span>
+<span class="nc" id="L49">                .findFirst()</span>
+<span class="nc" id="L50">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;La unidad no pertenece a la orden&quot;));</span>
+    }
+
+    public String consultarProfesional(Long id) {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">        if (id == null) throw new IllegalArgumentException(&quot;Debes seleccionar un profesional&quot;);</span>
+<span class="nc" id="L55">        return consultar(profesionales, &quot;/api/v1/profesionales/&quot; + id, Profesional.class, null).nombre();</span>
+    }
+
+    public Long consultarPaciente(Jwt jwt) {
+<span class="nc" id="L59">        return consultar(pacientes, &quot;/api/v1/pacientes/me&quot;, Paciente.class, jwt).pacienteId();</span>
+    }
+
+    private static RestClient cliente(String url) {
+<span class="nc" id="L63">        var solicitudes = new SimpleClientHttpRequestFactory();</span>
+<span class="nc" id="L64">        solicitudes.setConnectTimeout(3000);</span>
+<span class="nc" id="L65">        solicitudes.setReadTimeout(5000);</span>
+<span class="nc" id="L66">        return RestClient.builder().baseUrl(url).requestFactory(solicitudes).build();</span>
+    }
+
+    private &lt;T&gt; T consultar(RestClient cliente, String ruta, Class&lt;T&gt; tipo, Jwt jwt) {
+        try {
+<span class="nc" id="L71">            var solicitud = cliente.get().uri(ruta);</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">            if (jwt != null) solicitud.headers(headers -&gt; headers.setBearerAuth(jwt.getTokenValue()));</span>
+<span class="nc" id="L73">            T respuesta = solicitud.retrieve().body(tipo);</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (respuesta == null) throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;Respuesta de integración vacía&quot;);</span>
+<span class="nc" id="L75">            return respuesta;</span>
+<span class="nc" id="L76">        } catch (RestClientResponseException error) {</span>
+<span class="nc" id="L77">            int estado = error.getStatusCode().value();</span>
+<span class="nc bnc" id="L78" title="All 4 branches missed.">            if (estado == 403 || estado == 401) throw new AccesoDenegadoException(&quot;No tienes acceso al registro relacionado&quot;);</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (estado == 404) throw new IllegalArgumentException(&quot;Verifica que el perfil, la orden y el profesional estén disponibles&quot;);</span>
+<span class="nc" id="L80">            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;No se pudo validar la reserva&quot;, error);</span>
+<span class="nc" id="L81">        } catch (RestClientException error) {</span>
+<span class="nc" id="L82">            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, &quot;No se pudo validar la reserva&quot;, error);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -128,6 +128,9 @@ function Navbar({ cantidadCarrito }) {
               {usuario ? (
                 <>
                   <Nav.Link as={Link} to={usuario.rol === 'ADMINISTRADOR' ? '/gestion/ordenes' : '/mis-ordenes'}>Órdenes</Nav.Link>
+                  {['CLIENTE', 'ADMINISTRADOR'].includes(usuario.rol) && (
+                    <Nav.Link as={Link} to="/mis-citas">Citas</Nav.Link>
+                  )}
                   <NavbarBootstrap.Text className="me-3 fw-bold text-light px-2">
                     Hola, {usuario.nombre || usuario.correo}
                   </NavbarBootstrap.Text>

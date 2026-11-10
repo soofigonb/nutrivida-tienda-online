@@ -7,6 +7,8 @@ package cl.nutrivida.pacientes.service;
 import java.util.*;
 // Importa PacienteDTO.
 import cl.nutrivida.pacientes.dto.PacienteDTO;
+import cl.nutrivida.pacientes.exceptions.AccesoDenegadoException;
+import org.springframework.security.oauth2.jwt.Jwt;
 // Importa RecursoNoEncontradoException.
 import cl.nutrivida.pacientes.exceptions.RecursoNoEncontradoException;
 // Importa PacienteMapper.
@@ -32,6 +34,43 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 // Define la clase.
 class PacienteServiceTest {
+
+    @Test void perfilPropioUsaIdentidadDelTokenYSePuedeActualizar() {
+        UUID cuenta = UUID.randomUUID();
+        Jwt jwt = token(cuenta);
+        PacienteDTO datos = dtoValido();
+        datos.setUsuarioId(UUID.randomUUID());
+        Paciente entidad = new PacienteMapper().toEntity(datos);
+        entidad.setActivo(true);
+        entidad.setUsuarioId(cuenta);
+        entidad.setPacienteId(4L);
+        when(repository.findByUsuarioId(cuenta))
+                .thenReturn(Optional.empty())
+                .thenReturn(Optional.of(entidad));
+        when(repository.save(any())).thenAnswer(invocacion -> invocacion.getArgument(0));
+
+        assertEquals(cuenta, service.guardarPerfilPropio(datos, jwt).getUsuarioId());
+        assertEquals(4L, service.guardarPerfilPropio(datos, jwt).getPacienteId());
+        assertEquals(cuenta, service.obtenerPerfilPropio(jwt).getUsuarioId());
+    }
+
+    @Test void impideAccesoAjenoYReactivacionDeUnaBaja() {
+        UUID cuenta = UUID.randomUUID();
+        Paciente entidad = new Paciente();
+        entidad.setUsuarioId(cuenta);
+        entidad.setActivo(false);
+        when(repository.findByUsuarioId(cuenta)).thenReturn(Optional.of(entidad));
+        when(repository.findById(4L)).thenReturn(Optional.of(entidad));
+
+        assertThrows(AccesoDenegadoException.class, () -> service.guardarPerfilPropio(dtoValido(), token(cuenta)));
+        assertThrows(AccesoDenegadoException.class, () -> service.obtenerPorId(4L, token(UUID.randomUUID())));
+        verify(repository, never()).save(any());
+    }
+
+    private Jwt token(UUID usuario) {
+        return Jwt.withTokenValue("prueba").header("alg", "RS256")
+                .subject(usuario.toString()).claim("roles", List.of("CLIENTE")).build();
+    }
 
     // Simula la dependencia del repositorio de pacientes.
     @Mock PacienteRepository repository;

@@ -26,29 +26,34 @@ import {
 } from '../utils/validacionesAdmin'
 
 function AdminFormulario({ tipo }) {
+  const { id } = useParams()
+  const { pacientes, nutricionistas } = useDatos()
+  const registros = tipo === 'pacientes' ? pacientes : nutricionistas
+  const registro = registros.find(item => String(item.id) === String(id))
+
+  if (id && !registro) {
+    return <Alert variant="warning">
+      El registro solicitado no está disponible.{' '}
+      <Link to={`/admin/${tipo}`}>Volver al listado</Link>
+    </Alert>
+  }
+
+  return <CamposFormulario key={`${tipo}:${id || 'nuevo'}`} tipo={tipo} id={id} registro={registro} />
+}
+
+function CamposFormulario({ tipo, id, registro }) {
   // ========================================
   // 1. DATOS Y NAVEGACIÓN
   // ========================================
 
-  const { id } = useParams()
   const navigate = useNavigate()
 
   const {
-    pacientes,
-    nutricionistas,
     guardarPaciente,
     guardarNutricionista,
   } = useDatos()
 
   const esPaciente = tipo === 'pacientes'
-
-  const registros = esPaciente
-    ? pacientes
-    : nutricionistas
-
-  const registro = registros.find(
-    (item) => String(item.id) === String(id),
-  )
 
   const [errorGeneral, setErrorGeneral] =
     useState('')
@@ -81,7 +86,6 @@ function AdminFormulario({ tipo }) {
             registro?.fechaNacimiento || '',
           region: registro?.region || '',
           comuna: registro?.comuna || '',
-          password: '',
         }
       : {
           nombre: registro?.nombre || '',
@@ -108,17 +112,6 @@ function AdminFormulario({ tipo }) {
     regionesComunas.find(
       (item) => item.region === region,
     )?.comunas || []
-
-  if (id && !registro) {
-    return (
-      <Alert variant="warning">
-        El registro solicitado no existe.{' '}
-        <Link to={`/admin/${tipo}`}>
-          Volver al listado
-        </Link>
-      </Alert>
-    )
-  }
 
   // ========================================
   // 3. CAMPOS Y VALIDACIONES DE PACIENTES
@@ -250,29 +243,7 @@ function AdminFormulario({ tipo }) {
           'Ingresa al menos 5 caracteres.',
       },
     },
-    {
-      nombre: 'password',
-      etiqueta: id
-        ? 'Nueva contraseña (opcional)'
-        : 'Contraseña',
-      tipo: 'password',
-      opcional: Boolean(id),
-      ayuda: id
-        ? 'Deja este campo vacío para conservar la contraseña actual.'
-        : 'Mínimo 6 caracteres.',
-      reglas: {
-        required: id
-          ? false
-          : 'Ingresa la contraseña.',
-        validate: (valor) =>
-          (!valor && Boolean(id)) ||
-          (
-            valor.length >= 6 &&
-            Boolean(valor.trim())
-          ) ||
-          'Utiliza al menos 6 caracteres; no solo espacios.',
-      },
-    },
+
   ]
 
   // ========================================

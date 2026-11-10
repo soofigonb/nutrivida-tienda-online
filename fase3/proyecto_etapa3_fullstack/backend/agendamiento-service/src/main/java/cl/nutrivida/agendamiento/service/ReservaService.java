@@ -1,15 +1,20 @@
 package cl.nutrivida.agendamiento.service;
 
 import cl.nutrivida.agendamiento.dto.ReservaDTO;
+import cl.nutrivida.agendamiento.client.ReservaReferencias;
 import cl.nutrivida.agendamiento.exceptions.AccesoDenegadoException;
 import cl.nutrivida.agendamiento.exceptions.RecursoNoEncontradoException;
 import cl.nutrivida.agendamiento.mapper.ReservaMapper;
 import cl.nutrivida.agendamiento.model.Reserva;
 import cl.nutrivida.agendamiento.repository.ReservaRepository;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,10 +26,14 @@ public class ReservaService {
 
     private final ReservaRepository repository;
     private final ReservaMapper mapper;
+    private final ReservaReferencias referencias;
+    @Value("${app.security.roles-claim:roles}")
+    private String claimRoles = "roles";
 
-    public ReservaService(ReservaRepository repository, ReservaMapper mapper) {
+    public ReservaService(ReservaRepository repository, ReservaMapper mapper, ReservaReferencias referencias) {
         this.repository = repository;
         this.mapper = mapper;
+        this.referencias = referencias;
     }
 
     // GET / -> listar reservas activas (todas para ADMINISTRADOR, propias para CLIENTE)
@@ -59,7 +68,30 @@ public class ReservaService {
     }
 
     public ReservaDTO crear(ReservaDTO dto, Jwt jwt) {
+        UUID usuario = jwt == null ? null : extraerUsuarioId(jwt);
+        if (jwt != null && (!esAdministrador(jwt) || dto.getOrdenId() != null)) {
+            if (dto.getOrdenId() == null || dto.getItemId() == null || dto.getUnidad() == null || dto.getUnidad() < 1) {
+                throw new IllegalArgumentException("Identifica la unidad de la orden que quieres agendar");
+            }
+            var previa = repository.findByOrdenIdAndItemIdAndUnidad(dto.getOrdenId(), dto.getItemId(), dto.getUnidad());
+            if (previa.isPresent()) {
+                Reserva guardada = previa.get();
+                verificarPropietarioOAdmin(guardada, jwt);
+                if (!Boolean.TRUE.equals(guardada.getActivo())) {
+                    throw new IllegalArgumentException("La cita de esa unidad está cancelada");
+                }
+                return mapper.toDTO(guardada);
+            }
+            var item = referencias.consultarItem(dto.getOrdenId(), dto.getItemId(), dto.getUnidad(), usuario, jwt);
+            dto.setPlanId(String.valueOf(item.idItem()));
+            dto.setServicio(item.nombreItem());
+            dto.setPrecio(item.precioUnitario());
+            dto.setPacienteId(referencias.consultarPaciente(jwt));
+            dto.setNutricionistaNombre(referencias.consultarProfesional(dto.getNutricionistaId()));
+            dto.setEstado("CONFIRMADA");
+        }
         validar(dto);
+        if (jwt != null) validarHorarioFuturo(dto);
 
         boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(
                 dto.getNutricionistaId(),
@@ -75,7 +107,7 @@ public class ReservaService {
         Reserva r = mapper.toEntity(dto);
         r.setReservaId(null);
         if (jwt != null) {
-            r.setUsuarioId(extraerUsuarioId(jwt));
+            r.setUsuarioId(usuario);
         }
         r.setFecha(dto.getFecha().trim());
         r.setHora(dto.getHora().trim());
@@ -96,7 +128,20 @@ public class ReservaService {
         Reserva existente = repository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Reserva no encontrada con id: " + id));
         verificarPropietarioOAdmin(existente, jwt);
+        if (!Boolean.TRUE.equals(existente.getActivo())) {
+            throw new IllegalArgumentException("La cita está cancelada");
+        }
+        if (jwt != null && (!esAdministrador(jwt) || existente.getOrdenId() != null)) {
+            // Conserva los datos de la compra.
+            dto.setPacienteId(existente.getPacienteId());
+            dto.setPlanId(existente.getPlanId());
+            dto.setServicio(existente.getServicio());
+            dto.setPrecio(existente.getPrecio());
+            dto.setEstado(existente.getEstado());
+            dto.setNutricionistaNombre(referencias.consultarProfesional(dto.getNutricionistaId()));
+        }
         validar(dto);
+        if (jwt != null) validarHorarioFuturo(dto);
 
         boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(
                 dto.getNutricionistaId(),
@@ -154,7 +199,7 @@ public class ReservaService {
     }
 
     private boolean esAdministrador(Jwt jwt) {
-        List<String> roles = jwt.getClaimAsStringList("roles");
+        List<String> roles = jwt.getClaimAsStringList(claimRoles);
         return roles != null && roles.contains("ADMINISTRADOR");
     }
 
@@ -193,6 +238,17 @@ public class ReservaService {
         }
         if (dto.getMotivo() == null || dto.getMotivo().trim().length() < 5 || dto.getMotivo().trim().length() > 100) {
             throw new IllegalArgumentException("El motivo debe tener entre 5 y 100 caracteres");
+        }
+    }
+
+    private void validarHorarioFuturo(ReservaDTO dto) {
+        try {
+            var horario = LocalDateTime.parse(dto.getFecha().trim() + "T" + dto.getHora());
+            if (!horario.isAfter(LocalDateTime.now(ZoneId.of("America/Santiago")))) {
+                throw new IllegalArgumentException("El horario debe ser futuro");
+            }
+        } catch (DateTimeParseException error) {
+            throw new IllegalArgumentException("La fecha de la cita no es válida");
         }
     }
 }

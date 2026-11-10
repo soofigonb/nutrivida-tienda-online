@@ -1,0 +1,149 @@
+name: nutrivida
+
+x-jwt: &jwt
+  JWT_ISSUER: ${JWT_ISSUER:-http://localhost:8081}
+  JWT_JWK_SET_URI: http://autenticacion-service:8081/.well-known/jwks.json
+
+x-healthcheck: &healthcheck
+  interval: 10s
+  timeout: 5s
+  retries: 18
+  start_period: 30s
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_BIND_ADDRESS:-127.0.0.1}:${FRONTEND_PORT:-5173}:5173"
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+        restart: true
+
+  api-gateway:
+    build: ./backend/api-gateway
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      <<: *jwt
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      AUTENTICACION_SERVICE_URL: http://autenticacion-service:8081
+      PACIENTES_SERVICE_URL: http://pacientes-service:8082
+      CATALOGO_SERVICE_URL: http://catalogo-service:8083
+      PROFESIONALES_SERVICE_URL: http://profesionales-service:8084
+      AGENDAMIENTO_SERVICE_URL: http://agendamiento-service:8085
+      ORDENES_SERVICE_URL: http://ordenes-service:8086
+    depends_on:
+      autenticacion-service:
+        condition: service_healthy
+      pacientes-service:
+        condition: service_healthy
+      catalogo-service:
+        condition: service_healthy
+      profesionales-service:
+        condition: service_healthy
+      agendamiento-service:
+        condition: service_healthy
+      ordenes-service:
+        condition: service_healthy
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/api/v1/catalogo/planes"]
+
+  autenticacion-service:
+    build: ./backend/autenticacion-service
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      JWT_ISSUER: ${JWT_ISSUER:-http://localhost:8081}
+      AUTENTICACION_DB_URL: ${AUTENTICACION_DB_URL:?Define AUTENTICACION_DB_URL en .env}
+      AUTENTICACION_DB_USERNAME: ${AUTENTICACION_DB_USERNAME:?Define AUTENTICACION_DB_USERNAME en .env}
+      AUTENTICACION_DB_PASSWORD: ${AUTENTICACION_DB_PASSWORD:?Define AUTENTICACION_DB_PASSWORD en .env}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      SESSION_COOKIE_SECURE: "${SESSION_COOKIE_SECURE:-false}"
+      JWT_PRIVATE_KEY_LOCATION: file:/run/secrets/jwt_private_key
+      JWT_PUBLIC_KEY_LOCATION: file:/run/secrets/jwt_public_key
+      BOOTSTRAP_ADMIN_ENABLED: "${BOOTSTRAP_ADMIN_ENABLED:-false}"
+      BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-}
+      BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-}
+    secrets:
+      - jwt_private_key
+      - jwt_public_key
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8081/.well-known/jwks.json"]
+
+  pacientes-service:
+    build: ./backend/pacientes-service
+    ports:
+      - "127.0.0.1:8082:8082"
+    environment:
+      <<: *jwt
+      PACIENTES_DB_URL: ${PACIENTES_DB_URL:?Define PACIENTES_DB_URL en .env}
+      PACIENTES_DB_USERNAME: ${PACIENTES_DB_USERNAME:?Define PACIENTES_DB_USERNAME en .env}
+      PACIENTES_DB_PASSWORD: ${PACIENTES_DB_PASSWORD:?Define PACIENTES_DB_PASSWORD en .env}
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8082/v3/api-docs"]
+
+  catalogo-service:
+    build: ./backend/catalogo-service
+    ports:
+      - "127.0.0.1:8083:8083"
+    environment:
+      <<: *jwt
+      CATALOGO_DB_URL: ${CATALOGO_DB_URL:?Define CATALOGO_DB_URL en .env}
+      CATALOGO_DB_USERNAME: ${CATALOGO_DB_USERNAME:?Define CATALOGO_DB_USERNAME en .env}
+      CATALOGO_DB_PASSWORD: ${CATALOGO_DB_PASSWORD:?Define CATALOGO_DB_PASSWORD en .env}
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8083/v3/api-docs"]
+
+  profesionales-service:
+    build: ./backend/profesionales-service
+    ports:
+      - "127.0.0.1:8084:8084"
+    environment:
+      <<: *jwt
+      PROFESIONALES_DB_URL: ${PROFESIONALES_DB_URL:?Define PROFESIONALES_DB_URL en .env}
+      PROFESIONALES_DB_USERNAME: ${PROFESIONALES_DB_USERNAME:?Define PROFESIONALES_DB_USERNAME en .env}
+      PROFESIONALES_DB_PASSWORD: ${PROFESIONALES_DB_PASSWORD:?Define PROFESIONALES_DB_PASSWORD en .env}
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8084/v3/api-docs"]
+
+  agendamiento-service:
+    build: ./backend/agendamiento-service
+    ports:
+      - "127.0.0.1:8085:8085"
+    environment:
+      <<: *jwt
+      AGENDAMIENTO_DB_URL: ${AGENDAMIENTO_DB_URL:?Define AGENDAMIENTO_DB_URL en .env}
+      AGENDAMIENTO_DB_USERNAME: ${AGENDAMIENTO_DB_USERNAME:?Define AGENDAMIENTO_DB_USERNAME en .env}
+      AGENDAMIENTO_DB_PASSWORD: ${AGENDAMIENTO_DB_PASSWORD:?Define AGENDAMIENTO_DB_PASSWORD en .env}
+      ORDENES_SERVICE_URL: http://ordenes-service:8086
+      PROFESIONALES_SERVICE_URL: http://profesionales-service:8084
+      PACIENTES_SERVICE_URL: http://pacientes-service:8082
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8085/v3/api-docs"]
+
+  ordenes-service:
+    build: ./backend/ordenes-service
+    ports:
+      - "127.0.0.1:8086:8086"
+    environment:
+      <<: *jwt
+      ORDENES_DB_URL: ${ORDENES_DB_URL:?Define ORDENES_DB_URL en .env}
+      ORDENES_DB_USERNAME: ${ORDENES_DB_USERNAME:?Define ORDENES_DB_USERNAME en .env}
+      ORDENES_DB_PASSWORD: ${ORDENES_DB_PASSWORD:?Define ORDENES_DB_PASSWORD en .env}
+      CATALOGO_SERVICE_URL: http://catalogo-service:8083
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8086/v3/api-docs"]
+
+secrets:
+  jwt_private_key:
+    file: ${JWT_PRIVATE_KEY_FILE:-./secrets/private.pem}
+  jwt_public_key:
+    file: ${JWT_PUBLIC_KEY_FILE:-./secrets/public.pem}
