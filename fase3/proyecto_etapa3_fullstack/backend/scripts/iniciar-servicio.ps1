@@ -1,6 +1,6 @@
-﻿param(
+param(
     [Parameter(Mandatory = $true)]
-    [ValidateSet('autenticacion-service', 'ordenes-service', 'pacientes-service', 'agendamiento-service')]
+    [ValidateSet('autenticacion-service', 'ordenes-service', 'pacientes-service', 'agendamiento-service', 'catalogo-service', 'profesionales-service', 'api-gateway')]
     [string]$Servicio,
     [switch]$CrearAdministradorInicial,
     [string]$Issuer = 'http://localhost:8081',
@@ -13,6 +13,9 @@ $prefijo = switch ($Servicio) {
     'ordenes-service'       { 'ORDENES' }
     'pacientes-service'     { 'PACIENTES' }
     'agendamiento-service'  { 'AGENDAMIENTO' }
+    'catalogo-service'      { 'CATALOGO' }
+    'profesionales-service' { 'PROFESIONALES' }
+    'api-gateway'           { 'GATEWAY' }
 }
 $anteriores = @{}
 
@@ -24,35 +27,47 @@ function Set-VariableDeProceso([string]$Nombre, [string]$Valor) {
 }
 
 try {
-    $jdbc = if ($Servicio -eq 'ordenes-service') {
-        $respuesta = Read-Host 'URL JDBC de órdenes (Enter para usar Supabase configurado)'
-        if ([string]::IsNullOrWhiteSpace($respuesta)) {
-            'jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require'
-        } else { $respuesta }
-    } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service')) {
-        $respuesta = Read-Host "URL JDBC de $Servicio (Enter para usar Supabase configurado)"
-        if ([string]::IsNullOrWhiteSpace($respuesta)) {
-            'jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require'
-        } else { $respuesta }
-    } else {
-        Read-Host 'URL JDBC de este proyecto Supabase, sin usuario ni contraseña'
+    if ($Servicio -ne 'api-gateway') {
+        $jdbc = if ($Servicio -eq 'ordenes-service') {
+            $respuesta = Read-Host 'URL JDBC de órdenes (Enter para usar Supabase configurado)'
+            if ([string]::IsNullOrWhiteSpace($respuesta)) {
+                'jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require'
+            } else { $respuesta }
+        } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service')) {
+            $respuesta = Read-Host "URL JDBC de $Servicio (Enter para usar Supabase configurado)"
+            if ([string]::IsNullOrWhiteSpace($respuesta)) {
+                'jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require'
+            } else { $respuesta }
+        } elseif ($Servicio -in @('catalogo-service', 'profesionales-service')) {
+            $respuesta = Read-Host "URL JDBC de $Servicio (Enter para usar Supabase configurado)"
+            if ([string]::IsNullOrWhiteSpace($respuesta)) {
+                'jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require'
+            } else { $respuesta }
+        } else {
+            Read-Host 'URL JDBC de este proyecto Supabase, sin usuario ni contraseña'
+        }
+        if ($jdbc -notmatch '^jdbc:postgresql://' -or $jdbc -match '(?i)(user|password)=|://[^/]*@') {
+            throw 'Utiliza una URL JDBC sin credenciales; se solicitan por separado.'
+        }
+        if ($jdbc -notmatch '(?i)sslmode=(require|verify-ca|verify-full)') {
+            throw 'La URL de Supabase debe incluir sslmode=require o una verificación SSL superior.'
+        }
+        Set-VariableDeProceso ($prefijo + '_DB_URL') $jdbc
+        $usuarioDb = Read-Host 'Usuario PostgreSQL completo (Enter utiliza el configurado por defecto)'
+        if ($Servicio -eq 'ordenes-service' -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
+            $usuarioDb = 'postgres.ngjummwpmhqdtabcieeg'
+        } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service') -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
+            $usuarioDb = 'postgres.nyaxmfgatgsrspxdfxwf'
+        } elseif ($Servicio -in @('catalogo-service', 'profesionales-service') -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
+            $usuarioDb = 'postgres.nodhgpcmnwipdefjcssj'
+        }
+        Set-VariableDeProceso ($prefijo + '_DB_USERNAME') $usuarioDb
+        $claveVar = [Environment]::GetEnvironmentVariable($prefijo + '_DB_PASSWORD', 'Process')
+        if ([string]::IsNullOrWhiteSpace($claveVar)) {
+            $clave = Read-Host 'Contraseña PostgreSQL' -AsSecureString
+            Set-VariableDeProceso ($prefijo + '_DB_PASSWORD') ([Net.NetworkCredential]::new('', $clave).Password)
+        }
     }
-    if ($jdbc -notmatch '^jdbc:postgresql://' -or $jdbc -match '(?i)(user|password)=|://[^/]*@') {
-        throw 'Utiliza una URL JDBC sin credenciales; se solicitan por separado.'
-    }
-    if ($jdbc -notmatch '(?i)sslmode=(require|verify-ca|verify-full)') {
-        throw 'La URL de Supabase debe incluir sslmode=require o una verificación SSL superior.'
-    }
-    Set-VariableDeProceso ($prefijo + '_DB_URL') $jdbc
-    $usuarioDb = Read-Host 'Usuario PostgreSQL completo (Enter utiliza el configurado por defecto)'
-    if ($Servicio -eq 'ordenes-service' -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
-        $usuarioDb = 'postgres.ngjummwpmhqdtabcieeg'
-    } elseif ($Servicio -in @('pacientes-service', 'agendamiento-service') -and [string]::IsNullOrWhiteSpace($usuarioDb)) {
-        $usuarioDb = 'postgres.nyaxmfgatgsrspxdfxwf'
-    }
-    Set-VariableDeProceso ($prefijo + '_DB_USERNAME') $usuarioDb
-    $clave = Read-Host 'Contraseña PostgreSQL' -AsSecureString
-    Set-VariableDeProceso ($prefijo + '_DB_PASSWORD') ([Net.NetworkCredential]::new('', $clave).Password)
     Set-VariableDeProceso 'JWT_ISSUER' $Issuer
 
     if ($Servicio -eq 'autenticacion-service') {
