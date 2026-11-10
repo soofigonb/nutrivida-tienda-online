@@ -71,6 +71,10 @@ try {
     Set-VariableDeProceso 'JWT_ISSUER' $Issuer
 
     if ($Servicio -eq 'autenticacion-service') {
+        foreach ($campo in @('URL', 'USERNAME', 'PASSWORD')) {
+            $valor = [Environment]::GetEnvironmentVariable("AUTENTICACION_DB_$campo", 'Process')
+            Set-VariableDeProceso "SPRING_DATASOURCE_$campo" $valor
+        }
         $carpeta = Read-Host 'Carpeta privada que contiene private.pem y public.pem'
         foreach ($tipo in @('private', 'public')) {
             $archivo = (Resolve-Path -LiteralPath (Join-Path $carpeta ($tipo + '.pem'))).Path

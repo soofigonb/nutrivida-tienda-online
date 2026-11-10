@@ -100,6 +100,8 @@ docker compose down
 
 Se requiere Java 17, Node.js y acceso a las bases de Supabase. Configura la URL JDBC, el usuario y la contraseña de cada servicio mediante variables de entorno. Para catálogo usa `CATALOGO_DB_URL`, `CATALOGO_DB_USERNAME` y `CATALOGO_DB_PASSWORD`. Para profesionales usa `PROFESIONALES_DB_URL`, `PROFESIONALES_DB_USERNAME` y `PROFESIONALES_DB_PASSWORD`. Autenticación también requiere `JWT_PRIVATE_KEY_LOCATION` y `JWT_PUBLIC_KEY_LOCATION`. Los scripts de `backend/scripts/` permiten generar las claves e iniciar autenticación u órdenes solicitando la contraseña en la terminal.
 
+Si inicias Autenticación con Maven directamente, usa `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` y `SPRING_DATASOURCE_PASSWORD`. Docker Compose y el script de arranque asignan esos valores a partir de la configuración de Autenticación.
+
 Desde la carpeta de cada servicio, inicia Spring Boot en una terminal independiente:
 
 ```bash
