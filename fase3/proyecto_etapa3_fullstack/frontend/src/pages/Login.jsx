@@ -100,13 +100,13 @@ function Login() {
 
           <h1 className="seccion-titulo">
             {accesoAdministrador
-              ? 'Iniciar sesión como administrador'
+              ? 'Iniciar sesión como administrador o vendedor'
               : 'Iniciar sesión'}
           </h1>
 
           <p className="seccion-descripcion">
             {accesoAdministrador
-              ? 'Ingresa con tu cuenta administrativa para gestionar pacientes y nutricionistas.'
+              ? 'Ingresa con tu cuenta de administrador o vendedor para acceder a tu panel.'
               : 'Ingresa a tu cuenta para continuar con tus consultas nutricionales.'}
           </p>
         </div>
@@ -233,7 +233,7 @@ function Login() {
 
                     {accesoAdministrador
                       ? 'Volver al acceso para pacientes'
-                      : 'Acceso para administradores'}
+                      : 'Acceso para administradores y vendedores'}
                   </Button>
                 </div>
               </Card.Body>
