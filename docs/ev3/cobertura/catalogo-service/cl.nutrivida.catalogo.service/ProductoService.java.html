@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductoService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">catalogo-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.catalogo.service</a> &gt; <span class="el_source">ProductoService.java</span></div><h1>ProductoService.java</h1><pre class="source lang-java linenums">package cl.nutrivida.catalogo.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.transaction.annotation.Transactional;
+import cl.nutrivida.catalogo.dto.CrearProductoDTO;
+import cl.nutrivida.catalogo.dto.ProductoDTO;
+import cl.nutrivida.catalogo.dto.PlanVentaDTO;
+import cl.nutrivida.catalogo.exceptions.RecursoNoEncontradoException;
+import cl.nutrivida.catalogo.dto.CategoriaDTO;
+import cl.nutrivida.catalogo.dto.ProductoMapper;
+import cl.nutrivida.catalogo.model.Categoria;
+import cl.nutrivida.catalogo.model.Producto;
+import cl.nutrivida.catalogo.repository.CategoriaRepository;
+import cl.nutrivida.catalogo.repository.ProductoRepository;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class ProductoService {
+
+    private final ProductoRepository productoRepository;
+    private final CategoriaRepository categoriaRepository;
+    private final ProductoMapper mapper;
+    private final int precioDecimales;
+
+    public ProductoService(ProductoRepository productoRepository, CategoriaRepository categoriaRepository,
+<span class="fc" id="L28">            ProductoMapper mapper, @Value(&quot;${catalogo.precio-decimales:2}&quot;) int precioDecimales) {</span>
+<span class="fc" id="L29">        this.productoRepository = productoRepository;</span>
+<span class="fc" id="L30">        this.categoriaRepository = categoriaRepository;</span>
+<span class="fc" id="L31">        this.mapper = mapper;</span>
+<span class="fc" id="L32">        this.precioDecimales = precioDecimales;</span>
+<span class="fc" id="L33">    }</span>
+
+    @Transactional(readOnly = true)
+    public List&lt;ProductoDTO&gt; listar() {
+<span class="fc" id="L37">        return productoRepository.findByActivoTrue().stream().map(mapper::toDTO).toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public ProductoDTO buscarPorId(UUID id) {
+<span class="fc" id="L42">        return mapper.toDTO(buscarActivo(id));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;CategoriaDTO&gt; listarCategorias() {
+<span class="fc" id="L47">        return categoriaRepository.findAll().stream().map(mapper::toDTO).toList();</span>
+    }
+
+    @Transactional
+    public CategoriaDTO crearCategoria(CategoriaDTO datos) {
+<span class="fc" id="L52">        String nombre = datos.nombre().strip();</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (categoriaRepository.existsByNombreIgnoreCase(nombre)) {</span>
+<span class="fc" id="L54">            throw new IllegalArgumentException(&quot;Ya existe una categoría con el nombre: &quot; + nombre);</span>
+        }
+<span class="fc" id="L56">        Categoria categoria = new Categoria();</span>
+<span class="fc" id="L57">        categoria.setNombre(nombre);</span>
+<span class="fc" id="L58">        categoria.setDescripcion(datos.descripcion());</span>
+<span class="fc" id="L59">        categoria.setActivo(datos.activo());</span>
+<span class="fc" id="L60">        return mapper.toDTO(categoriaRepository.save(categoria));</span>
+    }
+
+    @Transactional(readOnly = true)
+    public List&lt;PlanVentaDTO&gt; listarPlanes() {
+<span class="fc" id="L65">        return productoRepository.findByActivoTrue().stream().map(this::aPlan).toList();</span>
+    }
+
+    @Transactional(readOnly = true)
+    public PlanVentaDTO buscarPlan(Long id) {
+<span class="fc" id="L70">        return productoRepository.findByIdVentaAndActivoTrue(id).map(this::aPlan)</span>
+<span class="fc" id="L71">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Artículo no disponible&quot;));</span>
+    }
+
+    @Transactional
+    public ProductoDTO crear(CrearProductoDTO datos) {
+<span class="fc bfc" id="L76" title="All 2 branches covered.">        if (productoRepository.existsByNombreIgnoreCase(datos.nombre())) {</span>
+<span class="fc" id="L77">            throw new IllegalArgumentException(&quot;Ya existe un producto registrado con el nombre: &quot; + datos.nombre());</span>
+        }
+
+<span class="fc" id="L80">        Producto producto = new Producto();</span>
+<span class="fc" id="L81">        producto.setActivo(true);</span>
+<span class="fc" id="L82">        aplicarDatos(producto, datos);</span>
+<span class="fc" id="L83">        return mapper.toDTO(productoRepository.save(producto));</span>
+    }
+
+    @Transactional
+    public ProductoDTO actualizar(UUID id, CrearProductoDTO datos) {
+<span class="fc" id="L88">        Producto producto = buscarActivo(id);</span>
+<span class="fc bfc" id="L89" title="All 2 branches covered.">        if (productoRepository.existsByNombreIgnoreCaseAndIdNot(datos.nombre(), id)) {</span>
+<span class="fc" id="L90">            throw new IllegalArgumentException(&quot;Ya existe un producto registrado con el nombre: &quot; + datos.nombre());</span>
+        }
+<span class="fc" id="L92">        aplicarDatos(producto, datos);</span>
+<span class="fc" id="L93">        return mapper.toDTO(producto);</span>
+    }
+
+    @Transactional
+    public void darDeBaja(UUID id) {
+<span class="fc" id="L98">        buscarActivo(id).setActivo(false);</span>
+<span class="fc" id="L99">    }</span>
+
+    private Producto buscarActivo(UUID id) {
+<span class="fc" id="L102">        return productoRepository.findByIdAndActivoTrue(id)</span>
+<span class="fc" id="L103">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Producto con ID &quot; + id + &quot; no encontrado&quot;));</span>
+    }
+
+    private PlanVentaDTO aPlan(Producto producto) {
+<span class="fc" id="L107">        return new PlanVentaDTO(producto.getIdVenta(), producto.getCodigo(), producto.getNombre(),</span>
+<span class="fc" id="L108">                producto.getDescripcion(), producto.getPrecio(), producto.getCategoria().getNombre(),</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">                producto.getImagenUrl(), producto.getStock() &gt; 0);</span>
+    }
+
+    private void aplicarDatos(Producto producto, CrearProductoDTO datos) {
+<span class="fc bfc" id="L113" title="All 2 branches covered.">        if (datos.precio().stripTrailingZeros().scale() &gt; precioDecimales) {</span>
+<span class="fc" id="L114">            throw new IllegalArgumentException(&quot;El precio supera la precisión configurada&quot;);</span>
+        }
+<span class="fc" id="L116">        Categoria categoria = categoriaRepository.findById(datos.idCategoria())</span>
+<span class="pc" id="L117">                .orElseThrow(() -&gt; new RecursoNoEncontradoException(&quot;Categoría no encontrada con ID: &quot; + datos.idCategoria()));</span>
+
+<span class="fc" id="L119">        producto.setNombre(datos.nombre());</span>
+<span class="fc" id="L120">        producto.setDescripcion(datos.descripcion());</span>
+<span class="fc" id="L121">        producto.setPrecio(datos.precio());</span>
+<span class="fc" id="L122">        producto.setStock(datos.stock());</span>
+<span class="fc" id="L123">        producto.setImagenUrl(datos.imagenUrl());</span>
+<span class="fc" id="L124">        producto.setCategoria(categoria);</span>
+<span class="fc" id="L125">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

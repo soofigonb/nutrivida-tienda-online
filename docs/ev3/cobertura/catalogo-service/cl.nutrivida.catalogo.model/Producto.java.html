@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Producto.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">catalogo-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.catalogo.model</a> &gt; <span class="el_source">Producto.java</span></div><h1>Producto.java</h1><pre class="source lang-java linenums">package cl.nutrivida.catalogo.model;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.FetchType;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@Entity
+@Table(name = &quot;producto&quot;, schema = &quot;db_catalogo&quot;)
+public class Producto {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = &quot;id_venta&quot;, insertable = false, updatable = false)
+    private Long idVenta;
+
+    @Column(name = &quot;codigo&quot;, length = 100, updatable = false)
+    private String codigo;
+
+    @Column(name = &quot;nombre&quot;, nullable = false, length = 100)
+    private String nombre;
+
+    @Column(name = &quot;descripcion&quot;, length = 500)
+    private String descripcion;
+
+    @Column(name = &quot;precio&quot;, nullable = false, precision = 10, scale = 2)
+    private BigDecimal precio;
+
+    @Column(name = &quot;stock&quot;, nullable = false)
+    private Integer stock;
+
+    @Column(name = &quot;imagen_url&quot;, length = 500)
+    private String imagenUrl;
+
+    @Column(name = &quot;activo&quot;, nullable = false)
+    private Boolean activo;
+
+    @Column(name = &quot;creado_en&quot;, nullable = false, updatable = false)
+    private Instant creadoEn;
+    
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn (name = &quot;id_categoria&quot;, nullable = false)
+    private Categoria categoria;
+
+    @Column(name = &quot;actualizado_en&quot;, nullable = false)
+    private Instant actualizadoEn;
+
+    @Version
+    @Column(name = &quot;version&quot;, nullable = false)
+    private Long version;
+
+    @PrePersist
+    protected void antesDeCrear() {
+<span class="nc" id="L74">        Instant ahora = Instant.now();</span>
+<span class="nc" id="L75">        creadoEn = ahora;</span>
+<span class="nc" id="L76">        actualizadoEn = ahora;</span>
+<span class="nc" id="L77">    }</span>
+
+    @PreUpdate
+    protected void antesDeActualizar() {
+<span class="nc" id="L81">        actualizadoEn = Instant.now();</span>
+<span class="nc" id="L82">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

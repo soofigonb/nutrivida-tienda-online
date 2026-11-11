@@ -37,6 +37,55 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 // Define la clase.
 class ReservaServiceTest {
+@Test void rechazaCamposNulosYMotivosDemasiadoLargos() {
+        List<java.util.function.Consumer<ReservaDTO>> cambios = List.of(
+                d -> d.setPlanId(null), d -> d.setServicio(null), d -> d.setPrecio(null),
+                d -> d.setNutricionistaNombre(null), d -> d.setFecha(null),
+                d -> d.setHora(null), d -> d.setMotivo(null), d -> d.setMotivo("x".repeat(101)));
+        for (var cambio : cambios) {
+            var dto = dtoValido();
+            cambio.accept(dto);
+            assertThrows(IllegalArgumentException.class, () -> service.crear(dto));
+        }
+        assertThrows(IllegalArgumentException.class,
+                () -> service.estaDisponible(0, "2030-01-01", "09:00"));
+        verifyNoInteractions(repository);
+    }
+
+    @Test void administradorConsultaTodasLasCitasYClienteSinPropiedadNoAccede() {
+        var admin = Jwt.withTokenValue("admin").header("alg", "RS256")
+                .subject(UUID.randomUUID().toString()).claim("roles", List.of("ADMINISTRADOR")).build();
+        when(repository.findByActivoTrue()).thenReturn(List.of());
+        assertTrue(service.listarActivas(admin).isEmpty());
+        var reserva = new ReservaMapper().toEntity(dtoValido());
+        when(repository.findById(1L)).thenReturn(Optional.of(reserva));
+        assertThrows(AccesoDenegadoException.class, () -> service.obtenerPorId(1L, token(UUID.randomUUID())));
+        assertNotNull(service.obtenerPorId(1L, admin));
+    }
+
+    @Test void rechazaIdentidadesDeTokenInvalidas() {
+        assertThrows(AccesoDenegadoException.class, () -> service.contarConfirmadas(UUID.randomUUID(), null));
+        for (String sub : List.of(" ", "cuenta-invalida")) {
+            var jwt = Jwt.withTokenValue("prueba").header("alg", "RS256").subject(sub).build();
+            assertThrows(AccesoDenegadoException.class, () -> service.contarConfirmadas(UUID.randomUUID(), jwt));
+        }
+    }
+
+    @Test void rechazaUnidadesIncompletasYReprogramacionDeCitaCancelada() {
+        var cuenta = UUID.randomUUID();
+        var dto = dtoValido();
+        dto.setOrdenId(UUID.randomUUID());
+        assertThrows(IllegalArgumentException.class, () -> service.crear(dto, token(cuenta)));
+        dto.setItemId(1L);
+        assertThrows(IllegalArgumentException.class, () -> service.crear(dto, token(cuenta)));
+        dto.setUnidad(0);
+        assertThrows(IllegalArgumentException.class, () -> service.crear(dto, token(cuenta)));
+        var reserva = new ReservaMapper().toEntity(dtoValido());
+        reserva.setUsuarioId(cuenta);
+        reserva.setActivo(false);
+        when(repository.findById(1L)).thenReturn(Optional.of(reserva));
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(1L, dtoValido(), token(cuenta)));
+    }
 
     @Test void consultaDisponibilidadDeUnHorarioFuturo() {
         String fecha = LocalDate.now().plusDays(2).toString();

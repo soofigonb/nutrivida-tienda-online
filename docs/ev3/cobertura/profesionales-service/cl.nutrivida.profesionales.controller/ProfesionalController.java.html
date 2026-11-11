@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfesionalController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">profesionales-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.profesionales.controller</a> &gt; <span class="el_source">ProfesionalController.java</span></div><h1>ProfesionalController.java</h1><pre class="source lang-java linenums">package cl.nutrivida.profesionales.controller;
+
+import cl.nutrivida.profesionales.dto.ProfesionalDTO;
+import cl.nutrivida.profesionales.service.ProfesionalService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/v1/profesionales&quot;)
+@Tag(name = &quot;Profesionales&quot;, description = &quot;Endpoints para la gestión de nutricionistas y su disponibilidad&quot;)
+public class ProfesionalController {
+
+    private final ProfesionalService service;
+
+<span class="fc" id="L24">    public ProfesionalController(ProfesionalService service) {</span>
+<span class="fc" id="L25">        this.service = service;</span>
+<span class="fc" id="L26">    }</span>
+
+    @GetMapping
+    @Operation(summary = &quot;Listar profesionales activos&quot;, description = &quot;Retorna la lista de nutricionistas activos para reserva de citas&quot;)
+    public List&lt;ProfesionalDTO&gt; listarActivos() {
+<span class="fc" id="L31">        return service.listarActivos();</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    @Operation(summary = &quot;Obtener profesional por ID&quot;, description = &quot;Retorna el detalle público de un nutricionista&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Profesional encontrado&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Profesional no encontrado&quot;)
+    })
+    public ProfesionalDTO obtenerPorId(@PathVariable Long id) {
+<span class="fc" id="L41">        return service.obtenerPorId(id);</span>
+    }
+
+    @PostMapping
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @Operation(summary = &quot;Crear profesional (Admin)&quot;, description = &quot;Registra un nuevo nutricionista validando sus campos obligatorios&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Profesional creado exitosamente&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos de entrada inválidos o faltantes&quot;)
+    })
+    public ResponseEntity&lt;ProfesionalDTO&gt; crear(@Valid @RequestBody ProfesionalDTO dto) {
+<span class="fc" id="L52">        ProfesionalDTO creado = service.crear(dto);</span>
+<span class="fc" id="L53">        return ResponseEntity.status(HttpStatus.CREATED).body(creado);</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @Operation(summary = &quot;Actualizar profesional (Admin)&quot;, description = &quot;Modifica la información de un nutricionista existente&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Profesional actualizado correctamente&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos de entrada inválidos&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Profesional no encontrado&quot;)
+    })
+    public ProfesionalDTO actualizar(@PathVariable Long id, @Valid @RequestBody ProfesionalDTO dto) {
+<span class="fc" id="L65">        return service.actualizar(id, dto);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @Operation(summary = &quot;Baja controlada de profesional (Admin)&quot;, description = &quot;Realiza la baja lógica (activo = false) conservando el historial&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;204&quot;, description = &quot;Profesional dado de baja exitosamente&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Profesional no encontrado&quot;)
+    })
+    public ResponseEntity&lt;Void&gt; darDeBaja(@PathVariable Long id) {
+<span class="fc" id="L76">        service.darDeBaja(id);</span>
+<span class="fc" id="L77">        return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

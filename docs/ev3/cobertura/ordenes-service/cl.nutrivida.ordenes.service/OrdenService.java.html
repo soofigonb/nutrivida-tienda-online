@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrdenService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ordenes-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.ordenes.service</a> &gt; <span class="el_source">OrdenService.java</span></div><h1>OrdenService.java</h1><pre class="source lang-java linenums">// Reglas de negocio de órdenes.
+
+// Paquete de la clase.
+package cl.nutrivida.ordenes.service;
+
+// Importa los tipos del paquete.
+import java.math.*;
+// Importa los tipos del paquete.
+import java.util.*;
+import cl.nutrivida.ordenes.port.CatalogoPort;
+import cl.nutrivida.ordenes.client.AgendamientoClient;
+// Importa los tipos del paquete.
+import cl.nutrivida.ordenes.dto.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.ordenes.model.*;
+// Importa OrdenRepository.
+import cl.nutrivida.ordenes.repository.OrdenRepository;
+// Importa ApiException.
+import cl.nutrivida.ordenes.exceptions.ApiException;
+// Importa RequiredArgsConstructor.
+import lombok.RequiredArgsConstructor;
+// Importa Slf4j.
+import lombok.extern.slf4j.Slf4j;
+// Importa HttpStatus.
+import org.springframework.http.HttpStatus;
+// Importa Jwt.
+import org.springframework.security.oauth2.jwt.Jwt;
+// Importa Service.
+import org.springframework.stereotype.Service;
+// Importa Transactional.
+import org.springframework.transaction.annotation.Transactional;
+
+// Registra esta clase como servicio de reglas de negocio.
+<span class="fc" id="L34">@Service @RequiredArgsConstructor @Transactional @Slf4j</span>
+// Define la clase.
+public class OrdenService {
+    // Repositorio JPA de órdenes.
+    private final OrdenRepository repository;
+    private final OrdenMapper mapper;
+    private final CatalogoPort catalogo;
+    private final AgendamientoClient agendamiento;
+
+    public OrdenDTO crear(CrearOrdenDTO dto, Jwt jwt) {
+<span class="fc" id="L44">        return crear(dto, jwt, true);</span>
+    }
+
+    public OrdenDTO preparar(CrearOrdenDTO dto, Jwt jwt) {
+<span class="fc" id="L48">        return crear(dto, jwt, false);</span>
+    }
+
+    private OrdenDTO crear(CrearOrdenDTO dto, Jwt jwt, boolean publicada) {
+        // Obtiene el UUID propietario desde sub del JWT validado.
+<span class="fc" id="L53">        UUID usuario = UUID.fromString(jwt.getSubject());</span>
+        // Detecta reintentos por usuario.
+<span class="fc" id="L55">        Optional&lt;Orden&gt; previa = repository.findByIdUsuarioAndClaveIdempotencia(usuario, dto.claveIdempotencia());</span>
+<span class="fc bfc" id="L56" title="All 2 branches covered.">        if (previa.isPresent()) {</span>
+<span class="fc" id="L57">            Orden orden = previa.get();</span>
+<span class="fc bfc" id="L58" title="All 4 branches covered.">            if (publicada &amp;&amp; !orden.isPublicada())</span>
+<span class="fc" id="L59">                throw new ApiException(HttpStatus.CONFLICT, &quot;La solicitud aún tiene citas pendientes&quot;);</span>
+<span class="fc" id="L60">            Map&lt;Long, Integer&gt; original = new HashMap&lt;&gt;();</span>
+            // Agrupa los detalles guardados por artículo.
+<span class="fc" id="L62">            orden.getDetalles().forEach(d -&gt; original.put(d.getIdPlan(), d.getCantidad()));</span>
+<span class="fc" id="L63">            Map&lt;Long, Integer&gt; solicitud = new HashMap&lt;&gt;();</span>
+            // Agrupa los detalles recibidos por artículo.
+<span class="fc" id="L65">            dto.detalles().forEach(d -&gt; solicitud.put(d.idItem(), d.cantidad()));</span>
+            // Rechaza cambios en un reintento.
+<span class="fc bfc" id="L67" title="All 4 branches covered.">            if (!original.equals(solicitud) || dto.detalles().size() != original.size())</span>
+<span class="fc" id="L68">                throw new ApiException(HttpStatus.CONFLICT, &quot;La clave ya se usó con otros datos&quot;);</span>
+<span class="fc" id="L69">            return mapper.toDTO(orden);</span>
+        }
+        // Crea la cabecera de una orden nueva en memoria.
+<span class="fc" id="L72">        Orden orden = new Orden();</span>
+<span class="fc" id="L73">        orden.setPublicada(publicada);</span>
+        // Asigna el propietario obtenido del JWT.
+<span class="fc" id="L75">        orden.setIdUsuario(usuario);</span>
+        // Guarda la clave del intento.
+<span class="fc" id="L77">        orden.setClaveIdempotencia(dto.claveIdempotencia());</span>
+        // Usa aritmética decimal.
+<span class="fc" id="L79">        BigDecimal total = BigDecimal.ZERO;</span>
+        // Detecta artículos duplicados.
+<span class="fc" id="L81">        Set&lt;Long&gt; ids = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        for (CrearOrdenDTO.ItemDTO item : dto.detalles()) {</span>
+            // Set.add devuelve false si el identificador ya estaba.
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">            if (!ids.add(item.idItem())) throw new ApiException(HttpStatus.BAD_REQUEST, &quot;No repita un artículo en la orden&quot;);</span>
+<span class="fc" id="L85">            CatalogoPort.ProductoDTO articulo = catalogo.consultar(item.idItem(), jwt.getTokenValue());</span>
+            // Valida disponibilidad y precio.
+<span class="fc bfc" id="L87" title="All 6 branches covered.">            if (articulo == null || !item.idItem().equals(articulo.id()) || !Boolean.TRUE.equals(articulo.activo()) ||</span>
+                // Valida el nombre del artículo.
+<span class="fc bfc" id="L89" title="All 6 branches covered.">                articulo.nombre() == null || articulo.nombre().isBlank() || articulo.nombre().length() &gt; 150 ||</span>
+<span class="fc bfc" id="L90" title="All 4 branches covered.">                articulo.precio() == null || articulo.precio().signum() &lt; 0)</span>
+<span class="fc" id="L91">                throw new ApiException(HttpStatus.BAD_REQUEST, &quot;Artículo no disponible&quot;);</span>
+            // Exige precios enteros en CLP.
+            BigDecimal precio;
+            // Exige cero decimales sin redondear.
+<span class="fc" id="L95">            try { precio = articulo.precio().setScale(0, RoundingMode.UNNECESSARY); }</span>
+            // Rechaza precios incompatibles con el contrato.
+<span class="fc" id="L97">            catch (ArithmeticException e) { throw new ApiException(HttpStatus.BAD_GATEWAY, &quot;El catálogo debe entregar precios enteros en CLP&quot;); }</span>
+            // Conserva el precio de compra.
+<span class="fc" id="L99">            DetalleOrden detalle = new DetalleOrden();</span>
+<span class="fc" id="L100">            detalle.setOrden(orden); detalle.setIdPlan(articulo.id()); detalle.setNombrePlan(articulo.nombre());</span>
+<span class="fc" id="L101">            detalle.setCantidad(item.cantidad()); detalle.setPrecioUnitario(precio);</span>
+            // Añade el detalle a la colección de la orden.
+<span class="fc" id="L103">            orden.getDetalles().add(detalle);</span>
+<span class="fc" id="L104">            total = total.add(precio.multiply(BigDecimal.valueOf(item.cantidad())));</span>
+<span class="fc" id="L105">        }</span>
+        // Valida el límite de la columna.
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">        if (total.compareTo(new BigDecimal(&quot;999999999999&quot;)) &gt; 0)</span>
+            // Rechaza con 400 un total que no cabe en la columna SQL.
+<span class="nc" id="L109">            throw new ApiException(HttpStatus.BAD_REQUEST, &quot;La orden supera el monto permitido&quot;);</span>
+<span class="fc" id="L110">        orden.setTotal(total);</span>
+        // Persiste la orden y sus detalles.
+<span class="fc" id="L112">        Orden guardada = repository.saveAndFlush(orden);</span>
+<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        log.info(publicada ? &quot;Orden creada: {}&quot; : &quot;Solicitud de reserva preparada: {}&quot;, guardada.getId());</span>
+<span class="fc" id="L114">        return mapper.toDTO(guardada);</span>
+    }
+
+    // Ejecuta este método en una transacción de lectura.
+    @Transactional(readOnly = true)
+    public List&lt;OrdenDTO&gt; listar(Jwt jwt) {
+        // Limita al cliente a sus órdenes.
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        List&lt;Orden&gt; ordenes = personal(jwt)</span>
+<span class="fc" id="L122">                ? repository.findByIdUsuarioAndPublicadaTrueOrderByCreadoEnDesc(UUID.fromString(jwt.getSubject()))</span>
+<span class="fc" id="L123">                : repository.findByPublicadaTrueOrderByCreadoEnDesc();</span>
+<span class="fc" id="L124">        return ordenes.stream().map(mapper::toDTO).toList();</span>
+    }
+
+    // Ejecuta este método en una transacción de lectura.
+    @Transactional(readOnly = true)
+<span class="fc" id="L129">    public OrdenDTO obtener(UUID id, Jwt jwt) { return mapper.toDTO(buscarPublicada(id, jwt)); }</span>
+
+    @Transactional(readOnly = true)
+<span class="nc" id="L132">    public OrdenDTO obtenerReferencia(UUID id, Jwt jwt) { return mapper.toDTO(buscarPropia(id, jwt)); }</span>
+
+    public OrdenDTO publicar(UUID id, Jwt jwt) {
+<span class="fc" id="L135">        Orden orden = buscarPropia(id, jwt);</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (!orden.isPublicada()) {</span>
+<span class="fc" id="L137">            long esperadas = orden.getDetalles().stream()</span>
+<span class="fc" id="L138">                    .mapToLong(detalle -&gt; detalle.getCantidad())</span>
+<span class="fc" id="L139">                    .sum();</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">            if (agendamiento.contarConfirmadas(id, jwt.getTokenValue()) != esperadas)</span>
+<span class="fc" id="L141">                throw new ApiException(HttpStatus.CONFLICT, &quot;Aún hay citas pendientes para esta orden&quot;);</span>
+<span class="fc" id="L142">            orden.setPublicada(true);</span>
+        }
+<span class="fc" id="L144">        return mapper.toDTO(orden);</span>
+    }
+
+    public OrdenDTO cambiarEstado(UUID id, EstadoOrden estado, Jwt jwt) {
+<span class="fc" id="L148">        Orden orden = buscarPublicada(id, jwt);</span>
+        // Permite repetir el mismo cambio.
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (orden.getEstado() == estado) return mapper.toDTO(orden);</span>
+        // Solo permite salir de PENDIENTE hacia un estado final.
+<span class="pc bpc" id="L152" title="1 of 4 branches missed.">        if (orden.getEstado() != EstadoOrden.PENDIENTE || estado == EstadoOrden.PENDIENTE)</span>
+<span class="fc" id="L153">            throw new ApiException(HttpStatus.CONFLICT, &quot;La orden ya no admite este cambio de estado&quot;);</span>
+        // Actualiza la entidad administrada por JPA.
+<span class="fc" id="L155">        orden.setEstado(estado);</span>
+<span class="fc" id="L156">        log.info(&quot;Estado de orden {} actualizado a {}&quot;, id, estado);</span>
+<span class="fc" id="L157">        return mapper.toDTO(orden);</span>
+    }
+
+    // Verifica existencia y propiedad.
+    private Orden buscarPublicada(UUID id, Jwt jwt) {
+<span class="fc" id="L162">        Orden orden = buscar(id);</span>
+        // Comprueba el propietario de la orden.
+<span class="fc bfc" id="L164" title="All 6 branches covered.">        if (!orden.isPublicada() || (personal(jwt) &amp;&amp; !esPropietario(orden, jwt)))</span>
+            // Devuelve 404 para órdenes ajenas.
+<span class="fc" id="L166">            throw new ApiException(HttpStatus.NOT_FOUND, &quot;Orden no encontrada&quot;);</span>
+<span class="fc" id="L167">        return orden;</span>
+    }
+
+    private Orden buscarPropia(UUID id, Jwt jwt) {
+<span class="fc" id="L171">        Orden orden = buscar(id);</span>
+<span class="fc bfc" id="L172" title="All 2 branches covered.">        if (!esPropietario(orden, jwt)) throw new ApiException(HttpStatus.NOT_FOUND, &quot;Orden no encontrada&quot;);</span>
+<span class="fc" id="L173">        return orden;</span>
+    }
+
+    private Orden buscar(UUID id) {
+<span class="pc" id="L177">        return repository.findById(id).orElseThrow(() -&gt; new ApiException(HttpStatus.NOT_FOUND, &quot;Orden no encontrada&quot;));</span>
+    }
+
+    private boolean esPropietario(Orden orden, Jwt jwt) {
+<span class="fc" id="L181">        return orden.getIdUsuario().toString().equals(jwt.getSubject());</span>
+    }
+
+    // Limita el acceso según el rol.
+    private boolean personal(Jwt jwt) {
+        // Lee los roles del JWT validado como una lista de texto.
+<span class="fc" id="L187">        List&lt;String&gt; roles = jwt.getClaimAsStringList(&quot;roles&quot;);</span>
+<span class="fc bfc" id="L188" title="All 6 branches covered.">        return roles == null || (!roles.contains(&quot;ADMINISTRADOR&quot;) &amp;&amp; !roles.contains(&quot;VENDEDOR&quot;));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

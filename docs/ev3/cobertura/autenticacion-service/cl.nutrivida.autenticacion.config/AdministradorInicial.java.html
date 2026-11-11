@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AdministradorInicial.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">autenticacion-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.autenticacion.config</a> &gt; <span class="el_source">AdministradorInicial.java</span></div><h1>AdministradorInicial.java</h1><pre class="source lang-java linenums">package cl.nutrivida.autenticacion.config;
+
+import cl.nutrivida.autenticacion.dto.RegistroDTO;
+import cl.nutrivida.autenticacion.dto.UsuarioDTO;
+import cl.nutrivida.autenticacion.repository.UsuarioRepository;
+import cl.nutrivida.autenticacion.service.AutenticacionService;
+import jakarta.validation.Validator;
+import java.nio.charset.StandardCharsets;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Component
+@ConditionalOnProperty(name = &quot;app.bootstrap.enabled&quot;, havingValue = &quot;true&quot;)
+public class AdministradorInicial implements ApplicationRunner {
+    private final AutenticacionService service;
+    private final UsuarioRepository usuarios;
+    private final Validator validator;
+    private final String correo;
+    private final String password;
+
+    public AdministradorInicial(AutenticacionService service, UsuarioRepository usuarios, Validator validator,
+<span class="fc" id="L26">        @Value(&quot;${app.bootstrap.email:}&quot;) String correo, @Value(&quot;${app.bootstrap.password:}&quot;) String password) {</span>
+<span class="fc" id="L27">        this.service = service; this.usuarios = usuarios; this.validator = validator;</span>
+<span class="fc" id="L28">        this.correo = correo; this.password = password;</span>
+<span class="fc" id="L29">    }</span>
+
+    @Override
+    @Transactional
+    public void run(ApplicationArguments args) {
+<span class="fc bfc" id="L34" title="All 2 branches covered.">        if (usuarios.existsByRol_Nombre(&quot;ADMINISTRADOR&quot;)) return;</span>
+<span class="fc" id="L35">        RegistroDTO dto = new RegistroDTO(correo, password);</span>
+<span class="pc bpc" id="L36" title="1 of 4 branches missed.">        if (!validator.validate(dto).isEmpty() || password.getBytes(StandardCharsets.UTF_8).length &gt; 72) {</span>
+<span class="fc" id="L37">            throw new IllegalStateException(&quot;Configure un correo y contraseña inicial válidos mediante el entorno&quot;);</span>
+        }
+<span class="fc" id="L39">        UsuarioDTO creado = service.registrar(dto);</span>
+<span class="fc" id="L40">        service.actualizar(creado.id(), &quot;ADMINISTRADOR&quot;, &quot;ACTIVO&quot;);</span>
+<span class="fc" id="L41">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

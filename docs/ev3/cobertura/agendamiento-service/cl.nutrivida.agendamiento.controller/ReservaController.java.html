@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(&quot;/api/v1/agendamiento&quot;)
@@ -27,9 +28,22 @@ public class ReservaController {
 
     private final ReservaService service;
 
-<span class="fc" id="L30">    public ReservaController(ReservaService service) {</span>
-<span class="fc" id="L31">        this.service = service;</span>
-<span class="fc" id="L32">    }</span>
+<span class="fc" id="L31">    public ReservaController(ReservaService service) {</span>
+<span class="fc" id="L32">        this.service = service;</span>
+<span class="fc" id="L33">    }</span>
+
+    @GetMapping(&quot;/disponibilidad&quot;)
+    @Operation(summary = &quot;Consultar disponibilidad de un horario&quot;, security = {})
+    public boolean consultarDisponibilidad(@RequestParam long nutricionistaId,
+            @RequestParam String fecha, @RequestParam String hora) {
+<span class="fc" id="L39">        return service.estaDisponible(nutricionistaId, fecha, hora);</span>
+    }
+
+    @GetMapping(&quot;/ordenes/{ordenId}/confirmadas&quot;)
+    @Operation(summary = &quot;Contar las citas confirmadas de una orden propia&quot;)
+    public long contarConfirmadas(@PathVariable UUID ordenId, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L45">        return service.contarConfirmadas(ordenId, jwt);</span>
+    }
 
     @GetMapping
     @Operation(
@@ -38,11 +52,11 @@ public class ReservaController {
     )
     @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Listado de reservas obtenido correctamente&quot;)
     public List&lt;ReservaDTO&gt; listarActivas(@AuthenticationPrincipal Jwt jwt) {
-<span class="nc" id="L41">        return service.listarActivas(jwt);</span>
+<span class="fc" id="L55">        return service.listarActivas(jwt);</span>
     }
 
     public List&lt;ReservaDTO&gt; listarActivas() {
-<span class="fc" id="L45">        return service.listarActivas();</span>
+<span class="fc" id="L59">        return service.listarActivas();</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
@@ -56,11 +70,11 @@ public class ReservaController {
             @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Reserva no encontrada con el ID indicado&quot;)
     })
     public ReservaDTO obtenerPorId(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-<span class="nc" id="L59">        return service.obtenerPorId(id, jwt);</span>
+<span class="nc" id="L73">        return service.obtenerPorId(id, jwt);</span>
     }
 
     public ReservaDTO obtenerPorId(Long id) {
-<span class="fc" id="L63">        return service.obtenerPorId(id);</span>
+<span class="fc" id="L77">        return service.obtenerPorId(id);</span>
     }
 
     @PostMapping
@@ -73,13 +87,13 @@ public class ReservaController {
             @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos inválidos o conflicto de horario con el nutricionista&quot;)
     })
     public ResponseEntity&lt;ReservaDTO&gt; crear(@RequestBody ReservaDTO dto, @AuthenticationPrincipal Jwt jwt) {
-<span class="nc" id="L76">        ReservaDTO creada = service.crear(dto, jwt);</span>
-<span class="nc" id="L77">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
+<span class="nc" id="L90">        ReservaDTO creada = service.crear(dto, jwt);</span>
+<span class="nc" id="L91">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
     }
 
     public ResponseEntity&lt;ReservaDTO&gt; crear(ReservaDTO dto) {
-<span class="fc" id="L81">        ReservaDTO creada = service.crear(dto);</span>
-<span class="fc" id="L82">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
+<span class="fc" id="L95">        ReservaDTO creada = service.crear(dto);</span>
+<span class="fc" id="L96">        return ResponseEntity.status(HttpStatus.CREATED).body(creada);</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
@@ -94,11 +108,11 @@ public class ReservaController {
             @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Reserva no encontrada&quot;)
     })
     public ReservaDTO actualizar(@PathVariable Long id, @RequestBody ReservaDTO dto, @AuthenticationPrincipal Jwt jwt) {
-<span class="nc" id="L97">        return service.actualizar(id, dto, jwt);</span>
+<span class="nc" id="L111">        return service.actualizar(id, dto, jwt);</span>
     }
 
     public ReservaDTO actualizar(Long id, ReservaDTO dto) {
-<span class="fc" id="L101">        return service.actualizar(id, dto);</span>
+<span class="fc" id="L115">        return service.actualizar(id, dto);</span>
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
@@ -112,13 +126,13 @@ public class ReservaController {
             @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Reserva no encontrada&quot;)
     })
     public ResponseEntity&lt;Void&gt; cancelar(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
-<span class="nc" id="L115">        service.cancelar(id, jwt);</span>
-<span class="nc" id="L116">        return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L129">        service.cancelar(id, jwt);</span>
+<span class="nc" id="L130">        return ResponseEntity.noContent().build();</span>
     }
 
     public ResponseEntity&lt;Void&gt; cancelar(Long id) {
-<span class="fc" id="L120">        service.cancelar(id);</span>
-<span class="fc" id="L121">        return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L134">        service.cancelar(id);</span>
+<span class="fc" id="L135">        return ResponseEntity.noContent().build();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

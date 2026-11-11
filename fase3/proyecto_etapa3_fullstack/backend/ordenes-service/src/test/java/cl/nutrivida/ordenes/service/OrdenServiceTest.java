@@ -36,6 +36,63 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 // Define la clase.
 class OrdenServiceTest {
+@Test void rechazaTodosLosDatosIncompatiblesDelCatalogo() {
+        List<CatalogoPort.ProductoDTO> invalidos = Arrays.asList(
+                null,
+                new CatalogoPort.ProductoDTO(2L, "Consulta", BigDecimal.TEN, true),
+                new CatalogoPort.ProductoDTO(1L, "Consulta", BigDecimal.TEN, null),
+                new CatalogoPort.ProductoDTO(1L, null, BigDecimal.TEN, true),
+                new CatalogoPort.ProductoDTO(1L, " ", BigDecimal.TEN, true),
+                new CatalogoPort.ProductoDTO(1L, "x".repeat(151), BigDecimal.TEN, true),
+                new CatalogoPort.ProductoDTO(1L, "Consulta", null, true),
+                new CatalogoPort.ProductoDTO(1L, "Consulta", BigDecimal.valueOf(-1), true),
+                new CatalogoPort.ProductoDTO(1L, "Consulta", new BigDecimal("1.5"), true));
+        var solicitud = new CrearOrdenDTO(UUID.randomUUID(), List.of(new CrearOrdenDTO.ItemDTO(1L, 1)));
+        for (var articulo : invalidos) {
+            when(catalogo.consultar(1L, "jwt")).thenReturn(articulo);
+            assertThrows(ApiException.class, () -> service.crear(solicitud, jwt));
+        }
+        verify(repository, never()).saveAndFlush(any());
+    }
+
+    @Test void permiteListarAlPersonalYConservaLasRestriccionesDeEstado() {
+        var admin = Jwt.withTokenValue("admin").header("alg", "RS256").subject(usuario.toString())
+                .claim("roles", List.of("ADMINISTRADOR")).build();
+        var vendedor = Jwt.withTokenValue("vendedor").header("alg", "RS256").subject(usuario.toString())
+                .claim("roles", List.of("VENDEDOR")).build();
+        var sinRoles = Jwt.withTokenValue("otro").header("alg", "RS256").subject(usuario.toString()).build();
+        when(repository.findByPublicadaTrueOrderByCreadoEnDesc()).thenReturn(List.of());
+        assertTrue(service.listar(admin).isEmpty());
+        assertTrue(service.listar(vendedor).isEmpty());
+        assertTrue(service.listar(sinRoles).isEmpty());
+        var orden = new Orden();
+        orden.setIdUsuario(usuario);
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.of(orden));
+        assertEquals(EstadoOrden.CONFIRMADA, service.cambiarEstado(id, EstadoOrden.CONFIRMADA, admin).estado());
+        assertEquals(EstadoOrden.CONFIRMADA, service.cambiarEstado(id, EstadoOrden.CONFIRMADA, admin).estado());
+        assertThrows(ApiException.class, () -> service.cambiarEstado(id, EstadoOrden.CANCELADA, admin));
+        assertNotNull(service.publicar(id, jwt));
+        assertThrows(ApiException.class, () -> service.obtenerReferencia(id,
+                Jwt.withTokenValue("ajeno").header("alg", "RS256").subject(UUID.randomUUID().toString()).build()));
+    }
+
+    @Test void reintentoDeBorradorNoPermiteSaltarLaPublicacionNiDuplicarArticulos() {
+        var orden = new Orden();
+        orden.setIdUsuario(usuario);
+        orden.setPublicada(false);
+        var detalle = new DetalleOrden();
+        detalle.setIdPlan(1L);
+        detalle.setCantidad(1);
+        orden.getDetalles().add(detalle);
+        var clave = UUID.randomUUID();
+        when(repository.findByIdUsuarioAndClaveIdempotencia(usuario, clave)).thenReturn(Optional.of(orden));
+        var item = new CrearOrdenDTO.ItemDTO(1L, 1);
+        var solicitud = new CrearOrdenDTO(clave, List.of(item));
+        assertNotNull(service.preparar(solicitud, jwt));
+        assertThrows(ApiException.class, () -> service.crear(solicitud, jwt));
+        assertThrows(ApiException.class, () -> service.preparar(new CrearOrdenDTO(clave, List.of(item, item)), jwt));
+    }
     // Simula la dependencia.
     @Mock OrdenRepository repository;
     // Simula la dependencia.

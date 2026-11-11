@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">autenticacion-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.autenticacion.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">
+// Paquete de la clase.
+package cl.nutrivida.autenticacion.config;
+
+// Importa los tipos del paquete.
+import org.springframework.context.annotation.*;
+// Importa HttpMethod.
+import org.springframework.http.HttpMethod;
+// Importa EnableMethodSecurity.
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+// Importa HttpSecurity.
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+// Importa SessionCreationPolicy.
+import org.springframework.security.config.http.SessionCreationPolicy;
+// Importa BCryptPasswordEncoder.
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+// Importa PasswordEncoder.
+import org.springframework.security.crypto.password.PasswordEncoder;
+// Importa los tipos del paquete.
+import org.springframework.security.oauth2.server.resource.authentication.*;
+// Importa SecurityFilterChain.
+import org.springframework.security.web.SecurityFilterChain;
+
+// Configuración de Spring.
+@Configuration
+@EnableMethodSecurity
+// Define la clase.
+<span class="fc" id="L28">public class SecurityConfig {</span>
+    // Registra el componente en Spring.
+    @Bean
+<span class="fc" id="L31">    PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }</span>
+
+    // Registra el componente en Spring.
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+<span class="fc" id="L36">        JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();</span>
+<span class="fc" id="L37">        roles.setAuthoritiesClaimName(&quot;roles&quot;);</span>
+<span class="fc" id="L38">        roles.setAuthorityPrefix(&quot;ROLE_&quot;);</span>
+<span class="fc" id="L39">        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();</span>
+<span class="fc" id="L40">        converter.setJwtGrantedAuthoritiesConverter(roles);</span>
+        // Configura la seguridad HTTP.
+<span class="fc" id="L42">        return http.csrf(c -&gt; c.disable())</span>
+            // Sin sesiones HTTP en el servidor.
+<span class="fc" id="L44">            .sessionManagement(s -&gt; s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+            // Inicia las reglas de acceso HTTP.
+<span class="fc" id="L46">            .authorizeHttpRequests(a -&gt; a</span>
+<span class="fc" id="L47">                .requestMatchers(HttpMethod.POST, &quot;/api/v1/autenticacion/registro&quot;, &quot;/api/v1/autenticacion/login&quot;, &quot;/api/v1/autenticacion/renovar&quot;, &quot;/api/v1/autenticacion/logout&quot;, &quot;/api/v1/autenticacion/web/**&quot;).permitAll()</span>
+                // Incluye los recursos de Swagger.
+<span class="fc" id="L49">                .requestMatchers(&quot;/.well-known/jwks.json&quot;, &quot;/v3/api-docs/**&quot;, &quot;/swagger-ui/**&quot;, &quot;/doc/swagger-ui.html&quot;, &quot;/doc/swagger-ui/**&quot;).permitAll()</span>
+<span class="fc" id="L50">                .anyRequest().authenticated())</span>
+            // Valida el JWT y obtiene los roles.
+<span class="fc" id="L52">            .oauth2ResourceServer(o -&gt; o.jwt(j -&gt; j.jwtAuthenticationConverter(converter)))</span>
+            // Construye la configuración.
+<span class="fc" id="L54">            .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -13,25 +14,26 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @SecurityScheme(name = &quot;bearerAuth&quot;, type = SecuritySchemeType.HTTP, scheme = &quot;bearer&quot;, bearerFormat = &quot;JWT&quot;)
-<span class="nc" id="L16">public class SecurityConfig {</span>
+<span class="fc" id="L17">public class SecurityConfig {</span>
 
     @Bean
     SecurityFilterChain seguridad(HttpSecurity http,
             @Value(&quot;${app.security.roles-claim:roles}&quot;) String claimRoles) throws Exception {
-<span class="nc" id="L21">        var roles = new JwtGrantedAuthoritiesConverter();</span>
-<span class="nc" id="L22">        roles.setAuthoritiesClaimName(claimRoles);</span>
-<span class="nc" id="L23">        roles.setAuthorityPrefix(&quot;ROLE_&quot;);</span>
-<span class="nc" id="L24">        var conversor = new JwtAuthenticationConverter();</span>
-<span class="nc" id="L25">        conversor.setJwtGrantedAuthoritiesConverter(roles);</span>
+<span class="fc" id="L22">        var roles = new JwtGrantedAuthoritiesConverter();</span>
+<span class="fc" id="L23">        roles.setAuthoritiesClaimName(claimRoles);</span>
+<span class="fc" id="L24">        roles.setAuthorityPrefix(&quot;ROLE_&quot;);</span>
+<span class="fc" id="L25">        var conversor = new JwtAuthenticationConverter();</span>
+<span class="fc" id="L26">        conversor.setJwtGrantedAuthoritiesConverter(roles);</span>
 
-<span class="nc" id="L27">        return http.csrf(csrf -&gt; csrf.disable())</span>
-<span class="nc" id="L28">                .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
-<span class="nc" id="L29">                .authorizeHttpRequests(auth -&gt; auth</span>
-<span class="nc" id="L30">                        .requestMatchers(&quot;/v3/api-docs/**&quot;, &quot;/swagger-ui/**&quot;, &quot;/doc/swagger-ui.html&quot;, &quot;/doc/swagger-ui/**&quot;).permitAll()</span>
-<span class="nc" id="L31">                        .requestMatchers(&quot;/api/v1/agendamiento/**&quot;).hasAnyRole(&quot;CLIENTE&quot;, &quot;ADMINISTRADOR&quot;)</span>
-<span class="nc" id="L32">                        .anyRequest().denyAll())</span>
-<span class="nc" id="L33">                .oauth2ResourceServer(oauth -&gt; oauth.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(conversor)))</span>
-<span class="nc" id="L34">                .build();</span>
+<span class="fc" id="L28">        return http.csrf(csrf -&gt; csrf.disable())</span>
+<span class="fc" id="L29">                .sessionManagement(session -&gt; session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))</span>
+<span class="fc" id="L30">                .authorizeHttpRequests(auth -&gt; auth</span>
+<span class="fc" id="L31">                        .requestMatchers(&quot;/v3/api-docs/**&quot;, &quot;/swagger-ui/**&quot;, &quot;/doc/swagger-ui.html&quot;, &quot;/doc/swagger-ui/**&quot;).permitAll()</span>
+<span class="fc" id="L32">                        .requestMatchers(HttpMethod.GET, &quot;/api/v1/agendamiento/disponibilidad&quot;).permitAll()</span>
+<span class="fc" id="L33">                        .requestMatchers(&quot;/api/v1/agendamiento/**&quot;).hasAnyRole(&quot;CLIENTE&quot;, &quot;ADMINISTRADOR&quot;)</span>
+<span class="fc" id="L34">                        .anyRequest().denyAll())</span>
+<span class="fc" id="L35">                .oauth2ResourceServer(oauth -&gt; oauth.jwt(jwt -&gt; jwt.jwtAuthenticationConverter(conversor)))</span>
+<span class="fc" id="L36">                .build();</span>
     }
 }
 
