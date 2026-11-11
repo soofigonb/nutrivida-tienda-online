@@ -1,5 +1,6 @@
 // Adapta el carrito a la API.
 import { api, ApiError } from './api.js'
+import { consultarDisponibilidad } from './agendamiento.js'
 
 export async function crearOrdenDesdeCarrito(reservas, cuenta, cliente = api, storage = sessionStorage) {
   if (!cuenta?.id) throw new ApiError('Inicia sesión para crear tu orden.', 401)
@@ -8,7 +9,7 @@ export async function crearOrdenDesdeCarrito(reservas, cuenta, cliente = api, st
   let intento
   try { intento = JSON.parse(storage.getItem('nutrivida:orden-intento')) } catch { /* Recupera un intento válido abajo. */ }
   if (intento?.firma === firma && intento?.clave && intento?.unidades) {
-    const orden = await cliente.solicitar('ordenes', { method: 'POST', body: {
+    const orden = await cliente.solicitar('ordenes/preparar', { method: 'POST', body: {
       claveIdempotencia: intento.clave, detalles: intento.detalles,
     } })
     return { ...orden, unidades: intento.unidades }
@@ -27,10 +28,26 @@ export async function crearOrdenDesdeCarrito(reservas, cuenta, cliente = api, st
     return { idItem: item.id, unidad }
   })
   const detalles = [...cantidades].sort(([a], [b]) => a - b).map(([idItem, cantidad]) => ({ idItem, cantidad }))
+  // Revisa los horarios antes de enviar una orden nueva.
+  const disponibilidad = await Promise.all(reservas.map(reserva =>
+    consultarDisponibilidad(reserva.nutricionistaId, reserva.fecha, reserva.hora, { cliente }),
+  ))
+  const indiceOcupado = disponibilidad.indexOf(false)
+  if (indiceOcupado >= 0) {
+    const reserva = reservas[indiceOcupado]
+    throw new ApiError(`El horario de «${reserva.servicio}» (${reserva.fecha} a las ${reserva.hora}) está ocupado. Quita esa consulta del carrito y elige otro horario en Agendar.`)
+  }
+  if (!disponibilidad.every(disponible => disponible === true)) {
+    throw new ApiError('No se pudo comprobar la disponibilidad. Inténtalo nuevamente.')
+  }
   intento = { firma, clave: crypto.randomUUID(), detalles, unidades }
   // Conserva el intento antes de enviarlo.
   storage.setItem('nutrivida:orden-intento', JSON.stringify(intento))
   // El backend calcula los precios.
-  const orden = await cliente.solicitar('ordenes', { method: 'POST', body: { claveIdempotencia: intento.clave, detalles } })
+  const orden = await cliente.solicitar('ordenes/preparar', { method: 'POST', body: { claveIdempotencia: intento.clave, detalles } })
   return { ...orden, unidades }
+}
+
+export function publicarOrden(id) {
+  return api.solicitar(`ordenes/${encodeURIComponent(id)}/publicar`, { method: 'POST' })
 }

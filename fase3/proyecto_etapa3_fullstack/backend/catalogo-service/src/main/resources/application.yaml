@@ -1,23 +1,11 @@
+# Configuración propia del catálogo de NutriVida.
 spring:
   profiles:
     default: nutrivida
-  datasource:
-    url: ${CATALOGO_DB_URL}
-    username: ${CATALOGO_DB_USERNAME}
-    password: ${CATALOGO_DB_PASSWORD}
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        default_schema: db_catalogo
   flyway:
+    # El perfil NutriVida agrega sus datos iniciales.
     locations: classpath:db/migration
-    default-schema: db_catalogo
-    schemas: db_catalogo
-    clean-disabled: true
-    baseline-on-migrate: true
+  # Valida los tokens emitidos por Autenticación.
   security:
     oauth2:
       resourceserver:
@@ -26,11 +14,9 @@ spring:
           jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/.well-known/jwks.json}
 app:
   security:
+    # Atributo de roles y permiso de escritura.
     roles-claim: ${JWT_ROLES_CLAIM:roles}
     write-role: ${CATALOGO_WRITE_ROLE:ADMINISTRADOR}
-springdoc:
-  swagger-ui:
-    path: /doc/swagger-ui.html
 ---
 # Datos de ejemplo para NutriVida.
 spring:

@@ -1,5 +1,10 @@
 import { api } from './api.js'
 
+export function consultarDisponibilidad(nutricionistaId, fecha, hora, { signal, cliente = api } = {}) {
+  const parametros = new URLSearchParams({ nutricionistaId, fecha, hora })
+  return cliente.solicitar(`agendamiento/disponibilidad?${parametros}`, { publica: true, signal })
+}
+
 export async function registrarCitasDesdeCarrito(reservas, orden) {
   const citas = []
   const pendientes = []

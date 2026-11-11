@@ -1,5 +1,5 @@
 import { api } from '../services/api'
-import { crearOrdenDesdeCarrito } from '../services/ordenes'
+import { crearOrdenDesdeCarrito, publicarOrden } from '../services/ordenes'
 import { registrarCitasDesdeCarrito } from '../services/agendamiento'
 import {
   createContext,
@@ -401,6 +401,15 @@ export function CarritoProvider({ children }) {
       }
       const orden = await crearOrdenDesdeCarrito(actuales, api.usuarioActual())
       const { citas, pendientes } = await registrarCitasDesdeCarrito(actuales, orden)
+      // Conserva el carrito completo mientras haya citas por reintentar.
+      if (pendientes.length === 0) {
+        await publicarOrden(orden.id)
+        const procesadas = new Map(actuales.map(reserva => [reserva.id, JSON.stringify(reserva)]))
+        const restantes = leerLista(CLAVE_CARRITO).filter(
+          reserva => procesadas.get(reserva.id) !== JSON.stringify(reserva),
+        )
+        guardarCarrito(restantes)
+      }
       return { exito: true, orden, citas, pendientes }
     } catch (error) { return informarError(error.message) }
   }

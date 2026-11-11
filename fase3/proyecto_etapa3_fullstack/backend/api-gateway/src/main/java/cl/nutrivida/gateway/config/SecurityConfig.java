@@ -69,6 +69,7 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .pathMatchers(HttpMethod.POST, "/api/v1/autenticacion/registro", "/api/v1/autenticacion/login", "/api/v1/autenticacion/renovar", "/api/v1/autenticacion/logout", "/api/v1/autenticacion/web/**").permitAll()
                 .pathMatchers(HttpMethod.GET, "/api/v1/catalogo/**", "/api/v1/profesionales/**").permitAll()
+                .pathMatchers(HttpMethod.GET, "/api/v1/agendamiento/disponibilidad").permitAll()
                 .pathMatchers("/api/v1/autenticacion/usuarios/**").hasRole("ADMINISTRADOR")
                 // Exige un JWT válido para consultar la cuenta actual.
                 .pathMatchers("/api/v1/autenticacion/me").authenticated()

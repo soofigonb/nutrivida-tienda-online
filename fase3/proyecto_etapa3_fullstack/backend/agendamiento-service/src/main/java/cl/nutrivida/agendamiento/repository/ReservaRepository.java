@@ -9,6 +9,7 @@ import java.util.UUID;
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     Optional<Reserva> findByOrdenIdAndItemIdAndUnidad(UUID ordenId, Long itemId, Integer unidad);
+    long countByOrdenIdAndUsuarioIdAndEstadoAndActivoTrue(UUID ordenId, UUID usuarioId, String estado);
 
     List<Reserva> findByActivoTrue();
 

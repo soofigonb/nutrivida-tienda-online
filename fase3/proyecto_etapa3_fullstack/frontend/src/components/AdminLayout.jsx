@@ -16,13 +16,16 @@ function AdminLayout() {
   // 1. CONTEXTOS Y NAVEGACIÓN
   // ========================================
 
-  const { usuario, cerrarSesion } =
+  const { usuario, cerrarSesion, errorSesion } =
     useContext(AuthContext)
 
   const { errorDatos } = useDatos()
 
   const { pathname } = useLocation()
   const navigate = useNavigate()
+  const esAdmin = usuario?.rol === 'ADMINISTRADOR'
+  const tieneEncabezadoPropio = pathname.startsWith('/gestion') || pathname === '/admin/cuentas'
+  const nombreRol = esAdmin ? 'Administrador' : 'Vendedor'
 
   // ========================================
   // 2. IDENTIFICAR LA SECCIÓN ACTUAL
@@ -63,7 +66,7 @@ function AdminLayout() {
   function salir() {
     cerrarSesion()
 
-    navigate('/login?acceso=admin', {
+    navigate(esAdmin ? '/login?acceso=admin' : '/login', {
       replace: true,
     })
   }
@@ -76,7 +79,7 @@ function AdminLayout() {
 
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
-          <Link to="/admin">
+          <Link to={esAdmin ? '/admin' : '/gestion/ordenes'}>
             <i
               className="bi bi-heart-pulse"
               aria-hidden="true"
@@ -84,49 +87,32 @@ function AdminLayout() {
             NutriVida
           </Link>
 
-          <span>Panel administrador</span>
+          <span>{esAdmin ? 'Panel administrador' : 'Panel vendedor'}</span>
         </div>
 
         <nav
           className="admin-nav"
-          aria-label="Navegación administrativa"
+          aria-label={esAdmin ? 'Navegación administrativa' : 'Navegación de gestión'}
         >
           <NavLink to="/gestion/ordenes" className="admin-nav-link">Órdenes</NavLink>
           <NavLink to="/gestion/catalogo" className="admin-nav-link">Catálogo</NavLink>
-          <NavLink to="/admin/cuentas" className="admin-nav-link">Cuentas de acceso</NavLink>
-          <NavLink
-            to="/admin"
-            end
-            className="admin-nav-link"
-          >
-            <i
-              className="bi bi-grid"
-              aria-hidden="true"
-            />
-            Dashboard
-          </NavLink>
-
-          <NavLink
-            to="/admin/pacientes"
-            className="admin-nav-link"
-          >
-            <i
-              className="bi bi-people"
-              aria-hidden="true"
-            />
-            Pacientes
-          </NavLink>
-
-          <NavLink
-            to="/admin/nutricionistas"
-            className="admin-nav-link"
-          >
-            <i
-              className="bi bi-person-badge"
-              aria-hidden="true"
-            />
-            Nutricionistas
-          </NavLink>
+          {esAdmin && (
+            <>
+              <NavLink to="/admin/cuentas" className="admin-nav-link">Cuentas de acceso</NavLink>
+              <NavLink to="/admin" end className="admin-nav-link">
+                <i className="bi bi-grid" aria-hidden="true" />
+                Dashboard
+              </NavLink>
+              <NavLink to="/admin/pacientes" className="admin-nav-link">
+                <i className="bi bi-people" aria-hidden="true" />
+                Pacientes
+              </NavLink>
+              <NavLink to="/admin/nutricionistas" className="admin-nav-link">
+                <i className="bi bi-person-badge" aria-hidden="true" />
+                Nutricionistas
+              </NavLink>
+            </>
+          )}
         </nav>
 
         {/* Usuario y acciones de la sesión */}
@@ -139,20 +125,20 @@ function AdminLayout() {
 
             <div>
               <strong>
-                {usuario?.nombre || 'Administrador'}
+                {usuario?.nombre || nombreRol}
               </strong>
 
               <span>Sesión activa</span>
             </div>
           </div>
 
-          <Link to="/" className="admin-nav-link">
+          {esAdmin && <Link to="/" className="admin-nav-link">
             <i
               className="bi bi-box-arrow-left"
               aria-hidden="true"
             />
             Volver al sitio
-          </Link>
+          </Link>}
 
           <button
             type="button"
@@ -173,7 +159,7 @@ function AdminLayout() {
           ======================================== */}
 
       <main className="admin-content">
-        <header className="admin-topbar">
+        {!tieneEncabezadoPropio && <header className="admin-topbar">
           <div>
             <p className="admin-bienvenida">
               {etiqueta}
@@ -201,8 +187,9 @@ function AdminLayout() {
                 : 'Nuevo nutricionista'}
             </Link>
           )}
-        </header>
+        </header>}
 
+        {errorSesion && <Alert variant="warning">{errorSesion}</Alert>}
         {esPaciente && <Alert role="note" variant="info">Las fichas se guardan en Pacientes. Las cuentas de acceso se gestionan en «Cuentas de acceso».</Alert>}
 
         {esPaciente && errorDatos ? (

@@ -15,9 +15,9 @@ spring:
   # Conexión a la base PostgreSQL de pacientes en Supabase.
   datasource:
     # Conexión Supabase con SSL; la variable permite usar otra base.
-    url: ${PACIENTES_DB_URL:jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require}
+    url: ${PACIENTES_DB_URL:}
     # Usuario del proyecto de pacientes; puede reemplazarse desde el entorno.
-    username: ${PACIENTES_DB_USERNAME:postgres.nyaxmfgatgsrspxdfxwf}
+    username: ${PACIENTES_DB_USERNAME:}
     # Contraseña desde el entorno; nunca escribir el secreto en este archivo.
     password: ${PACIENTES_DB_PASSWORD}
     # Driver JDBC que permite comunicarse con PostgreSQL.

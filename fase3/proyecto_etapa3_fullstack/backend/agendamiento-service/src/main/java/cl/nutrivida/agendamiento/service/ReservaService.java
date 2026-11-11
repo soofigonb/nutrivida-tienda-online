@@ -36,6 +36,23 @@ public class ReservaService {
         this.referencias = referencias;
     }
 
+    public boolean estaDisponible(long nutricionistaId, String fecha, String hora) {
+        if (nutricionistaId < 1) throw new IllegalArgumentException("Selecciona un profesional válido");
+        validarBloque(fecha, hora);
+        validarHorarioFuturo(fecha, hora);
+        return !horarioOcupado(nutricionistaId, fecha, hora);
+    }
+
+    public long contarConfirmadas(UUID ordenId, Jwt jwt) {
+        return repository.countByOrdenIdAndUsuarioIdAndEstadoAndActivoTrue(
+                ordenId, extraerUsuarioId(jwt), "CONFIRMADA");
+    }
+
+    private boolean horarioOcupado(Long nutricionistaId, String fecha, String hora) {
+        return repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(
+                nutricionistaId, fecha.trim(), hora.trim());
+    }
+
     // GET / -> listar reservas activas (todas para ADMINISTRADOR, propias para CLIENTE)
     public List<ReservaDTO> listarActivas() {
         return listarActivas(null);
@@ -91,14 +108,9 @@ public class ReservaService {
             dto.setEstado("CONFIRMADA");
         }
         validar(dto);
-        if (jwt != null) validarHorarioFuturo(dto);
+        if (jwt != null) validarHorarioFuturo(dto.getFecha(), dto.getHora());
 
-        boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(
-                dto.getNutricionistaId(),
-                dto.getFecha().trim(),
-                dto.getHora().trim()
-        );
-        if (conflicto) {
+        if (horarioOcupado(dto.getNutricionistaId(), dto.getFecha(), dto.getHora())) {
             throw new IllegalArgumentException(
                     "El nutricionista seleccionado ya tiene una reserva en esa fecha y horario."
             );
@@ -141,7 +153,7 @@ public class ReservaService {
             dto.setNutricionistaNombre(referencias.consultarProfesional(dto.getNutricionistaId()));
         }
         validar(dto);
-        if (jwt != null) validarHorarioFuturo(dto);
+        if (jwt != null) validarHorarioFuturo(dto.getFecha(), dto.getHora());
 
         boolean conflicto = repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrueAndReservaIdNot(
                 dto.getNutricionistaId(),
@@ -230,20 +242,24 @@ public class ReservaService {
         if (dto.getNutricionistaNombre() == null || dto.getNutricionistaNombre().isBlank()) {
             throw new IllegalArgumentException("El nombre del nutricionista es obligatorio");
         }
-        if (dto.getFecha() == null || !dto.getFecha().trim().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
-            throw new IllegalArgumentException("La fecha debe tener formato YYYY-MM-DD");
-        }
-        if (dto.getHora() == null || !HORARIOS_PERMITIDOS.contains(dto.getHora().trim())) {
-            throw new IllegalArgumentException("El horario debe ser 09:00, 11:00, 15:00 o 17:00");
-        }
+        validarBloque(dto.getFecha(), dto.getHora());
         if (dto.getMotivo() == null || dto.getMotivo().trim().length() < 5 || dto.getMotivo().trim().length() > 100) {
             throw new IllegalArgumentException("El motivo debe tener entre 5 y 100 caracteres");
         }
     }
 
-    private void validarHorarioFuturo(ReservaDTO dto) {
+    private void validarBloque(String fecha, String hora) {
+        if (fecha == null || !fecha.trim().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+            throw new IllegalArgumentException("La fecha debe tener formato YYYY-MM-DD");
+        }
+        if (hora == null || !HORARIOS_PERMITIDOS.contains(hora.trim())) {
+            throw new IllegalArgumentException("El horario debe ser 09:00, 11:00, 15:00 o 17:00");
+        }
+    }
+
+    private void validarHorarioFuturo(String fecha, String hora) {
         try {
-            var horario = LocalDateTime.parse(dto.getFecha().trim() + "T" + dto.getHora());
+            var horario = LocalDateTime.parse(fecha.trim() + "T" + hora.trim());
             if (!horario.isAfter(LocalDateTime.now(ZoneId.of("America/Santiago")))) {
                 throw new IllegalArgumentException("El horario debe ser futuro");
             }

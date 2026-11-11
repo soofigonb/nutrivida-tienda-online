@@ -8,6 +8,7 @@ import java.math.*;
 // Importa los tipos del paquete.
 import java.util.*;
 import cl.nutrivida.ordenes.port.CatalogoPort;
+import cl.nutrivida.ordenes.client.AgendamientoClient;
 // Importa los tipos del paquete.
 import cl.nutrivida.ordenes.dto.*;
 // Importa los tipos del paquete.
@@ -37,14 +38,25 @@ public class OrdenService {
     private final OrdenRepository repository;
     private final OrdenMapper mapper;
     private final CatalogoPort catalogo;
+    private final AgendamientoClient agendamiento;
 
     public OrdenDTO crear(CrearOrdenDTO dto, Jwt jwt) {
+        return crear(dto, jwt, true);
+    }
+
+    public OrdenDTO preparar(CrearOrdenDTO dto, Jwt jwt) {
+        return crear(dto, jwt, false);
+    }
+
+    private OrdenDTO crear(CrearOrdenDTO dto, Jwt jwt, boolean publicada) {
         // Obtiene el UUID propietario desde sub del JWT validado.
         UUID usuario = UUID.fromString(jwt.getSubject());
         // Detecta reintentos por usuario.
         Optional<Orden> previa = repository.findByIdUsuarioAndClaveIdempotencia(usuario, dto.claveIdempotencia());
         if (previa.isPresent()) {
             Orden orden = previa.get();
+            if (publicada && !orden.isPublicada())
+                throw new ApiException(HttpStatus.CONFLICT, "La solicitud aún tiene citas pendientes");
             Map<Long, Integer> original = new HashMap<>();
             // Agrupa los detalles guardados por artículo.
             orden.getDetalles().forEach(d -> original.put(d.getIdPlan(), d.getCantidad()));
@@ -58,6 +70,7 @@ public class OrdenService {
         }
         // Crea la cabecera de una orden nueva en memoria.
         Orden orden = new Orden();
+        orden.setPublicada(publicada);
         // Asigna el propietario obtenido del JWT.
         orden.setIdUsuario(usuario);
         // Guarda la clave del intento.
@@ -97,7 +110,7 @@ public class OrdenService {
         orden.setTotal(total);
         // Persiste la orden y sus detalles.
         Orden guardada = repository.saveAndFlush(orden);
-        log.info("Orden creada: {}", guardada.getId());
+        log.info(publicada ? "Orden creada: {}" : "Solicitud de reserva preparada: {}", guardada.getId());
         return mapper.toDTO(guardada);
     }
 
@@ -105,16 +118,34 @@ public class OrdenService {
     @Transactional(readOnly = true)
     public List<OrdenDTO> listar(Jwt jwt) {
         // Limita al cliente a sus órdenes.
-        List<Orden> ordenes = personal(jwt) ? repository.findByIdUsuarioOrderByCreadoEnDesc(UUID.fromString(jwt.getSubject())) : repository.findAll();
+        List<Orden> ordenes = personal(jwt)
+                ? repository.findByIdUsuarioAndPublicadaTrueOrderByCreadoEnDesc(UUID.fromString(jwt.getSubject()))
+                : repository.findByPublicadaTrueOrderByCreadoEnDesc();
         return ordenes.stream().map(mapper::toDTO).toList();
     }
 
     // Ejecuta este método en una transacción de lectura.
     @Transactional(readOnly = true)
-    public OrdenDTO obtener(UUID id, Jwt jwt) { return mapper.toDTO(buscarAutorizada(id, jwt)); }
+    public OrdenDTO obtener(UUID id, Jwt jwt) { return mapper.toDTO(buscarPublicada(id, jwt)); }
+
+    @Transactional(readOnly = true)
+    public OrdenDTO obtenerReferencia(UUID id, Jwt jwt) { return mapper.toDTO(buscarPropia(id, jwt)); }
+
+    public OrdenDTO publicar(UUID id, Jwt jwt) {
+        Orden orden = buscarPropia(id, jwt);
+        if (!orden.isPublicada()) {
+            long esperadas = orden.getDetalles().stream()
+                    .mapToLong(detalle -> detalle.getCantidad())
+                    .sum();
+            if (agendamiento.contarConfirmadas(id, jwt.getTokenValue()) != esperadas)
+                throw new ApiException(HttpStatus.CONFLICT, "Aún hay citas pendientes para esta orden");
+            orden.setPublicada(true);
+        }
+        return mapper.toDTO(orden);
+    }
 
     public OrdenDTO cambiarEstado(UUID id, EstadoOrden estado, Jwt jwt) {
-        Orden orden = buscarAutorizada(id, jwt);
+        Orden orden = buscarPublicada(id, jwt);
         // Permite repetir el mismo cambio.
         if (orden.getEstado() == estado) return mapper.toDTO(orden);
         // Solo permite salir de PENDIENTE hacia un estado final.
@@ -127,13 +158,27 @@ public class OrdenService {
     }
 
     // Verifica existencia y propiedad.
-    private Orden buscarAutorizada(UUID id, Jwt jwt) {
-        Orden orden = repository.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Orden no encontrada"));
+    private Orden buscarPublicada(UUID id, Jwt jwt) {
+        Orden orden = buscar(id);
         // Comprueba el propietario de la orden.
-        if (personal(jwt) && !orden.getIdUsuario().toString().equals(jwt.getSubject()))
+        if (!orden.isPublicada() || (personal(jwt) && !esPropietario(orden, jwt)))
             // Devuelve 404 para órdenes ajenas.
             throw new ApiException(HttpStatus.NOT_FOUND, "Orden no encontrada");
         return orden;
+    }
+
+    private Orden buscarPropia(UUID id, Jwt jwt) {
+        Orden orden = buscar(id);
+        if (!esPropietario(orden, jwt)) throw new ApiException(HttpStatus.NOT_FOUND, "Orden no encontrada");
+        return orden;
+    }
+
+    private Orden buscar(UUID id) {
+        return repository.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Orden no encontrada"));
+    }
+
+    private boolean esPropietario(Orden orden, Jwt jwt) {
+        return orden.getIdUsuario().toString().equals(jwt.getSubject());
     }
 
     // Limita el acceso según el rol.

@@ -38,6 +38,16 @@ import static org.mockito.Mockito.*;
 // Define la clase.
 class ReservaServiceTest {
 
+    @Test void consultaDisponibilidadDeUnHorarioFuturo() {
+        String fecha = LocalDate.now().plusDays(2).toString();
+        when(repository.existsByNutricionistaIdAndFechaAndHoraAndActivoTrue(1L, fecha, "09:00"))
+                .thenReturn(true);
+
+        assertFalse(service.estaDisponible(1L, fecha, "09:00"));
+        assertTrue(service.estaDisponible(1L, fecha, "11:00"));
+        assertThrows(IllegalArgumentException.class, () -> service.estaDisponible(1L, fecha, "10:00"));
+    }
+
     @Test void validaUnidadYPrecioEnLaOrdenYRecuperaLaCitaEnUnReintento() {
         UUID cuenta = UUID.randomUUID();
         UUID orden = UUID.randomUUID();

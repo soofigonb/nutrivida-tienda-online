@@ -30,9 +30,13 @@ it('ignora una identidad administrativa falsificada en localStorage', async () =
 })
 it('restaura la cuenta desde la renovación y consulta me', async () => {
   api.renovar.mockImplementation(async () => publicar(cliente))
+  api.solicitar.mockImplementation(async ruta => ruta === 'pacientes/me' ? { nombre: 'Ana' } : cliente)
   const { result } = mostrar()
-  await waitFor(() => expect(result.current.usuario?.id).toBe(cliente.id))
+  await waitFor(() => expect(result.current.nombrePaciente).toBe('Ana'))
+  expect(result.current.usuario.id).toBe(cliente.id)
   expect(api.solicitar).toHaveBeenCalledWith('autenticacion/me')
+  await act(async () => { await result.current.cerrarSesion() })
+  expect(result.current.nombrePaciente).toBeNull()
 })
 it('inicia sesión por API y normaliza el correo', async () => {
   const { result } = mostrar()
@@ -64,7 +68,7 @@ it('separa credenciales y perfil clínico en sus respectivos servicios', async (
   await act(async () => { respuesta = await result.current.registrarPaciente({ correo: cliente.correo, password: 'Clave123', nombre: 'Ana', apellidos: 'Torres', run: '123456785', rol: 'ADMINISTRADOR' }) })
   expect(respuesta.exito).toBe(true)
   expect(api.registrar).toHaveBeenCalledWith(cliente.correo, 'Clave123')
-  const [ruta, opciones] = api.solicitar.mock.calls.find(([r]) => r === 'pacientes/me')
+  const [ruta, opciones] = api.solicitar.mock.calls.find(([r, config]) => r === 'pacientes/me' && config.method === 'PUT')
   expect(ruta).toBe('pacientes/me')
   expect(opciones.body).not.toHaveProperty('password')
   expect(opciones.body).not.toHaveProperty('rol')

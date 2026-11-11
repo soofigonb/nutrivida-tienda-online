@@ -27,6 +27,7 @@ public class Orden {
     @Enumerated(EnumType.STRING) @Column(nullable = false, length = 20)
     // Estado comercial de la orden.
     private EstadoOrden estado = EstadoOrden.PENDIENTE;
+    @Column(nullable = false) private boolean publicada = true;
     // Configura la columna y sus restricciones.
     @Column(nullable = false, precision = 12, scale = 0) private BigDecimal total;
     // Configura la columna y sus restricciones.

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.*;
 // Importa CatalogoPort.
 import cl.nutrivida.ordenes.port.CatalogoPort;
+import cl.nutrivida.ordenes.client.AgendamientoClient;
 // Importa los tipos del paquete.
 import cl.nutrivida.ordenes.dto.*;
 // Importa los tipos del paquete.
@@ -39,6 +40,7 @@ class OrdenServiceTest {
     @Mock OrdenRepository repository;
     // Simula la dependencia.
     @Mock CatalogoPort catalogo;
+    @Mock AgendamientoClient agendamiento;
     // Servicio que se prueba.
     OrdenService service;
     // Identificadores de prueba.
@@ -46,7 +48,7 @@ class OrdenServiceTest {
     Jwt jwt;
     @BeforeEach void preparar() {
         // Prepara el servicio con dependencias simuladas.
-        service = new OrdenService(repository, new OrdenMapper(), catalogo);
+        service = new OrdenService(repository, new OrdenMapper(), catalogo, agendamiento);
         jwt = Jwt.withTokenValue("jwt").header("alg", "RS256").subject(usuario.toString()).claim("roles", List.of("CLIENTE")).build();
     }
     // Caso de prueba.
@@ -84,11 +86,30 @@ class OrdenServiceTest {
     // Caso de prueba.
     @Test void clienteSoloListaSusOrdenes() {
         // Respuesta simulada.
-        when(repository.findByIdUsuarioOrderByCreadoEnDesc(usuario)).thenReturn(List.of());
+        when(repository.findByIdUsuarioAndPublicadaTrueOrderByCreadoEnDesc(usuario)).thenReturn(List.of());
         // Verifica la condición.
         assertTrue(service.listar(jwt).isEmpty());
         // Verifica las llamadas esperadas.
-        verify(repository, never()).findAll();
+        verify(repository, never()).findByPublicadaTrueOrderByCreadoEnDesc();
+    }
+
+    @Test void ocultaElBorradorHastaQueSeConfirmenTodasSusCitas() {
+        UUID id = UUID.randomUUID();
+        Orden orden = new Orden();
+        orden.setIdUsuario(usuario);
+        orden.setPublicada(false);
+        DetalleOrden detalle = new DetalleOrden();
+        detalle.setCantidad(2);
+        orden.getDetalles().add(detalle);
+        when(repository.findById(id)).thenReturn(Optional.of(orden));
+        when(agendamiento.contarConfirmadas(id, "jwt")).thenReturn(1L).thenReturn(2L);
+
+        assertThrows(ApiException.class, () -> service.obtener(id, jwt));
+        assertThrows(ApiException.class, () -> service.publicar(id, jwt));
+        assertFalse(orden.isPublicada());
+        service.publicar(id, jwt);
+        assertTrue(orden.isPublicada());
+        assertEquals(EstadoOrden.PENDIENTE, service.obtener(id, jwt).estado());
     }
     // Caso de prueba.
     @Test void noPermiteReabrirOrdenCancelada() {

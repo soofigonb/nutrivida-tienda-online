@@ -12,6 +12,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useCarrito } from '../context/CarritoContext'
 import { useDatos } from '../context/DatosContext'
 import { usePlanesCatalogo } from '../hooks/usePlanesCatalogo'
+import { consultarDisponibilidad } from '../services/agendamiento'
 import formatearPrecio from '../utils/formatearPrecio'
 import {
   esFechaHoraFutura,
@@ -40,6 +41,32 @@ function Agendar() {
 
   const [errores, setErrores] = useState({})
   const [mensajeExito, setMensajeExito] = useState(null)
+  const [disponibilidad, setDisponibilidad] = useState(null)
+  const [revisionHorario, setRevisionHorario] = useState(0)
+  const bloque = nutricionistaId && fecha && hora && esFechaHoraFutura(fecha, hora)
+    ? `${nutricionistaId}|${fecha}|${hora}`
+    : ''
+  const estadoHorario = bloque && disponibilidad?.bloque === bloque
+    && disponibilidad.revision === revisionHorario ? disponibilidad.estado : null
+  const consultandoHorario = Boolean(bloque && !estadoHorario)
+
+  useEffect(() => {
+    if (!bloque) return
+    const controller = new AbortController()
+    consultarDisponibilidad(nutricionistaId, fecha, hora, { signal: controller.signal })
+      .then(disponible => {
+        if (typeof disponible !== 'boolean') throw new Error('Disponibilidad inválida')
+        if (!controller.signal.aborted) {
+          setDisponibilidad({ bloque, revision: revisionHorario, estado: disponible ? 'libre' : 'ocupado' })
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDisponibilidad({ bloque, revision: revisionHorario, estado: 'error' })
+        }
+      })
+    return () => controller.abort()
+  }, [bloque, nutricionistaId, fecha, hora, revisionHorario])
 
   // ========================================
   // 2. PRESELECCIÓN DEL PLAN
@@ -138,7 +165,7 @@ function Agendar() {
     event.preventDefault()
     setMensajeExito(null)
 
-    if (!validarFormulario()) {
+    if (!validarFormulario() || estadoHorario !== 'libre') {
       return
     }
 
@@ -355,6 +382,7 @@ function Agendar() {
                       aria-describedby="error-nutricionista"
                       onChange={(event) => {
                         setNutricionistaId(event.target.value)
+                        setDisponibilidad(null)
                         setErrores((actuales) => ({
                           ...actuales,
                           nutricionistaId: null,
@@ -442,6 +470,7 @@ function Agendar() {
                           aria-describedby="error-fecha-cita"
                           onChange={(event) => {
                             setFecha(event.target.value)
+                            setDisponibilidad(null)
                             setErrores((actuales) => ({
                               ...actuales,
                               fecha: null,
@@ -474,6 +503,7 @@ function Agendar() {
                           aria-describedby="error-hora-cita"
                           onChange={(event) => {
                             setHora(event.target.value)
+                            setDisponibilidad(null)
                             setErrores((actuales) => ({
                               ...actuales,
                               hora: null,
@@ -481,7 +511,7 @@ function Agendar() {
                               conflicto: null,
                             }))
                           }}
-                          isInvalid={Boolean(errores.hora)}
+                          isInvalid={Boolean(errores.hora) || estadoHorario === 'ocupado'}
                         >
                           <option value="">
                             Seleccione horario
@@ -496,17 +526,31 @@ function Agendar() {
                           type="invalid"
                           id="error-hora-cita"
                         >
-                          {errores.hora}
+                          {estadoHorario === 'ocupado'
+                            ? 'Este horario está ocupado. Elige otro horario u otro profesional.'
+                            : errores.hora}
                         </Form.Control.Feedback>
                       </Form.Group>
                     </Col>
                   </Row>
 
+                  {consultandoHorario && <p role="status">Consultando disponibilidad…</p>}
+                  {estadoHorario === 'error' && (
+                    <Alert variant="warning">
+                      No se pudo comprobar la disponibilidad.
+                      <div className="mt-2">
+                        <Button type="button" variant="outline-success" size="sm" onClick={() => setRevisionHorario(revision => revision + 1)}>
+                          Reintentar consulta
+                        </Button>
+                      </div>
+                    </Alert>
+                  )}
                   <Button
                     type="submit"
                     variant="success"
                     className="w-100"
                     id="boton-agregar-carrito"
+                    disabled={Boolean(bloque && estadoHorario !== 'libre')}
                   >
                     <i
                       className="bi bi-cart-plus me-2"
