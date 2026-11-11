@@ -37,7 +37,7 @@ public class ReservaReferencias {
         if (ordenId == null || itemId == null || unidad == null || unidad < 1) {
             throw new IllegalArgumentException("Identifica la unidad de la orden que quieres agendar");
         }
-        Orden orden = consultar(ordenes, "/api/v1/ordenes/" + ordenId, Orden.class, jwt);
+        Orden orden = consultar(ordenes, "/api/v1/ordenes/" + ordenId + "/referencia", Orden.class, jwt);
         if (!usuario.equals(orden.idUsuario())) {
             throw new AccesoDenegadoException("La orden pertenece a otra cuenta");
         }

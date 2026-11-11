@@ -52,6 +52,24 @@ public class OrdenController {
     ResponseEntity<OrdenDTO> crear(@Valid @RequestBody CrearOrdenDTO dto, @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(201).body(service.crear(dto, jwt));
     }
+
+    @PostMapping("/preparar") @PreAuthorize("hasAnyRole('CLIENTE','ADMINISTRADOR')")
+    @Operation(summary = "Preparar una solicitud de orden con citas pendientes")
+    OrdenDTO preparar(@Valid @RequestBody CrearOrdenDTO dto, @AuthenticationPrincipal Jwt jwt) {
+        return service.preparar(dto, jwt);
+    }
+
+    @GetMapping("/{id}/referencia") @PreAuthorize("hasAnyRole('CLIENTE','ADMINISTRADOR')")
+    @Operation(summary = "Consultar la solicitud propia para validar una cita")
+    OrdenDTO referencia(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return service.obtenerReferencia(id, jwt);
+    }
+
+    @PostMapping("/{id}/publicar") @PreAuthorize("hasAnyRole('CLIENTE','ADMINISTRADOR')")
+    @Operation(summary = "Registrar la orden después de verificar sus citas")
+    OrdenDTO publicar(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return service.publicar(id, jwt);
+    }
     // Describe la operación en Swagger.
     @Operation(summary = "Listar órdenes; el cliente solo ve las propias")
     // Verifica los roles permitidos.

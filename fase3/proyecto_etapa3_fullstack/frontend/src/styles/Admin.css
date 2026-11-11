@@ -431,6 +431,21 @@
   color: #2f241f;
 }
 
+.admin-content .pagina-gestion-panel {
+  min-height: 0;
+  padding: 0;
+  background-color: transparent;
+}
+
+.admin-panel-cuerpo {
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.catalogo-panel-precio {
+  color: #047857;
+  font-weight: 700;
+}
+
 /* ========================================
    9. DISEÑO RESPONSIVE
    ======================================== */

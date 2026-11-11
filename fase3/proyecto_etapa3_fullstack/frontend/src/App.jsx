@@ -10,7 +10,6 @@ import { useContext } from 'react'
 import { Alert } from 'react-bootstrap'
 import { AuthContext } from './context/AuthContext'
 import RutaRoles from './components/RutaRoles'
-import GestionLayout from './components/GestionLayout'
 import Ordenes from './pages/Ordenes'
 import CatalogoGestion from './pages/CatalogoGestion'
 import AdminCuentas from './pages/AdminCuentas'
@@ -93,7 +92,7 @@ function App() {
 
           <Routes>
             <Route element={<RutaRoles roles={['ADMINISTRADOR', 'VENDEDOR']} />}>
-              <Route path="/gestion" element={<GestionLayout />}>
+              <Route path="/gestion" element={<AdminLayout />}>
                 <Route index element={<Navigate to="ordenes" replace />} />
                 <Route path="ordenes" element={<Ordenes />} />
                 <Route path="ordenes/:id" element={<Ordenes />} />

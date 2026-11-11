@@ -1,5 +1,5 @@
 import { useContext, useRef, useState } from 'react'
-import { Alert, Button, Card, Container, Form, Table } from 'react-bootstrap'
+import { Alert, Button, Card, Col, Container, Form, Row } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { AuthContext } from '../context/AuthContext'
 import { useCarrito } from '../context/CarritoContext'
@@ -50,14 +50,19 @@ export default function Carrito() {
   }
 
   return <main className="pagina-gestion py-5"><Container>
-    <h1>Mi carrito de reservas</h1>
-    <p>Revisa tus consultas y crea una orden con precios validados por el catálogo.</p>
-    <Alert variant="info">Se registra la orden y luego se solicitan las citas. El proceso no realiza cobros.</Alert>
+    <header className="seccion-encabezado">
+      <p className="seccion-etiqueta">Reservas NutriVida</p>
+      <h1 className="seccion-titulo">Mi carrito de reservas</h1>
+      <p className="seccion-descripcion">Revisa tus consultas y crea una orden con precios validados por el catálogo.</p>
+    </header>
+    <Alert variant="info">La orden aparecerá en Mis órdenes cuando se registren todas las citas. El proceso no realiza cobros.</Alert>
     {(error || errorCarrito) && <Alert variant="danger" role="alert">{error || errorCarrito}</Alert>}
     {orden && <Alert variant={pendientes.length ? 'warning' : 'success'} role="status">
-      <h2 className="h5">Orden registrada</h2>
-      <p>Código: <strong>{orden.id}</strong></p>
-      <p>Estado: {orden.estado}. Total validado: <strong>{formatearPrecio(orden.total)}</strong>.</p>
+      <h2 className="gestion-subtitulo">{pendientes.length ? 'Solicitud de reserva pendiente' : 'Orden registrada'}</h2>
+      {pendientes.length === 0 && <>
+        <p>Código: <strong>{orden.id}</strong></p>
+        <p>Estado: {orden.estado}. Total validado: <strong>{formatearPrecio(orden.total)}</strong>.</p>
+      </>}
       {citasRegistradas.length > 0 && (
         <div className="mt-2 pt-2 border-top">
           <p className="mb-1 text-success fw-bold">✓ Cita registrada en PostgreSQL (Agendamiento):</p>
@@ -70,47 +75,89 @@ export default function Carrito() {
           </ul>
         </div>
       )}
-      <Link to={`/mis-ordenes/${orden.id}`}>Ver mi orden</Link>
+      {pendientes.length === 0 && <Button as={Link} variant="success" to={`/mis-ordenes/${orden.id}`}>Ver mi orden</Button>}
       {pendientes.length > 0 && <>
         <p className="mt-2 mb-1">Quedaron citas pendientes:</p>
-        <ul>{pendientes.map(cita => <li className="mb-3" key={cita.id}>
-          {cita.servicio}. {cita.motivo}
-          <Form className="d-flex flex-wrap align-items-end gap-2" onSubmit={evento => cambiarHorario(evento, cita.id)}>
-            <Form.Group controlId={`pendiente-fecha-${cita.id}`}>
-              <Form.Label>Nueva fecha</Form.Label>
-              <Form.Control name="fecha" type="date" required disabled={procesando} />
-            </Form.Group>
-            <Form.Group controlId={`pendiente-hora-${cita.id}`}>
-              <Form.Label>Nuevo horario</Form.Label>
-              <Form.Select name="hora" disabled={procesando}>
-                {['09:00', '11:00', '15:00', '17:00'].map(hora => <option key={hora}>{hora}</option>)}
-              </Form.Select>
-            </Form.Group>
-            <Button type="submit" variant="outline-primary" disabled={procesando}>Guardar horario</Button>
-          </Form>
-        </li>)}</ul>
-        {avisoHorario && <p>{avisoHorario}</p>}
-        <Button disabled={procesando} onClick={crearOrden}>Reintentar citas</Button>
+        {pendientes.map(cita => (
+          <Card key={cita.id} className="gestion-tarjeta my-3">
+            <Card.Body>
+              <h3 className="gestion-subtitulo">{cita.servicio}</h3>
+              <p className="gestion-ayuda">{cita.motivo}</p>
+              <Form onSubmit={evento => cambiarHorario(evento, cita.id)}>
+                <Row className="g-3 align-items-end">
+                  <Form.Group as={Col} xs={12} sm={6} lg={4} controlId={`pendiente-fecha-${cita.id}`}>
+                    <Form.Label>Nueva fecha</Form.Label>
+                    <Form.Control name="fecha" type="date" required disabled={procesando} />
+                  </Form.Group>
+                  <Form.Group as={Col} xs={12} sm={6} lg={4} controlId={`pendiente-hora-${cita.id}`}>
+                    <Form.Label>Nuevo horario</Form.Label>
+                    <Form.Select name="hora" disabled={procesando}>
+                      {['09:00', '11:00', '15:00', '17:00'].map(hora => <option key={hora}>{hora}</option>)}
+                    </Form.Select>
+                  </Form.Group>
+                  <Col xs={12} lg="auto">
+                    <Button type="submit" variant="outline-success" disabled={procesando}>Guardar horario</Button>
+                  </Col>
+                </Row>
+              </Form>
+            </Card.Body>
+          </Card>
+        ))}
+        {avisoHorario && <p role="status">{avisoHorario}</p>}
+        <Button variant="success" disabled={procesando} onClick={crearOrden}>Reintentar citas</Button>
       </>}
     </Alert>}
-    {cantidad === 0 ? <Card body><p>Tu carrito está vacío.</p><Link to="/agendar">Seleccionar una consulta</Link></Card> : <>
-      <Table responsive><thead><tr><th>Consulta</th><th>Profesional</th><th>Horario solicitado</th><th>Precio de referencia</th><th>Acción</th></tr></thead><tbody>
-        {reservas.map(r => <tr key={r.id}>
-          <td>{r.servicio}</td><td>{r.nutricionistaNombre}</td><td>{r.fecha} · {r.hora}</td><td>{formatearPrecio(r.precio)}</td>
-          <td><Button variant="outline-danger" size="sm" disabled={procesando || Boolean(orden)} onClick={() => { eliminarReserva(r.id); setRevisando(false) }}>Eliminar</Button></td>
-        </tr>)}
-      </tbody></Table>
-      <p>Total de referencia: <strong>{formatearPrecio(total)}</strong>. El precio definitivo lo calcula el servidor.</p>
-      {!usuario ? <Alert variant="warning"><Link to="/login">Inicia sesión</Link> para crear tu orden.</Alert> : <>
-        {!revisando && !orden && <Button variant="success" onClick={() => setRevisando(true)}>Revisar orden</Button>}
-        {revisando && <Card body className="mb-3">
-          <h2 className="h5">Revisión de orden</h2><p>La orden se asociará a tu cuenta: {usuario.correo}.</p>
-          <p>Si ya enviaste esta misma solicitud, se recuperará su orden sin duplicarla.</p>
-          <Button disabled={procesando} variant="success" onClick={crearOrden}>{procesando ? 'Registrando…' : 'Crear orden pendiente'}</Button>
-          <Button disabled={procesando} className="ms-2" variant="outline-secondary" onClick={() => setRevisando(false)}>Volver al carrito</Button>
-        </Card>}
-      </>}
-      <Button className="ms-2" variant="outline-danger" disabled={procesando} onClick={vaciar}>Vaciar carrito</Button>
-    </>}
+    {cantidad === 0 ? (
+      <Card className="gestion-tarjeta">
+        <Card.Body className="gestion-tarjeta-cuerpo">
+          <h2 className="gestion-subtitulo">Tu carrito está vacío.</h2>
+          <Button as={Link} variant="success" to="/agendar">Seleccionar una consulta</Button>
+        </Card.Body>
+      </Card>
+    ) : (
+      <Row className="g-4">
+        <Col xs={12} lg={7}>
+          <h2 className="gestion-subtitulo mb-3">Consultas seleccionadas</h2>
+          <div className="d-grid gap-3">
+            {reservas.map(reserva => (
+              <Card key={reserva.id} className="gestion-tarjeta">
+                <Card.Body className="gestion-tarjeta-cuerpo">
+                  <h3 className="gestion-subtitulo">{reserva.servicio}</h3>
+                  <p className="gestion-ayuda mb-3">
+                    {reserva.nutricionistaNombre} · {reserva.fecha} a las {reserva.hora}
+                  </p>
+                  <div className="gestion-acciones">
+                    <strong className="text-success">{formatearPrecio(reserva.precio)}</strong>
+                    <Button variant="outline-success" size="sm" disabled={procesando || Boolean(orden)} onClick={() => { eliminarReserva(reserva.id); setRevisando(false) }}>Eliminar</Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            ))}
+          </div>
+        </Col>
+        <Col xs={12} lg={5}>
+          <Card className="gestion-tarjeta">
+            <Card.Body className="gestion-tarjeta-cuerpo">
+              <h2 className="gestion-subtitulo">{revisando ? 'Confirmación de orden' : 'Resumen de la orden'}</h2>
+              <p className="mb-1">Total de referencia: <strong className="text-success">{formatearPrecio(total)}</strong></p>
+              <p className="gestion-ayuda">El precio definitivo lo calcula el servidor.</p>
+              {!usuario && <Alert variant="warning"><Link className="link-success" to="/login">Inicia sesión</Link> para crear tu orden.</Alert>}
+              {revisando && usuario && <>
+                <p className="text-break">La orden se asociará a tu cuenta: {usuario.correo}.</p>
+                <p className="gestion-ayuda">Si ya enviaste esta misma solicitud, se recuperará su orden sin duplicarla.</p>
+              </>}
+              <div className="d-flex flex-wrap gap-2 pt-3 border-top">
+                {usuario && !revisando && !orden && <Button variant="success" onClick={() => setRevisando(true)}>Confirmar orden</Button>}
+                {usuario && revisando && <>
+                  <Button disabled={procesando} variant="success" onClick={crearOrden}>{procesando ? 'Registrando…' : 'Registrar orden'}</Button>
+                  <Button disabled={procesando} variant="outline-success" onClick={() => setRevisando(false)}>Volver al carrito</Button>
+                </>}
+                <Button variant="outline-success" disabled={procesando} onClick={vaciar}>Vaciar carrito</Button>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    )}
   </Container></main>
 }

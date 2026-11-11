@@ -138,6 +138,7 @@ services:
       ORDENES_DB_USERNAME: ${ORDENES_DB_USERNAME:?Define ORDENES_DB_USERNAME en .env}
       ORDENES_DB_PASSWORD: ${ORDENES_DB_PASSWORD:?Define ORDENES_DB_PASSWORD en .env}
       CATALOGO_SERVICE_URL: http://catalogo-service:8083
+      AGENDAMIENTO_SERVICE_URL: http://agendamiento-service:8085
     healthcheck:
       <<: *healthcheck
       test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8086/v3/api-docs"]

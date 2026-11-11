@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/agendamiento")
@@ -29,6 +30,19 @@ public class ReservaController {
 
     public ReservaController(ReservaService service) {
         this.service = service;
+    }
+
+    @GetMapping("/disponibilidad")
+    @Operation(summary = "Consultar disponibilidad de un horario", security = {})
+    public boolean consultarDisponibilidad(@RequestParam long nutricionistaId,
+            @RequestParam String fecha, @RequestParam String hora) {
+        return service.estaDisponible(nutricionistaId, fecha, hora);
+    }
+
+    @GetMapping("/ordenes/{ordenId}/confirmadas")
+    @Operation(summary = "Contar las citas confirmadas de una orden propia")
+    public long contarConfirmadas(@PathVariable UUID ordenId, @AuthenticationPrincipal Jwt jwt) {
+        return service.contarConfirmadas(ordenId, jwt);
     }
 
     @GetMapping

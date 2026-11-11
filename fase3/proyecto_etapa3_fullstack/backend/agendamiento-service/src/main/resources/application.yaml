@@ -15,9 +15,9 @@ spring:
   # Conexión a la base PostgreSQL de agendamiento en Supabase.
   datasource:
     # Conexión Supabase con SSL; la variable permite usar otra base.
-    url: ${AGENDAMIENTO_DB_URL:jdbc:postgresql://aws-1-us-west-2.pooler.supabase.com:5432/postgres?sslmode=require}
+    url: ${AGENDAMIENTO_DB_URL:}
     # Usuario del proyecto de agendamiento; puede reemplazarse desde el entorno.
-    username: ${AGENDAMIENTO_DB_USERNAME:postgres.nyaxmfgatgsrspxdfxwf}
+    username: ${AGENDAMIENTO_DB_USERNAME:}
     # Contraseña desde el entorno; nunca escribir el secreto en este archivo.
     password: ${AGENDAMIENTO_DB_PASSWORD}
     # Driver JDBC que permite comunicarse con PostgreSQL.

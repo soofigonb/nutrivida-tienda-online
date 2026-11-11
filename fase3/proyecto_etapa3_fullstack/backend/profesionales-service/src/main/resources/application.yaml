@@ -1,23 +1,9 @@
+# Perfil y seguridad de Profesionales.
 spring:
   profiles:
     default: nutrivida
-  datasource:
-    url: ${PROFESIONALES_DB_URL}
-    username: ${PROFESIONALES_DB_USERNAME}
-    password: ${PROFESIONALES_DB_PASSWORD}
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        default_schema: db_profesionales
   flyway:
     locations: classpath:db/migration
-    default-schema: db_profesionales
-    schemas: db_profesionales
-    clean-disabled: true
-    baseline-on-migrate: true
   security:
     oauth2:
       resourceserver:
@@ -28,9 +14,6 @@ app:
   security:
     roles-claim: ${JWT_ROLES_CLAIM:roles}
     write-role: ${PROFESIONALES_WRITE_ROLE:ADMINISTRADOR}
-springdoc:
-  swagger-ui:
-    path: /doc/swagger-ui.html
 ---
 # Datos de ejemplo para NutriVida.
 spring:

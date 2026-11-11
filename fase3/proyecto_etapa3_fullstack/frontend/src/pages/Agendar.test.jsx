@@ -52,11 +52,28 @@ function renderAgendar(rutaInicial = '/agendar') {
 describe('Módulo de agendamiento', () => {
   beforeEach(() => {
     localStorage.clear()
-    vi.spyOn(api, 'solicitar').mockResolvedValue(profesionales.map(item => ({
+    vi.spyOn(api, 'solicitar').mockImplementation(async ruta => ruta.startsWith('agendamiento/disponibilidad?') ? true : profesionales.map(item => ({
       ...item, profesionalId: item.id, descripcion: item.experiencia, imagenUrl: item.foto,
     })))
   })
   afterEach(() => vi.restoreAllMocks())
+
+  test('avisa que un horario está ocupado antes de agregarlo al carrito', async () => {
+    const consultar = api.solicitar.getMockImplementation()
+    api.solicitar.mockImplementation(async ruta => ruta.startsWith('agendamiento/disponibilidad?') ? false : consultar(ruta))
+    const user = userEvent.setup()
+    renderAgendar()
+    const fecha = new Date()
+    fecha.setFullYear(fecha.getFullYear() + 1)
+    const fechaFutura = fecha.toISOString().slice(0, 10)
+    const profesional = await screen.findByRole('option', { name: new RegExp(profesionales[0].nombre) })
+    await user.selectOptions(screen.getByLabelText(/nutricionista/i), profesional)
+    await user.type(screen.getByLabelText(/fecha/i), fechaFutura)
+    await user.selectOptions(screen.getByLabelText(/horario/i), '09:00')
+    expect(await screen.findByText(/este horario está ocupado/i)).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /agregar al carrito/i })).toBeDisabled()
+    expect(JSON.parse(localStorage.getItem('carritoNutriVida') || '[]')).toEqual([])
+  })
 
   test('selecciona automáticamente el plan indicado en la URL', () => {
     renderAgendar('/agendar?plan=plan-integral')

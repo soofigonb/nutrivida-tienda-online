@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OrdenRepository extends JpaRepository<Orden, UUID> {
     // Consulta las órdenes del propietario.
-    List<Orden> findByIdUsuarioOrderByCreadoEnDesc(UUID idUsuario);
+    List<Orden> findByIdUsuarioAndPublicadaTrueOrderByCreadoEnDesc(UUID idUsuario);
+    List<Orden> findByPublicadaTrueOrderByCreadoEnDesc();
     Optional<Orden> findByIdUsuarioAndClaveIdempotencia(UUID idUsuario, UUID claveIdempotencia);
 }

@@ -1,10 +1,10 @@
 import { act, renderHook } from '@testing-library/react'
 import { beforeEach, expect, it, vi } from 'vitest'
 import { CarritoProvider, useCarrito } from './CarritoContext'
-import { crearOrdenDesdeCarrito } from '../services/ordenes'
+import { crearOrdenDesdeCarrito, publicarOrden } from '../services/ordenes'
 import { api } from '../services/api'
 
-vi.mock('../services/ordenes', () => ({ crearOrdenDesdeCarrito: vi.fn() }))
+vi.mock('../services/ordenes', () => ({ crearOrdenDesdeCarrito: vi.fn(), publicarOrden: vi.fn() }))
 vi.mock('../services/api', () => ({ api: {
   usuarioActual: () => ({ id: 'cuenta-1', rol: 'CLIENTE' }),
   solicitar: vi.fn(),
@@ -20,11 +20,13 @@ beforeEach(() => {
   })
   api.solicitar.mockResolvedValue({ reservaId: 4 })
 })
-it('crea una orden real y conserva los borradores sin crear citas locales', async () => {
+it('quita las reservas confirmadas del carrito sin crear citas locales', async () => {
   const { result } = mostrar(); let respuesta
   await act(async () => { respuesta = await result.current.confirmarReservas() })
   expect(respuesta.orden.estado).toBe('PENDIENTE')
-  expect(result.current.reservas).toHaveLength(1)
+  expect(publicarOrden).toHaveBeenCalledWith('orden-1')
+  expect(result.current.cantidad).toBe(0)
+  expect(localStorage.getItem('carritoNutriVida')).toBe('[]')
   expect(localStorage.getItem('citasNutriVida')).toBeNull()
 })
 it('un fallo conserva el carrito y muestra el error', async () => {
@@ -41,9 +43,11 @@ it('muestra la cita pendiente y reintenta la misma unidad de la orden', async ()
   let respuesta
   await act(async () => { respuesta = await result.current.confirmarReservas() })
   expect(respuesta.pendientes).toEqual([{ id: 'r1', servicio: reserva.servicio, motivo: 'Horario ocupado' }])
+  expect(publicarOrden).not.toHaveBeenCalled()
   await act(async () => { respuesta = await result.current.confirmarReservas() })
   expect(respuesta.citas).toEqual([{ reservaId: 4 }])
   expect(respuesta.pendientes).toEqual([])
+  expect(publicarOrden).toHaveBeenCalledOnce()
   expect(api.solicitar.mock.calls[0][1].body).toEqual(api.solicitar.mock.calls[1][1].body)
 })
 it('rechaza un carrito cambiado antes de llamar al backend', async () => {

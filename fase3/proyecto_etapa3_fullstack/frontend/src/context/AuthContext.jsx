@@ -9,6 +9,9 @@ export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(api.usuarioActual())
   const [cargandoSesion, setCargandoSesion] = useState(true)
   const [errorSesion, setErrorSesion] = useState('')
+  const [perfil, setPerfil] = useState(null)
+  const [revisionPerfil, setRevisionPerfil] = useState(0)
+  const clienteId = usuario?.rol === 'CLIENTE' ? usuario.id : null
 
   useEffect(() => {
     let activo = true
@@ -30,6 +33,22 @@ export function AuthProvider({ children }) {
     restaurar()
     return () => { activo = false; cancelar() }
   }, [])
+
+  useEffect(() => {
+    if (!clienteId) return
+    const controller = new AbortController()
+    api.solicitar('pacientes/me', { signal: controller.signal })
+      .then(datos => {
+        if (!controller.signal.aborted) {
+          setPerfil({ cuentaId: clienteId, nombre: datos?.nombre?.trim() })
+        }
+      })
+      .catch(() => {
+        // El saludo es opcional si el perfil no está disponible.
+        if (!controller.signal.aborted) setPerfil(null)
+      })
+    return () => controller.abort()
+  }, [clienteId, revisionPerfil])
 
   async function iniciarSesion(correo, password, soloPersonal = false) {
     setErrorSesion('')
@@ -81,11 +100,13 @@ export function AuthProvider({ children }) {
     const { nombre, apellidos, run, telefono, direccion, fechaNacimiento, region, comuna } = datos
     try {
       await api.solicitar('pacientes/me', { method: 'PUT', body: { nombre, apellidos, run, correo: cuenta.correo, telefono, direccion, fechaNacimiento: fechaNacimiento || null, region, comuna } })
+      setRevisionPerfil(revision => revision + 1)
       return { exito: true }
     } catch (error) {
       return { exito: false, mensaje: `Tu cuenta ya está creada. El perfil de paciente todavía no se pudo guardar: ${error.message}` }
     }
   }
 
-  return <AuthContext.Provider value={{ usuario, cargandoSesion, errorSesion, iniciarSesion, cerrarSesion, registrarCuenta, registrarPaciente }}>{children}</AuthContext.Provider>
+  const nombrePaciente = clienteId && perfil?.cuentaId === clienteId ? perfil.nombre : null
+  return <AuthContext.Provider value={{ usuario, nombrePaciente, cargandoSesion, errorSesion, iniciarSesion, cerrarSesion, registrarCuenta, registrarPaciente }}>{children}</AuthContext.Provider>
 }
