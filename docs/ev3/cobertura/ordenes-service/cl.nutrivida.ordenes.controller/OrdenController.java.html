@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrdenController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ordenes-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.ordenes.controller</a> &gt; <span class="el_source">OrdenController.java</span></div><h1>OrdenController.java</h1><pre class="source lang-java linenums">
+// Paquete de la clase.
+package cl.nutrivida.ordenes.controller;
+
+// Importa los tipos del paquete.
+import java.util.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.ordenes.dto.*;
+// Importa EstadoOrden.
+import cl.nutrivida.ordenes.model.EstadoOrden;
+// Importa OrdenService.
+import cl.nutrivida.ordenes.service.OrdenService;
+// Importa Operation.
+import io.swagger.v3.oas.annotations.Operation;
+// Importa SecurityRequirement.
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+// Importa Tag.
+import io.swagger.v3.oas.annotations.tags.Tag;
+// Importa Valid.
+import jakarta.validation.Valid;
+// Importa NotNull.
+import jakarta.validation.constraints.NotNull;
+// Importa RequiredArgsConstructor.
+import lombok.RequiredArgsConstructor;
+// Importa ResponseEntity.
+import org.springframework.http.ResponseEntity;
+// Importa PreAuthorize.
+import org.springframework.security.access.prepost.PreAuthorize;
+// Importa AuthenticationPrincipal.
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+// Importa Jwt.
+import org.springframework.security.oauth2.jwt.Jwt;
+// Importa los tipos del paquete.
+import org.springframework.web.bind.annotation.*;
+
+// Genera el constructor de dependencias.
+@RestController @RequiredArgsConstructor
+// Prefijo de las rutas del controlador.
+@RequestMapping(&quot;/api/v1/ordenes&quot;)
+@Tag(name = &quot;Órdenes&quot;) @SecurityRequirement(name = &quot;bearerAuth&quot;)
+// Define la clase.
+public class OrdenController {
+    // Servicio que contiene las reglas de negocio.
+    private final OrdenService service;
+    // DTO de actualización: exige un EstadoOrden no nulo.
+<span class="fc" id="L46">    public record EstadoDTO(@NotNull EstadoOrden estado) {}</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Crear una orden con precios validados por el catálogo&quot;)
+    // Verifica los roles permitidos.
+    @PostMapping @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR')&quot;)
+    // Crea la orden con precios del catálogo.
+    ResponseEntity&lt;OrdenDTO&gt; crear(@Valid @RequestBody CrearOrdenDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="fc" id="L53">        return ResponseEntity.status(201).body(service.crear(dto, jwt));</span>
+    }
+
+    @PostMapping(&quot;/preparar&quot;) @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR')&quot;)
+    @Operation(summary = &quot;Preparar una solicitud de orden con citas pendientes&quot;)
+    OrdenDTO preparar(@Valid @RequestBody CrearOrdenDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L59">        return service.preparar(dto, jwt);</span>
+    }
+
+    @GetMapping(&quot;/{id}/referencia&quot;) @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR')&quot;)
+    @Operation(summary = &quot;Consultar la solicitud propia para validar una cita&quot;)
+    OrdenDTO referencia(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L65">        return service.obtenerReferencia(id, jwt);</span>
+    }
+
+    @PostMapping(&quot;/{id}/publicar&quot;) @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR')&quot;)
+    @Operation(summary = &quot;Registrar la orden después de verificar sus citas&quot;)
+    OrdenDTO publicar(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+<span class="nc" id="L71">        return service.publicar(id, jwt);</span>
+    }
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Listar órdenes; el cliente solo ve las propias&quot;)
+    // Verifica los roles permitidos.
+    @GetMapping @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR','VENDEDOR')&quot;)
+    // Devuelve la lista de registros.
+<span class="fc" id="L78">    List&lt;OrdenDTO&gt; listar(@AuthenticationPrincipal Jwt jwt) { return service.listar(jwt); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Consultar el detalle de una orden&quot;)
+    // Asocia el método HTTP y la ruta.
+    @GetMapping(&quot;/{id}&quot;) @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR','VENDEDOR')&quot;)
+    // Busca el registro por ID.
+<span class="fc" id="L84">    OrdenDTO obtener(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) { return service.obtener(id, jwt); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Actualizar estado de una orden pendiente&quot;)
+    // Asocia el método HTTP y la ruta.
+    @PutMapping(&quot;/{id}&quot;) @PreAuthorize(&quot;hasRole('ADMINISTRADOR')&quot;)
+    // Valida y actualiza el registro.
+    OrdenDTO actualizar(@PathVariable UUID id, @Valid @RequestBody EstadoDTO dto, @AuthenticationPrincipal Jwt jwt) {
+<span class="fc" id="L91">        return service.cambiarEstado(id, dto.estado(), jwt);</span>
+    }
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Cancelar una orden pendiente mediante borrado lógico&quot;)
+    // Asocia el método HTTP y la ruta.
+    @DeleteMapping(&quot;/{id}&quot;) @PreAuthorize(&quot;hasAnyRole('CLIENTE','ADMINISTRADOR')&quot;)
+    // Cancela la orden y responde 204.
+    ResponseEntity&lt;Void&gt; cancelar(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        // Solicita al servicio cancelar la orden.
+<span class="fc" id="L100">        service.cambiarEstado(id, EstadoOrden.CANCELADA, jwt); return ResponseEntity.noContent().build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

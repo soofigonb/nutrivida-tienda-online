@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">autenticacion-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.autenticacion.config</a> &gt; <span class="el_source">JwtConfig.java</span></div><h1>JwtConfig.java</h1><pre class="source lang-java linenums">
+// Paquete de la clase.
+package cl.nutrivida.autenticacion.config;
+
+// Importa RSAPublicKey.
+import java.security.interfaces.RSAPublicKey;
+// Importa RSAPrivateKey.
+import java.security.interfaces.RSAPrivateKey;
+// Importa los tipos del paquete.
+import com.nimbusds.jose.jwk.*;
+// Importa ImmutableJWKSet.
+import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
+// Importa Value.
+import org.springframework.beans.factory.annotation.Value;
+// Importa los tipos del paquete.
+import org.springframework.context.annotation.*;
+// Importa los tipos del paquete.
+import org.springframework.security.oauth2.jwt.*;
+
+// Configuración de Spring.
+@Configuration
+// Define la clase.
+<span class="fc" id="L23">public class JwtConfig {</span>
+    // Registra el componente en Spring.
+    @Bean
+    RSAKey rsaKey(@Value(&quot;${app.jwt.public-key}&quot;) RSAPublicKey publica,
+                  // Lee la propiedad de configuración.
+                  @Value(&quot;${app.jwt.private-key}&quot;) RSAPrivateKey privada) {
+        // Reúne las claves pública y privada en un objeto JWK.
+<span class="fc" id="L30">        return new RSAKey.Builder(publica).privateKey(privada).keyID(&quot;nutrivida-rsa-1&quot;).build();</span>
+    }
+
+    // Registra el componente en Spring.
+    @Bean
+    // Prepara el componente que firma los JWT.
+    JwtEncoder jwtEncoder(RSAKey key) {
+<span class="fc" id="L37">        return new NimbusJwtEncoder(new ImmutableJWKSet&lt;&gt;(new JWKSet(key)));</span>
+    }
+
+    // Registra el componente en Spring.
+    @Bean
+    JwtDecoder jwtDecoder(RSAKey key, @Value(&quot;${app.jwt.issuer}&quot;) String issuer) throws Exception {
+<span class="fc" id="L43">        NimbusJwtDecoder decoder = NimbusJwtDecoder.withPublicKey(key.toRSAPublicKey()).build();</span>
+        // Valida emisor y vigencia del JWT.
+<span class="fc" id="L45">        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));</span>
+<span class="fc" id="L46">        return decoder;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

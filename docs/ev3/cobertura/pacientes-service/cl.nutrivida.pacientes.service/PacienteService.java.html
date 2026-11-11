@@ -59,11 +59,11 @@ public class PacienteService {
 <span class="fc" id="L59">                throw new AccesoDenegadoException(&quot;El perfil fue dado de baja&quot;);</span>
             }
 <span class="fc" id="L61">            Long id = existente.getPacienteId();</span>
-<span class="pc bpc" id="L62" title="1 of 2 branches missed.">            if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {</span>
-<span class="nc" id="L63">                throw new IllegalArgumentException(&quot;El RUN ya está registrado por otro paciente&quot;);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            if (repository.existsByRunAndActivoTrueAndPacienteIdNot(runNormalizado, id)) {</span>
+<span class="fc" id="L63">                throw new IllegalArgumentException(&quot;El RUN ya está registrado por otro paciente&quot;);</span>
             }
-<span class="pc bpc" id="L65" title="2 of 4 branches missed.">            if (correoNormalizado != null &amp;&amp; repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(correoNormalizado, id)) {</span>
-<span class="nc" id="L66">                throw new IllegalArgumentException(&quot;El correo ya está registrado por otro paciente&quot;);</span>
+<span class="pc bpc" id="L65" title="1 of 4 branches missed.">            if (correoNormalizado != null &amp;&amp; repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot(correoNormalizado, id)) {</span>
+<span class="fc" id="L66">                throw new IllegalArgumentException(&quot;El correo ya está registrado por otro paciente&quot;);</span>
             }
 <span class="fc" id="L68">            existente.setUsuarioId(usuarioId);</span>
 <span class="fc" id="L69">            existente.setRun(runNormalizado);</span>
@@ -80,11 +80,11 @@ public class PacienteService {
 <span class="fc" id="L80">            return mapper.toDTO(repository.save(existente));</span>
         }
 
-<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (repository.existsByRunAndActivoTrue(runNormalizado)) {</span>
-<span class="nc" id="L84">            throw new IllegalArgumentException(&quot;El RUN ya está registrado&quot;);</span>
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (repository.existsByRunAndActivoTrue(runNormalizado)) {</span>
+<span class="fc" id="L84">            throw new IllegalArgumentException(&quot;El RUN ya está registrado&quot;);</span>
         }
-<span class="pc bpc" id="L86" title="2 of 4 branches missed.">        if (correoNormalizado != null &amp;&amp; repository.existsByCorreoIgnoreCaseAndActivoTrue(correoNormalizado)) {</span>
-<span class="nc" id="L87">            throw new IllegalArgumentException(&quot;El correo ya está registrado&quot;);</span>
+<span class="fc bfc" id="L86" title="All 4 branches covered.">        if (correoNormalizado != null &amp;&amp; repository.existsByCorreoIgnoreCaseAndActivoTrue(correoNormalizado)) {</span>
+<span class="fc" id="L87">            throw new IllegalArgumentException(&quot;El correo ya está registrado&quot;);</span>
         }
 
 <span class="fc" id="L90">        Paciente nuevo = mapper.toEntity(dto);</span>
@@ -180,57 +180,57 @@ public class PacienteService {
 <span class="fc" id="L180">    }</span>
 
     private void verificarPropietarioOAdmin(Paciente paciente, Jwt jwt) {
-<span class="pc bpc" id="L183" title="1 of 4 branches missed.">        if (jwt == null || esAdministrador(jwt)) {</span>
+<span class="fc bfc" id="L183" title="All 4 branches covered.">        if (jwt == null || esAdministrador(jwt)) {</span>
 <span class="fc" id="L184">            return;</span>
         }
 <span class="fc" id="L186">        UUID usuarioId = extraerUsuarioId(jwt);</span>
-<span class="pc bpc" id="L187" title="2 of 4 branches missed.">        if (paciente.getUsuarioId() == null || !paciente.getUsuarioId().equals(usuarioId)) {</span>
+<span class="fc bfc" id="L187" title="All 4 branches covered.">        if (paciente.getUsuarioId() == null || !paciente.getUsuarioId().equals(usuarioId)) {</span>
 <span class="fc" id="L188">            throw new AccesoDenegadoException(&quot;No tienes permiso para acceder o modificar el perfil de otro paciente&quot;);</span>
         }
-<span class="nc" id="L190">    }</span>
+<span class="fc" id="L190">    }</span>
 
     private boolean esAdministrador(Jwt jwt) {
 <span class="fc" id="L193">        List&lt;String&gt; roles = jwt.getClaimAsStringList(claimRoles);</span>
-<span class="pc bpc" id="L194" title="2 of 4 branches missed.">        return roles != null &amp;&amp; roles.contains(&quot;ADMINISTRADOR&quot;);</span>
+<span class="fc bfc" id="L194" title="All 4 branches covered.">        return roles != null &amp;&amp; roles.contains(&quot;ADMINISTRADOR&quot;);</span>
     }
 
     private UUID extraerUsuarioId(Jwt jwt) {
-<span class="pc bpc" id="L198" title="3 of 6 branches missed.">        if (jwt == null || jwt.getSubject() == null || jwt.getSubject().isBlank()) {</span>
-<span class="nc" id="L199">            throw new AccesoDenegadoException(&quot;Token de sesión inválido o sin identificador de usuario&quot;);</span>
+<span class="pc bpc" id="L198" title="1 of 6 branches missed.">        if (jwt == null || jwt.getSubject() == null || jwt.getSubject().isBlank()) {</span>
+<span class="fc" id="L199">            throw new AccesoDenegadoException(&quot;Token de sesión inválido o sin identificador de usuario&quot;);</span>
         }
         try {
 <span class="fc" id="L202">            return UUID.fromString(jwt.getSubject());</span>
-<span class="nc" id="L203">        } catch (IllegalArgumentException ex) {</span>
-<span class="nc" id="L204">            throw new AccesoDenegadoException(&quot;El identificador de la cuenta en el token no es un UUID válido&quot;);</span>
+<span class="fc" id="L203">        } catch (IllegalArgumentException ex) {</span>
+<span class="fc" id="L204">            throw new AccesoDenegadoException(&quot;El identificador de la cuenta en el token no es un UUID válido&quot;);</span>
         }
     }
 
     private String normalizarCorreoOpcional(String correo) {
-<span class="pc bpc" id="L209" title="2 of 4 branches missed.">        if (correo == null || correo.isBlank()) {</span>
-<span class="nc" id="L210">            return null;</span>
+<span class="fc bfc" id="L209" title="All 4 branches covered.">        if (correo == null || correo.isBlank()) {</span>
+<span class="fc" id="L210">            return null;</span>
         }
 <span class="fc" id="L212">        String limpio = correo.trim().toLowerCase();</span>
-<span class="pc bpc" id="L213" title="1 of 2 branches missed.">        if (!limpio.contains(&quot;@&quot;)) {</span>
-<span class="nc" id="L214">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (!limpio.contains(&quot;@&quot;)) {</span>
+<span class="fc" id="L214">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
         }
 <span class="fc" id="L216">        return limpio;</span>
     }
 
     private void validarDatosBasicos(PacienteDTO dto) {
-<span class="pc bpc" id="L220" title="1 of 4 branches missed.">        if (dto.getRun() == null || dto.getRun().isBlank()) {</span>
+<span class="fc bfc" id="L220" title="All 4 branches covered.">        if (dto.getRun() == null || dto.getRun().isBlank()) {</span>
 <span class="fc" id="L221">            throw new IllegalArgumentException(&quot;El RUN es obligatorio&quot;);</span>
         }
-<span class="pc bpc" id="L223" title="1 of 4 branches missed.">        if (dto.getNombre() == null || dto.getNombre().trim().length() &lt; 2) {</span>
+<span class="fc bfc" id="L223" title="All 4 branches covered.">        if (dto.getNombre() == null || dto.getNombre().trim().length() &lt; 2) {</span>
 <span class="fc" id="L224">            throw new IllegalArgumentException(&quot;El nombre debe tener al menos 2 caracteres&quot;);</span>
         }
-<span class="pc bpc" id="L226" title="1 of 4 branches missed.">        if (dto.getApellidos() == null || dto.getApellidos().trim().length() &lt; 2) {</span>
+<span class="fc bfc" id="L226" title="All 4 branches covered.">        if (dto.getApellidos() == null || dto.getApellidos().trim().length() &lt; 2) {</span>
 <span class="fc" id="L227">            throw new IllegalArgumentException(&quot;Los apellidos deben tener al menos 2 caracteres&quot;);</span>
         }
 <span class="fc" id="L229">    }</span>
 
     private void validar(PacienteDTO dto) {
 <span class="fc" id="L232">        validarDatosBasicos(dto);</span>
-<span class="pc bpc" id="L233" title="2 of 6 branches missed.">        if (dto.getCorreo() == null || dto.getCorreo().isBlank() || !dto.getCorreo().contains(&quot;@&quot;)) {</span>
+<span class="fc bfc" id="L233" title="All 6 branches covered.">        if (dto.getCorreo() == null || dto.getCorreo().isBlank() || !dto.getCorreo().contains(&quot;@&quot;)) {</span>
 <span class="fc" id="L234">            throw new IllegalArgumentException(&quot;El correo electrónico no es válido&quot;);</span>
         }
 <span class="fc" id="L236">    }</span>

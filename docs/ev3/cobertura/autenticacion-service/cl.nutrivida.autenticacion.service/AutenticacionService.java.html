@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AutenticacionService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">autenticacion-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.autenticacion.service</a> &gt; <span class="el_source">AutenticacionService.java</span></div><h1>AutenticacionService.java</h1><pre class="source lang-java linenums">// Reglas de autenticación y cuentas.
+
+// Paquete de la clase.
+package cl.nutrivida.autenticacion.service;
+
+// Importa StandardCharsets.
+import java.nio.charset.StandardCharsets;
+// Importa los tipos del paquete.
+import java.security.*;
+// Importa los tipos del paquete.
+import java.time.*;
+// Importa los tipos del paquete.
+import java.util.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.autenticacion.dto.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.autenticacion.model.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.autenticacion.repository.*;
+// Importa ApiException.
+import cl.nutrivida.autenticacion.exceptions.ApiException;
+// Importa RequiredArgsConstructor.
+import lombok.RequiredArgsConstructor;
+// Importa Slf4j.
+import lombok.extern.slf4j.Slf4j;
+// Importa Value.
+import org.springframework.beans.factory.annotation.Value;
+// Importa HttpStatus.
+import org.springframework.http.HttpStatus;
+// Importa PasswordEncoder.
+import org.springframework.security.crypto.password.PasswordEncoder;
+// Importa los tipos del paquete.
+import org.springframework.security.oauth2.jwt.*;
+// Importa Service.
+import org.springframework.stereotype.Service;
+// Importa Transactional.
+import org.springframework.transaction.annotation.Transactional;
+
+// Registra esta clase como servicio de reglas de negocio.
+@Service
+<span class="fc" id="L41">@Slf4j</span>
+// Genera el constructor de dependencias.
+@RequiredArgsConstructor
+// Aplica una transacción al servicio.
+@Transactional
+// Define la clase.
+public class AutenticacionService {
+    private final UsuarioRepository usuarios;
+    private final RolRepository roles;
+    private final EstadoUsuarioRepository estados;
+    private final TokenRenovacionRepository tokens;
+    private final UsuarioMapper mapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtEncoder jwtEncoder;
+    // Lee la propiedad de configuración.
+    @Value(&quot;${app.jwt.issuer}&quot;) private String issuer;
+    // Lee la propiedad de configuración.
+    @Value(&quot;${app.jwt.access-token-duration:15m}&quot;) private Duration acceso;
+    // Lee la propiedad de configuración.
+    @Value(&quot;${app.jwt.refresh-token-duration:7d}&quot;) private Duration renovacion;
+    @Value(&quot;${app.registration.default-role:CLIENTE}&quot;) private String rolRegistro = &quot;CLIENTE&quot;;
+    @Value(&quot;${app.registration.default-state:ACTIVO}&quot;) private String estadoRegistro = &quot;ACTIVO&quot;;
+
+    // Recibe datos de registro y crea una cuenta cliente.
+    public UsuarioDTO registrar(RegistroDTO dto) {
+        // Normaliza el correo recibido.
+<span class="fc" id="L67">        String correo = normalizar(dto.correo());</span>
+        // Comprueba el límite de bytes de BCrypt.
+<span class="fc" id="L69">        validarPassword(dto.password());</span>
+        // Rechaza correos duplicados.
+<span class="fc bfc" id="L71" title="All 2 branches covered.">        if (usuarios.existsByCorreo(correo)) throw new ApiException(HttpStatus.CONFLICT, &quot;El correo ya está registrado&quot;);</span>
+        // Crea en memoria la entidad de la nueva cuenta.
+<span class="fc" id="L73">        Usuario usuario = new Usuario();</span>
+        // Asigna a la entidad el correo normalizado.
+<span class="fc" id="L75">        usuario.setCorreo(correo);</span>
+<span class="fc" id="L76">        usuario.setPasswordHash(passwordEncoder.encode(dto.password()));</span>
+        // Asigna el rol del servidor.
+<span class="pc" id="L78">        usuario.setRol(roles.findByNombre(rolRegistro).orElseThrow(() -&gt; new IllegalStateException(&quot;Rol inicial no configurado en la base&quot;)));</span>
+<span class="pc" id="L79">        usuario.setEstadoUsuario(estados.findByNombre(estadoRegistro).orElseThrow(() -&gt; new IllegalStateException(&quot;Estado inicial no configurado en la base&quot;)));</span>
+<span class="fc" id="L80">        Usuario guardado = usuarios.save(usuario);</span>
+<span class="fc" id="L81">        log.info(&quot;Cuenta de cliente creada: {}&quot;, guardado.getId());</span>
+        // Convierte la entidad guardada a su respuesta pública.
+<span class="fc" id="L83">        return mapper.toDTO(guardado);</span>
+    }
+
+    public SesionDTO login(LoginDTO dto) {
+        // Busca la cuenta por el correo normalizado.
+<span class="fc" id="L88">        Usuario usuario = usuarios.findByCorreo(normalizar(dto.correo()))</span>
+            // Devuelve 401 si la cuenta no existe.
+<span class="fc" id="L90">            .orElseThrow(AutenticacionService::credencialesInvalidas);</span>
+        // Rechaza credenciales o cuentas inactivas.
+<span class="fc bfc" id="L92" title="All 4 branches covered.">        if (!passwordEncoder.matches(dto.password(), usuario.getPasswordHash()) || !activo(usuario))</span>
+<span class="fc" id="L93">            throw credencialesInvalidas();</span>
+        // Emite los tokens de una nueva sesión.
+<span class="fc" id="L95">        return sesion(usuario, UUID.randomUUID(), null);</span>
+    }
+
+    public SesionDTO renovar(String token) {
+        // Busca y bloquea el token por hash.
+<span class="fc" id="L100">        TokenRenovacion anterior = tokens.buscarParaRenovar(hash(token)).orElseThrow(AutenticacionService::credencialesInvalidas);</span>
+        // Valida token y cuenta activa.
+<span class="pc bpc" id="L102" title="2 of 6 branches missed.">        if (anterior.getRevocadoEn() != null || !anterior.getExpiraEn().isAfter(Instant.now()) || !activo(anterior.getUsuario()))</span>
+<span class="fc" id="L103">            throw credencialesInvalidas();</span>
+        // Invalida el token usado.
+<span class="fc" id="L105">        anterior.setRevocadoEn(Instant.now());</span>
+        // Conserva la familia del token.
+<span class="fc" id="L107">        return sesion(anterior.getUsuario(), anterior.getFamiliaId(), anterior);</span>
+    }
+
+    // Cierra la posibilidad de renovar esa sesión.
+    public void logout(String token) {
+<span class="fc" id="L112">        tokens.buscarParaRenovar(hash(token)).ifPresent(t -&gt; {</span>
+            // Revoca únicamente un token todavía vigente.
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">            if (t.getRevocadoEn() == null) t.setRevocadoEn(Instant.now());</span>
+<span class="fc" id="L115">        });</span>
+<span class="fc" id="L116">    }</span>
+
+    // Ejecuta este método en una transacción de lectura.
+    @Transactional(readOnly = true)
+<span class="fc" id="L120">    public UsuarioDTO obtener(UUID id) { return mapper.toDTO(buscar(id)); }</span>
+
+    // Ejecuta este método en una transacción de lectura.
+    @Transactional(readOnly = true)
+    // Devuelve la lista de registros.
+<span class="fc" id="L125">    public List&lt;UsuarioDTO&gt; listar() { return usuarios.findAll().stream().map(mapper::toDTO).toList(); }</span>
+
+    public UsuarioDTO actualizar(UUID id, String rol, String estado) {
+<span class="fc" id="L128">        Usuario usuario = buscar(id);</span>
+        // Busca el rol solicitado y lo asigna.
+<span class="pc" id="L130">        usuario.setRol(roles.findByNombre(rol).orElseThrow(() -&gt; new ApiException(HttpStatus.BAD_REQUEST, &quot;Rol inválido&quot;)));</span>
+        // Busca y asigna el estado solicitado.
+<span class="pc" id="L132">        usuario.setEstadoUsuario(estados.findByNombre(estado).orElseThrow(() -&gt; new ApiException(HttpStatus.BAD_REQUEST, &quot;Estado inválido&quot;)));</span>
+        // Revoca las renovaciones de esa cuenta.
+<span class="fc" id="L134">        tokens.revocarPorUsuario(id);</span>
+<span class="fc" id="L135">        log.info(&quot;Permisos actualizados y renovaciones revocadas para cuenta {}&quot;, id);</span>
+        // Devuelve los datos públicos de la cuenta.
+<span class="fc" id="L137">        return mapper.toDTO(usuario);</span>
+    }
+
+    // Desactiva la cuenta y revoca sesiones.
+<span class="fc" id="L141">    public void desactivar(UUID id) { actualizar(id, buscar(id).getRol().getNombre(), &quot;INACTIVO&quot;); }</span>
+
+    private Usuario buscar(UUID id) {
+        // Busca la entidad por su UUID.
+<span class="pc" id="L145">        return usuarios.findById(id).orElseThrow(() -&gt; new ApiException(HttpStatus.NOT_FOUND, &quot;Usuario no encontrado&quot;));</span>
+    }
+
+    // Firma el JWT y crea la renovación.
+    private SesionDTO sesion(Usuario usuario, UUID familia, TokenRenovacion anterior) {
+<span class="fc" id="L150">        Instant ahora = Instant.now();</span>
+        // Identifica el emisor y el usuario.
+<span class="fc" id="L152">        JwtClaimsSet claims = JwtClaimsSet.builder().issuer(issuer).subject(usuario.getId().toString())</span>
+<span class="fc" id="L153">            .issuedAt(ahora).expiresAt(ahora.plus(acceso)).id(UUID.randomUUID().toString())</span>
+<span class="fc" id="L154">            .claim(&quot;roles&quot;, List.of(usuario.getRol().getNombre())).build();</span>
+<span class="fc" id="L155">        String jwt = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();</span>
+        // Reserva 48 bytes para el secreto.
+<span class="fc" id="L157">        byte[] bytes = new byte[48];</span>
+        // Genera un secreto criptográfico.
+<span class="fc" id="L159">        new SecureRandom().nextBytes(bytes);</span>
+        // Codifica en Base64 URL.
+<span class="fc" id="L161">        String refresh = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);</span>
+<span class="fc" id="L162">        TokenRenovacion nuevo = new TokenRenovacion();</span>
+        // Relaciona el token con la cuenta propietaria.
+<span class="fc" id="L164">        nuevo.setUsuario(usuario);</span>
+<span class="fc" id="L165">        nuevo.setFamiliaId(familia);</span>
+        // Guarda únicamente el SHA-256 del secreto.
+<span class="fc" id="L167">        nuevo.setTokenHash(hash(refresh));</span>
+<span class="fc" id="L168">        nuevo.setExpiraEn(ahora.plus(renovacion));</span>
+<span class="fc" id="L169">        tokens.saveAndFlush(nuevo);</span>
+        // Enlaza el token anterior con su reemplazo.
+<span class="fc bfc" id="L171" title="All 2 branches covered.">        if (anterior != null) anterior.setReemplazadoPor(nuevo);</span>
+        // Devuelve los tokens y la cuenta.
+<span class="fc" id="L173">        return new SesionDTO(jwt, refresh, &quot;Bearer&quot;, acceso.toSeconds(), mapper.toDTO(usuario));</span>
+    }
+
+    // Normaliza el correo con Locale.ROOT.
+<span class="fc" id="L177">    private static String normalizar(String correo) { return correo.strip().toLowerCase(Locale.ROOT); }</span>
+<span class="fc" id="L178">    private static boolean activo(Usuario u) { return &quot;ACTIVO&quot;.equals(u.getEstadoUsuario().getNombre()); }</span>
+<span class="fc" id="L179">    private static ApiException credencialesInvalidas() { return new ApiException(HttpStatus.UNAUTHORIZED, &quot;Credenciales o sesión inválidas&quot;); }</span>
+    // Valida el límite de BCrypt.
+    private static void validarPassword(String password) {
+        // Mide el largo real en bytes UTF-8.
+<span class="fc bfc" id="L183" title="All 2 branches covered.">        if (password.getBytes(StandardCharsets.UTF_8).length &gt; 72)</span>
+<span class="fc" id="L184">            throw new ApiException(HttpStatus.BAD_REQUEST, &quot;La contraseña supera 72 bytes&quot;);</span>
+<span class="fc" id="L185">    }</span>
+    // Guarda una huella SHA-256.
+    private static String hash(String token) {
+<span class="fc" id="L188">        try { return HexFormat.of().formatHex(MessageDigest.getInstance(&quot;SHA-256&quot;).digest(token.getBytes(StandardCharsets.UTF_8))); }</span>
+<span class="nc" id="L189">        catch (NoSuchAlgorithmException e) { throw new IllegalStateException(e); }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

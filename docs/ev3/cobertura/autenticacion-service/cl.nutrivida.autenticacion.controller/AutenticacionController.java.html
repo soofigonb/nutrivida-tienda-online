@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AutenticacionController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">autenticacion-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.autenticacion.controller</a> &gt; <span class="el_source">AutenticacionController.java</span></div><h1>AutenticacionController.java</h1><pre class="source lang-java linenums">
+// Paquete de la clase.
+package cl.nutrivida.autenticacion.controller;
+
+// Importa los tipos del paquete.
+import java.util.*;
+// Importa los tipos del paquete.
+import com.nimbusds.jose.jwk.*;
+// Importa los tipos del paquete.
+import cl.nutrivida.autenticacion.dto.*;
+// Importa AutenticacionService.
+import cl.nutrivida.autenticacion.service.AutenticacionService;
+// Importa Operation.
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+// Importa Tag.
+import io.swagger.v3.oas.annotations.tags.Tag;
+// Importa Valid.
+import jakarta.validation.Valid;
+// Importa NotBlank.
+import jakarta.validation.constraints.NotBlank;
+// Importa RequiredArgsConstructor.
+import lombok.RequiredArgsConstructor;
+// Importa ResponseEntity.
+import org.springframework.http.ResponseEntity;
+// Importa PreAuthorize.
+import org.springframework.security.access.prepost.PreAuthorize;
+// Importa AuthenticationPrincipal.
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+// Importa Jwt.
+import org.springframework.security.oauth2.jwt.Jwt;
+// Importa los tipos del paquete.
+import org.springframework.web.bind.annotation.*;
+
+// Registra un controlador REST.
+@RestController
+// Genera el constructor de dependencias.
+@RequiredArgsConstructor
+@Tag(name = &quot;Autenticación&quot;, description = &quot;Cuentas, sesiones JWT y permisos&quot;)
+// Define la clase.
+public class AutenticacionController {
+    // Servicio que contiene las reglas de negocio.
+    private final AutenticacionService service;
+    // Par de claves RSA.
+    private final RSAKey key;
+    private static final String BASE = &quot;/api/v1/autenticacion&quot;;
+<span class="fc" id="L47">    public record PermisosDTO(@NotBlank String rol, @NotBlank String estado) {}</span>
+
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Registrar una cuenta de cliente&quot;)
+    // Asocia el método HTTP y la ruta.
+    @PostMapping(BASE + &quot;/registro&quot;)
+    // Recibe datos de registro y crea una cuenta cliente.
+    ResponseEntity&lt;UsuarioDTO&gt; registrar(@Valid @RequestBody RegistroDTO dto) {
+<span class="fc" id="L55">        return ResponseEntity.status(201).body(service.registrar(dto));</span>
+    }
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Iniciar sesión&quot;)
+    // Asocia el método HTTP y la ruta.
+    @PostMapping(BASE + &quot;/login&quot;)
+    // Valida las credenciales e inicia sesión.
+<span class="fc" id="L62">    SesionDTO login(@Valid @RequestBody LoginDTO dto) { return service.login(dto); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Renovar y rotar los tokens de sesión&quot;)
+    // Asocia el método HTTP y la ruta.
+    @PostMapping(BASE + &quot;/renovar&quot;)
+    // Valida y rota el token de renovación.
+<span class="fc" id="L68">    SesionDTO renovar(@Valid @RequestBody RenovacionDTO dto) { return service.renovar(dto.refreshToken()); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Revocar un token de renovación&quot;)
+    // Asocia el método HTTP y la ruta.
+    @PostMapping(BASE + &quot;/logout&quot;)
+    // Cierra la posibilidad de renovar esa sesión.
+    ResponseEntity&lt;Void&gt; logout(@Valid @RequestBody RenovacionDTO dto) {
+<span class="fc" id="L75">        service.logout(dto.refreshToken()); return ResponseEntity.noContent().build();</span>
+    }
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Consultar mi cuenta&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    // Asocia el método HTTP y la ruta.
+    @GetMapping(BASE + &quot;/me&quot;)
+    // Consulta la cuenta del JWT.
+<span class="fc" id="L83">    UsuarioDTO me(@AuthenticationPrincipal Jwt jwt) { return service.obtener(UUID.fromString(jwt.getSubject())); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Listar cuentas como administrador&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    // Asocia el método HTTP y la ruta.
+    @GetMapping(BASE + &quot;/usuarios&quot;) @PreAuthorize(&quot;hasRole('ADMINISTRADOR')&quot;)
+<span class="fc" id="L89">    List&lt;UsuarioDTO&gt; listar() { return service.listar(); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Consultar una cuenta como administrador&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    // Asocia el método HTTP y la ruta.
+    @GetMapping(BASE + &quot;/usuarios/{id}&quot;) @PreAuthorize(&quot;hasRole('ADMINISTRADOR')&quot;)
+    // Busca el registro por ID.
+<span class="fc" id="L96">    UsuarioDTO obtener(@PathVariable UUID id) { return service.obtener(id); }</span>
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Actualizar rol y estado de una cuenta&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    // Asocia el método HTTP y la ruta.
+    @PutMapping(BASE + &quot;/usuarios/{id}&quot;) @PreAuthorize(&quot;hasRole('ADMINISTRADOR')&quot;)
+    // Valida y actualiza el registro.
+    UsuarioDTO actualizar(@PathVariable UUID id, @Valid @RequestBody PermisosDTO dto) {
+<span class="fc" id="L104">        return service.actualizar(id, dto.rol(), dto.estado());</span>
+    }
+    // Describe la operación en Swagger.
+    @Operation(summary = &quot;Desactivar una cuenta&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    // Asocia el método HTTP y la ruta.
+    @DeleteMapping(BASE + &quot;/usuarios/{id}&quot;) @PreAuthorize(&quot;hasRole('ADMINISTRADOR')&quot;)
+    // Desactiva la cuenta y devuelve 204 sin cuerpo.
+    ResponseEntity&lt;Void&gt; eliminar(@PathVariable UUID id) {
+<span class="fc" id="L113">        service.desactivar(id); return ResponseEntity.noContent().build();</span>
+    }
+    // Asocia el método HTTP y la ruta.
+    @GetMapping(&quot;/.well-known/jwks.json&quot;)
+    // Publica únicamente la clave pública en un conjunto JWK.
+<span class="fc" id="L118">    Map&lt;String, Object&gt; jwks() { return new JWKSet(key.toPublicJWK()).toJSONObject(); }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

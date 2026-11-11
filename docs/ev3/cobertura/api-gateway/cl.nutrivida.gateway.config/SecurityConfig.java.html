@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SecurityConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">api-gateway</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.gateway.config</a> &gt; <span class="el_source">SecurityConfig.java</span></div><h1>SecurityConfig.java</h1><pre class="source lang-java linenums">
+// Paquete de la clase.
+package cl.nutrivida.gateway.config;
+
+// Importa List.
+import java.util.List;
+// Importa Value.
+import org.springframework.beans.factory.annotation.Value;
+// Importa los tipos del paquete.
+import org.springframework.context.annotation.*;
+// Importa HttpMethod.
+import org.springframework.http.HttpMethod;
+// Importa EnableWebFluxSecurity.
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+// Importa ServerHttpSecurity.
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+// Importa los tipos del paquete.
+import org.springframework.security.oauth2.jwt.*;
+// Importa los tipos del paquete.
+import org.springframework.security.oauth2.server.resource.authentication.*;
+// Importa SecurityWebFilterChain.
+import org.springframework.security.web.server.SecurityWebFilterChain;
+// Importa CorsConfiguration.
+import org.springframework.web.cors.CorsConfiguration;
+// Importa los tipos del paquete.
+import org.springframework.web.cors.reactive.*;
+
+// Configuración de Spring.
+@Configuration @EnableWebFluxSecurity
+// Define la clase.
+<span class="fc" id="L31">public class SecurityConfig {</span>
+    // Registra el componente en Spring.
+    @Bean
+    ReactiveJwtDecoder jwtDecoder(@Value(&quot;${JWT_JWK_SET_URI:http://localhost:8081/.well-known/jwks.json}&quot;) String jwks,
+                                  // Lee la propiedad de configuración.
+                                  @Value(&quot;${JWT_ISSUER:http://localhost:8081}&quot;) String issuer) {
+<span class="nc" id="L37">        NimbusReactiveJwtDecoder decoder = NimbusReactiveJwtDecoder.withJwkSetUri(jwks).build();</span>
+        // Valida emisor y vigencia del JWT.
+<span class="nc" id="L39">        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));</span>
+<span class="nc" id="L40">        return decoder;</span>
+    }
+    // Registra el componente en Spring.
+    @Bean
+    CorsConfigurationSource corsConfigurationSource(@Value(&quot;${FRONTEND_URL:http://localhost:5173}&quot;) String frontend) {
+<span class="fc" id="L45">        CorsConfiguration cors = new CorsConfiguration();</span>
+        // Autoriza solo FRONTEND_URL.
+<span class="fc" id="L47">        cors.setAllowedOrigins(List.of(frontend));</span>
+<span class="fc" id="L48">        cors.setAllowedMethods(List.of(&quot;GET&quot;, &quot;POST&quot;, &quot;PUT&quot;, &quot;PATCH&quot;, &quot;DELETE&quot;, &quot;OPTIONS&quot;));</span>
+<span class="fc" id="L49">        cors.setAllowedHeaders(List.of(&quot;Authorization&quot;, &quot;Content-Type&quot;, &quot;Accept&quot;));</span>
+        // Permite enviar cookies.
+<span class="fc" id="L51">        cors.setAllowCredentials(true);</span>
+<span class="fc" id="L52">        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
+<span class="fc" id="L53">        source.registerCorsConfiguration(&quot;/**&quot;, cors);</span>
+        // Entrega a Spring Security el registro de reglas CORS.
+<span class="fc" id="L55">        return source;</span>
+    }
+    // Registra el componente en Spring.
+    @Bean
+    SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+<span class="fc" id="L60">        JwtGrantedAuthoritiesConverter roles = new JwtGrantedAuthoritiesConverter();</span>
+        // Lee el campo roles y antepone ROLE_ a cada valor.
+<span class="fc" id="L62">        roles.setAuthoritiesClaimName(&quot;roles&quot;); roles.setAuthorityPrefix(&quot;ROLE_&quot;);</span>
+<span class="fc" id="L63">        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();</span>
+<span class="fc" id="L64">        converter.setJwtGrantedAuthoritiesConverter(roles);</span>
+<span class="fc" id="L65">        return http.csrf(c -&gt; c.disable()).cors(c -&gt; {})</span>
+            // Inicia las reglas de acceso del gateway reactivo.
+<span class="fc" id="L67">            .authorizeExchange(a -&gt; a</span>
+                // Permite las solicitudes CORS previas.
+<span class="fc" id="L69">                .pathMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll()</span>
+<span class="fc" id="L70">                .pathMatchers(HttpMethod.POST, &quot;/api/v1/autenticacion/registro&quot;, &quot;/api/v1/autenticacion/login&quot;, &quot;/api/v1/autenticacion/renovar&quot;, &quot;/api/v1/autenticacion/logout&quot;, &quot;/api/v1/autenticacion/web/**&quot;).permitAll()</span>
+<span class="fc" id="L71">                .pathMatchers(HttpMethod.GET, &quot;/api/v1/catalogo/**&quot;, &quot;/api/v1/profesionales/**&quot;).permitAll()</span>
+<span class="fc" id="L72">                .pathMatchers(HttpMethod.GET, &quot;/api/v1/agendamiento/disponibilidad&quot;).permitAll()</span>
+<span class="fc" id="L73">                .pathMatchers(&quot;/api/v1/autenticacion/usuarios/**&quot;).hasRole(&quot;ADMINISTRADOR&quot;)</span>
+                // Exige un JWT válido para consultar la cuenta actual.
+<span class="fc" id="L75">                .pathMatchers(&quot;/api/v1/autenticacion/me&quot;).authenticated()</span>
+                // Permite consultar órdenes a los tres roles.
+<span class="fc" id="L77">                .pathMatchers(HttpMethod.GET, &quot;/api/v1/ordenes/**&quot;).hasAnyRole(&quot;ADMINISTRADOR&quot;, &quot;VENDEDOR&quot;, &quot;CLIENTE&quot;)</span>
+<span class="fc" id="L78">                .pathMatchers(&quot;/api/v1/ordenes/**&quot;).hasAnyRole(&quot;ADMINISTRADOR&quot;, &quot;CLIENTE&quot;)</span>
+<span class="fc" id="L79">                .pathMatchers(&quot;/api/v1/catalogo/**&quot;, &quot;/api/v1/profesionales/**&quot;).hasRole(&quot;ADMINISTRADOR&quot;)</span>
+<span class="fc" id="L80">                .pathMatchers(&quot;/api/v1/pacientes&quot;, &quot;/api/v1/pacientes/&quot;).hasRole(&quot;ADMINISTRADOR&quot;)</span>
+<span class="fc" id="L81">                .pathMatchers(HttpMethod.DELETE, &quot;/api/v1/pacientes/**&quot;).hasRole(&quot;ADMINISTRADOR&quot;)</span>
+<span class="fc" id="L82">                .pathMatchers(&quot;/api/v1/pacientes/**&quot;, &quot;/api/v1/agendamiento/**&quot;).hasAnyRole(&quot;ADMINISTRADOR&quot;, &quot;CLIENTE&quot;)</span>
+                // Bloquea rutas sin regla.
+<span class="fc" id="L84">                .anyExchange().denyAll())</span>
+            // Activa JWT en WebFlux.
+<span class="fc" id="L86">            .oauth2ResourceServer(o -&gt; o.jwt(j -&gt; j.jwtAuthenticationConverter(new ReactiveJwtAuthenticationConverterAdapter(converter))))</span>
+            // Construye la configuración.
+<span class="fc" id="L88">            .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>

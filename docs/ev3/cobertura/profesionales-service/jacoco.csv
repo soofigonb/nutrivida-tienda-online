@@ -1,0 +1,10 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+profesionales-service,cl.nutrivida.profesionales.service,ProfesionalService,12,213,0,22,0,47,2,20,2,9
+profesionales-service,cl.nutrivida.profesionales.dto,ProfesionalDTO,0,59,0,0,0,17,0,17,0,17
+profesionales-service,cl.nutrivida.profesionales.dto,ProfesionalMapper,0,79,0,0,0,21,0,3,0,3
+profesionales-service,cl.nutrivida.profesionales.config,SecurityConfig,0,101,0,0,0,15,0,7,0,7
+profesionales-service,cl.nutrivida.profesionales.model,Profesional,0,63,0,0,0,27,0,17,0,17
+profesionales-service,cl.nutrivida.profesionales,ProfesionalesServiceApplication,5,3,0,0,2,1,1,1,1,1
+profesionales-service,cl.nutrivida.profesionales.controller,ProfesionalController,0,38,0,0,0,10,0,6,0,6
+profesionales-service,cl.nutrivida.profesionales.exceptions,GlobalExceptionHandler,0,19,0,0,0,5,0,3,0,3
+profesionales-service,cl.nutrivida.profesionales.exceptions,RecursoNoEncontradoException,0,4,0,0,0,2,0,1,0,1

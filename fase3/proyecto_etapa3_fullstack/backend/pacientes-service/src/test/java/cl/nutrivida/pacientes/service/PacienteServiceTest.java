@@ -34,6 +34,63 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 // Define la clase.
 class PacienteServiceTest {
+@Test void validaCamposNulosYCorreoOpcional() {
+        List<java.util.function.Consumer<PacienteDTO>> cambios = List.of(
+                d -> d.setRun(null), d -> d.setNombre(null), d -> d.setApellidos(null),
+                d -> d.setCorreo(null), d -> d.setCorreo(" "));
+        for (var cambio : cambios) {
+            var dto = dtoValido();
+            cambio.accept(dto);
+            assertThrows(IllegalArgumentException.class, () -> service.crear(dto));
+        }
+        var dto = dtoValido();
+        dto.setCorreo("sin-arroba");
+        assertThrows(IllegalArgumentException.class, () -> service.guardarPerfilPropio(dto, token(UUID.randomUUID())));
+        when(repository.save(any())).thenAnswer(i -> i.getArgument(0));
+        dto.setCorreo(null);
+        assertNull(service.guardarPerfilPropio(dto, token(UUID.randomUUID())).getCorreo());
+        dto.setCorreo(" ");
+        assertNull(service.guardarPerfilPropio(dto, token(UUID.randomUUID())).getCorreo());
+    }
+
+    @Test void rechazaIdentidadesInvalidasYPermiteAlAdministradorConsultar() {
+        assertThrows(AccesoDenegadoException.class, () -> service.obtenerPerfilPropio(null));
+        for (String sub : List.of(" ", "invalido")) {
+            var jwt = Jwt.withTokenValue("prueba").header("alg", "RS256").subject(sub).build();
+            assertThrows(AccesoDenegadoException.class, () -> service.obtenerPerfilPropio(jwt));
+        }
+        var paciente = new PacienteMapper().toEntity(dtoValido());
+        var cuenta = UUID.randomUUID();
+        paciente.setUsuarioId(cuenta);
+        when(repository.findById(1L)).thenReturn(Optional.of(paciente));
+        assertNotNull(service.obtenerPorId(1L, token(cuenta)));
+        var admin = Jwt.withTokenValue("admin").header("alg", "RS256")
+                .subject(UUID.randomUUID().toString()).claim("roles", List.of("ADMINISTRADOR")).build();
+        assertNotNull(service.obtenerPorId(1L, admin));
+        var sinRoles = Jwt.withTokenValue("sin-roles").header("alg", "RS256").subject(cuenta.toString()).build();
+        paciente.setUsuarioId(null);
+        assertThrows(AccesoDenegadoException.class, () -> service.obtenerPorId(1L, sinRoles));
+    }
+
+    @Test void impideDuplicadosAlCrearYActualizarPerfilPropio() {
+        var cuenta = UUID.randomUUID();
+        var jwt = token(cuenta);
+        var dto = dtoValido();
+        when(repository.existsByRunAndActivoTrue("19876543-K")).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.guardarPerfilPropio(dto, jwt));
+        when(repository.existsByRunAndActivoTrue("19876543-K")).thenReturn(false);
+        when(repository.existsByCorreoIgnoreCaseAndActivoTrue("valentina@duoc.cl")).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.guardarPerfilPropio(dto, jwt));
+        var paciente = new PacienteMapper().toEntity(dto);
+        paciente.setPacienteId(4L);
+        paciente.setActivo(true);
+        when(repository.findByUsuarioId(cuenta)).thenReturn(Optional.of(paciente));
+        when(repository.existsByRunAndActivoTrueAndPacienteIdNot("19876543-K", 4L)).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.guardarPerfilPropio(dto, jwt));
+        when(repository.existsByRunAndActivoTrueAndPacienteIdNot("19876543-K", 4L)).thenReturn(false);
+        when(repository.existsByCorreoIgnoreCaseAndActivoTrueAndPacienteIdNot("valentina@duoc.cl", 4L)).thenReturn(true);
+        assertThrows(IllegalArgumentException.class, () -> service.guardarPerfilPropio(dto, jwt));
+    }
 
     @Test void perfilPropioUsaIdentidadDelTokenYSePuedeActualizar() {
         UUID cuenta = UUID.randomUUID();

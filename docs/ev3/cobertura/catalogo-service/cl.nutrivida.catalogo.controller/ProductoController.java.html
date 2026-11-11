@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProductoController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">catalogo-service</a> &gt; <a href="index.source.html" class="el_package">cl.nutrivida.catalogo.controller</a> &gt; <span class="el_source">ProductoController.java</span></div><h1>ProductoController.java</h1><pre class="source lang-java linenums">package cl.nutrivida.catalogo.controller;
+
+import cl.nutrivida.catalogo.dto.CategoriaDTO;
+import cl.nutrivida.catalogo.dto.CrearProductoDTO;
+import cl.nutrivida.catalogo.dto.ProductoDTO;
+import cl.nutrivida.catalogo.dto.PlanVentaDTO;
+import cl.nutrivida.catalogo.service.ProductoService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping({&quot;/api/v1/catalogo&quot;, &quot;/api/productos&quot;})
+@Tag(name = &quot;Productos&quot;, description = &quot;Endpoints para la gestión del catálogo de productos&quot;)
+public class ProductoController {
+
+    private final ProductoService service;
+
+<span class="fc" id="L28">    public ProductoController(ProductoService service) {</span>
+<span class="fc" id="L29">        this.service = service;</span>
+<span class="fc" id="L30">    }</span>
+
+    @GetMapping
+    @Operation(summary = &quot;Listar todos los productos&quot;, description = &quot;Retorna el catálogo completo de productos activos&quot;)
+    public List&lt;ProductoDTO&gt; listar() {
+<span class="fc" id="L35">        return service.listar();</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    @Operation(summary = &quot;Obtener producto por ID&quot;, description = &quot;Retorna los detalles de un producto específico dado su UUID&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;200&quot;, description = &quot;Producto encontrado&quot;),
+        @ApiResponse(responseCode = &quot;404&quot;, description = &quot;Producto no encontrado&quot;)
+    })
+    public ProductoDTO buscarPorId(@PathVariable UUID id) {
+<span class="fc" id="L45">        return service.buscarPorId(id);</span>
+    }
+
+    @GetMapping(&quot;/categorias&quot;)
+    @Operation(summary = &quot;Listar categorías&quot;, description = &quot;Retorna el listado de categorías disponibles&quot;)
+    public List&lt;CategoriaDTO&gt; listarCategorias() {
+<span class="fc" id="L51">        return service.listarCategorias();</span>
+    }
+
+    @PostMapping(&quot;/categorias&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = &quot;Crear una categoría&quot;)
+    @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Categoría creada&quot;)
+    public CategoriaDTO crearCategoria(@Valid @RequestBody CategoriaDTO datos) {
+<span class="fc" id="L60">        return service.crearCategoria(datos);</span>
+    }
+
+    @PostMapping
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @Operation(summary = &quot;Crear nuevo producto&quot;, description = &quot;Crea un producto en el catálogo validando sus atributos obligatorios&quot;)
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = &quot;201&quot;, description = &quot;Producto creado exitosamente&quot;),
+        @ApiResponse(responseCode = &quot;400&quot;, description = &quot;Datos de entrada inválidos o faltantes&quot;)
+    })
+    public ResponseEntity&lt;ProductoDTO&gt; crear(@Valid @RequestBody CrearProductoDTO datos) {
+<span class="fc" id="L71">        return ResponseEntity.status(HttpStatus.CREATED).body(service.crear(datos));</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @Operation(summary = &quot;Actualizar producto&quot;)
+    public ProductoDTO actualizar(@PathVariable UUID id, @Valid @RequestBody CrearProductoDTO datos) {
+<span class="fc" id="L78">        return service.actualizar(id, datos);</span>
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    @SecurityRequirement(name = &quot;bearerAuth&quot;)
+    @Operation(summary = &quot;Dar de baja un producto&quot;)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void darDeBaja(@PathVariable UUID id) {
+<span class="fc" id="L86">        service.darDeBaja(id);</span>
+<span class="fc" id="L87">    }</span>
+
+    @GetMapping(&quot;/planes&quot;)
+    @Operation(summary = &quot;Listar artículos con su identificador de venta&quot;)
+    public List&lt;PlanVentaDTO&gt; listarPlanes() {
+<span class="fc" id="L92">        return service.listarPlanes();</span>
+    }
+
+    @GetMapping(&quot;/planes/{id}&quot;)
+    @Operation(summary = &quot;Consultar un artículo por su identificador de venta&quot;)
+    public PlanVentaDTO buscarPlan(@PathVariable Long id) {
+<span class="fc" id="L98">        return service.buscarPlan(id);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span></div></body></html>
