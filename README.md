@@ -1,302 +1,210 @@
 # 🥑 NutriVida
 
-> **Avance EV3:** autenticación, órdenes y gateway están en `fase3/proyecto_etapa3_fullstack/backend`, con rutas directas y sin Eureka. El frontend de fase 3 integra sesión, cuentas y órdenes por API. Catálogo, pacientes y agendamiento reales siguen pendientes de coordinación con el equipo.
-
 <p align="center">
-  <strong>Clínica nutricional para una vida más saludable</strong>
+  <strong>Plataforma web de la Clínica Nutricional NutriVida</strong>
 </p>
 
 <p align="center">
-  Aplicación web para consultar servicios nutricionales, agendar atenciones y administrar pacientes y profesionales.
+  Consulta de planes nutricionales, agendamiento de citas y gestión de la clínica.
 </p>
 
 <p align="center">
-  <a href="./fase1/proyecto_etapa1_html/">Fase 1 · HTML</a>
+  <a href="https://54.160.139.179/">☁️ Aplicación en AWS</a>
   ·
-  <a href="./fase2/proyecto_etapa2_react/">Fase 2 · React</a>
+  <a href="./fase1/proyecto_etapa1_html/">Fase 1</a>
   ·
-  <a href="./docs/ev2/">Documentación EV2</a>
+  <a href="./fase2/proyecto_etapa2_react/">Fase 2</a>
+  ·
+  <a href="./fase3/proyecto_etapa3_fullstack/">Fase 3</a>
 </p>
-
----
 
 ## 🌿 Acerca del proyecto
 
-**NutriVida** es un proyecto web para una clínica nutricional. Facilita el acceso a información sobre sus profesionales, planes de atención y contenidos sobre alimentación saludable.
+**NutriVida** es un proyecto académico de Desarrollo Full Stack II para una clínica nutricional. Los visitantes pueden consultar planes, conocer a los nutricionistas, revisar ofertas y leer artículos sobre alimentación saludable. Los clientes pueden crear una cuenta, solicitar atenciones y consultar sus citas y órdenes. El personal de la clínica dispone de paneles de gestión según su rol.
 
-La aplicación permite registrar pacientes, iniciar sesión, explorar servicios por categoría, consultar ofertas, agendar atenciones y revisar los datos de una reserva antes de confirmarla. También incorpora un panel administrativo para gestionar pacientes y nutricionistas.
+El repositorio reúne la evolución del proyecto desde el sitio inicial en HTML, CSS y JavaScript hasta la aplicación integrada con **React y Vite, Spring Boot, un API Gateway y PostgreSQL en Supabase**.
 
-El repositorio conserva dos etapas: la versión original desarrollada con HTML, CSS y JavaScript, y su migración a React con Vite.
+## 📚 Fases del proyecto
 
-> El sistema es un prototipo frontend con datos de demostración. La autenticación, la confirmación de reservas y el envío de contacto son simulados. Los datos se almacenan localmente en el navegador. No utiliza un backend ni procesa pagos reales.
+| Fase | Desarrollo | Código y guía |
+| --- | --- | --- |
+| **1 · Sitio web inicial** | Sitio adaptable con HTML, CSS, JavaScript y Bootstrap. Presenta la clínica, los profesionales y los servicios nutricionales. | [README de la fase 1](./fase1/proyecto_etapa1_html/README.md) |
+| **2 · Aplicación React** | Migración a React y Vite. Incorpora navegación, componentes reutilizables, formularios, contextos, administración de registros, persistencia en el navegador y pruebas automatizadas. | [README de la fase 2](./fase2/proyecto_etapa2_react/README.md) |
+| **3 · Integración full stack** | Conexión del frontend con seis microservicios en Spring Boot mediante APIs REST. Incorpora autenticación con JWT, acceso por roles, persistencia en PostgreSQL y el flujo integrado de órdenes y citas. | [README de la fase 3](./fase3/proyecto_etapa3_fullstack/README.md) |
 
----
+## ☁️ Despliegue en AWS
 
-## 📚 Etapas del proyecto
+**[Abrir NutriVida en AWS EC2 · Fase 3](https://54.160.139.179/)**
 
-| Etapa | Descripción | Documentación |
-|---|---|---|
-| Fase 1 | Sitio desarrollado con HTML, CSS, JavaScript y Bootstrap. | [README de fase 1](./fase1/proyecto_etapa1_html/README.md) |
-| Fase 2 | Aplicación React con componentes reutilizables, navegación, contextos, CRUD, persistencia y pruebas automatizadas. | [README de fase 2](./fase2/proyecto_etapa2_react/README.md) |
+La fase 2 también se publicó en AWS EC2 con Ubuntu y Nginx. El procedimiento y las capturas de esa publicación se conservan en la [documentación de despliegue de la EV2](./docs/ev2/despliegue_aws/).
 
----
+## ✨ Funcionalidades de la aplicación integrada
 
-## ✨ Funcionalidades principales
+| Área | Funcionalidades |
+| --- | --- |
+| **Sitio público** | Información de la clínica, listado y detalle de nutricionistas, planes con precios en CLP, filtros por categoría, ofertas, blog y formulario de contacto. |
+| **Cuentas y pacientes** | Registro, inicio y cierre de sesión, renovación de sesión web y gestión de fichas de identificación y contacto. El formulario valida el RUN y permite seleccionar región y comuna. |
+| **Agendamiento y carrito** | Selección de plan, profesional, motivo, fecha y horario. El sistema comprueba la disponibilidad y permite revisar las atenciones antes de registrar la orden. |
+| **Órdenes y citas** | Registro y consulta de órdenes propias. Consulta, reprogramación y cancelación de citas según los permisos y el estado de cada registro. |
+| **Gestión de la clínica** | Paneles para consultar órdenes y catálogo, y para administrar cuentas, roles, pacientes, profesionales, productos y categorías. |
 
-### Sitio público
+El formulario de contacto y el registro de órdenes se utilizan con fines de demostración académica. El flujo de órdenes y citas no realiza cobros.
 
-- Presentación de la clínica e información institucional.
-- Video educativo sobre alimentación saludable, con su fuente.
-- Listado de nutricionistas y detalle de cada profesional.
-- Planes y servicios con precios en pesos chilenos.
-- Catálogo con filtro por categoría y selección conservada en la URL.
-- Página de ofertas con condiciones del beneficio.
-- Promoción interactiva en el inicio.
-- Blogs y artículos sobre nutrición.
-- Formulario de contacto con validaciones.
-- Navegación y diseño responsive.
+### 👥 Roles
 
-### Cuentas de usuario
+| Rol | Acceso |
+| --- | --- |
+| **Cliente** | Consulta planes y profesionales, solicita atenciones y gestiona sus propias citas y órdenes según las acciones disponibles. |
+| **Vendedor** | Consulta el catálogo y los listados y detalles de órdenes desde el panel comercial. |
+| **Administrador** | Gestiona cuentas, roles, pacientes, profesionales y catálogo. Consulta órdenes y realiza los cambios de estado autorizados. |
 
-- Registro de pacientes con validaciones.
-- Comprobación del RUN/RUT y su dígito verificador.
-- Selección relacionada de región y comuna.
-- Detección de RUN/RUT y correos duplicados.
-- Inicio y cierre de sesión simulados.
-- Acceso diferenciado para pacientes y administrador.
-- Actualización del menú según la sesión.
+## 🧩 Arquitectura de la fase 3
 
-### Agendamiento y carrito
+El frontend envía las solicitudes a `/api`. En desarrollo, Vite las reenvía al **API Gateway**. Con Docker Compose, Nginx sirve la aplicación compilada y reenvía las solicitudes de API al Gateway. Cada microservicio aplica sus reglas de negocio y guarda sus datos en PostgreSQL.
 
-- Selección de un plan, profesional, motivo, fecha y horario.
-- Preselección del plan desde servicios y ofertas.
-- Validación de fechas y horarios futuros.
-- Detección de reservas duplicadas.
-- Incorporación, eliminación y vaciado de consultas.
-- Cálculo del total según los planes seleccionados.
-- Revisión de consultas y datos del paciente antes de confirmar.
-- Nombre y correo completados desde la sesión cuando está disponible.
-- Confirmación simulada con resumen y código de reserva.
-- Manejo de errores y conservación de reservas ante fallos.
-- Prevención de duplicados al reintentar la confirmación.
+| Componente | Puerto local | Ruta base | Responsabilidad |
+| --- | ---: | --- | --- |
+| Frontend | `5173` | `/` | Sitio público, formularios, carrito y paneles por rol. |
+| API Gateway | `8080` | `/api/v1` | Enrutamiento de solicitudes, validación de JWT y control de acceso. |
+| Autenticación | `8081` | `/api/v1/autenticacion` | Registro, sesiones y gestión de cuentas, roles y estados. |
+| Pacientes | `8082` | `/api/v1/pacientes` | Consulta y gestión de fichas de pacientes. |
+| Catálogo | `8083` | `/api/v1/catalogo` | Productos, categorías y planes disponibles para el carrito. |
+| Profesionales | `8084` | `/api/v1/profesionales` | Gestión de nutricionistas, especialidades y modalidades de atención. |
+| Agendamiento | `8085` | `/api/v1/agendamiento` | Disponibilidad, registro, consulta, reprogramación y cancelación de citas. |
+| Órdenes | `8086` | `/api/v1/ordenes` | Validación de precios, preparación, publicación y cambios de estado de órdenes. |
 
-El precio corresponde al plan seleccionado. No se agrega un cobro adicional por elegir un nutricionista.
+Autenticación firma los JWT de acceso con RSA y almacena las contraseñas como hashes BCrypt. El frontend mantiene el token de acceso en memoria y usa una cookie `HttpOnly` para renovar la sesión web. Los servicios protegidos verifican los permisos y la titularidad del recurso cuando corresponde.
 
-### Panel administrativo
+### 🛒 Flujo de orden y cita
 
-- Dashboard con información general.
-- Listados y búsquedas de pacientes y nutricionistas.
-- Creación, edición y eliminación de registros.
-- Formularios reutilizables con validaciones.
-- Confirmación antes de eliminar.
-- Comprobación de relaciones con citas y reservas.
-- Actualización de los profesionales utilizados por el sitio público.
+1. El cliente selecciona un plan, un profesional y un horario disponible, y agrega la atención al carrito.
+2. Al pulsar **Registrar orden**, el frontend llama a `POST /api/v1/ordenes/preparar`. Órdenes consulta los precios en Catálogo y guarda la solicitud con una clave de idempotencia para reconocer reintentos.
+3. Agendamiento registra las citas asociadas a las unidades de la orden y comprueba que los horarios sigan disponibles. Si queda una cita pendiente, el cliente puede corregir su horario y reintentar. El sistema conserva la orden preparada y las citas registradas.
+4. Cuando todas las citas están confirmadas, el frontend llama a `POST /api/v1/ordenes/{id}/publicar`. El cliente puede consultar la orden en **Mis órdenes** y revisar las atenciones en **Mis citas**.
 
----
+La orden y la cita tienen estados independientes. Una orden publicada puede tener estado comercial `PENDIENTE` mientras su cita está `CONFIRMADA`.
 
 ## 🛠️ Tecnologías
 
 | Área | Tecnologías |
-|---|---|
-| Primera etapa | HTML5, CSS y JavaScript |
-| Aplicación | React y JSX |
-| Desarrollo y compilación | Vite |
-| Navegación | React Router |
-| Diseño e interfaz | Bootstrap, React Bootstrap y CSS |
-| Iconografía | Bootstrap Icons |
-| Formularios | React Hook Form |
-| Estado compartido | React Context |
-| Persistencia | `localStorage` y JSON |
-| Pruebas | Vitest, React Testing Library, user-event y jest-dom |
-| Entorno de pruebas | jsdom |
-| Cobertura | v8 mediante `@vitest/coverage-v8` |
-| Análisis estático | Oxlint |
-| Publicación | AWS EC2, Ubuntu y Nginx |
+| --- | --- |
+| Sitio inicial | HTML5, CSS, JavaScript y Bootstrap |
+| Frontend | React, Vite, React Router, React Bootstrap, React Hook Form, React Context y `fetch` |
+| Backend | Java 17, Spring Boot, Spring Cloud Gateway, Spring Security y Maven |
+| Persistencia | `localStorage` en la fase 2. PostgreSQL en Supabase, Spring Data JPA y Flyway en la fase 3 |
+| Contratos de API | Springdoc, OpenAPI y Swagger UI |
+| Pruebas y cobertura | Vitest, React Testing Library, JUnit, Mockito, MockMvc y JaCoCo |
+| Ejecución y despliegue | Docker Compose, Nginx y AWS EC2 |
 | Control de versiones | Git y GitHub |
-
----
 
 ## 📁 Organización del repositorio
 
-| Ubicación | Contenido |
-|---|---|
-| [`fase1/proyecto_etapa1_html/`](./fase1/proyecto_etapa1_html/) | Versión original y su README. |
-| [`fase2/proyecto_etapa2_react/`](./fase2/proyecto_etapa2_react/) | Aplicación React, configuración y pruebas. |
-| [`docs/ev1/`](./docs/ev1/) | Documentación de la primera entrega. |
-| [`docs/ev2/`](./docs/ev2/) | Documentación de la segunda entrega. |
-| [ERS de NutriVida versión 2](./docs/ev2/DSY1104%20Evaluaci%C3%B3n%20Parcial%202%20-%20Anexo%204%20ERS-Especificacion%20de%20Requisitos%20del%20software.docx.pdf) | Requisitos y criterios de aceptación de la aplicación React. |
-| [`docs/ev2/pruebas_unitarias/`](./docs/ev2/pruebas_unitarias/) | Informe, cobertura y evidencias de pruebas. |
-| [`docs/ev2/despliegue_aws/`](./docs/ev2/despliegue_aws/) | Procedimiento y evidencias del despliegue en AWS. |
-| `README.md` | Presentación e instrucciones generales. |
+```text
+nutrivida-tienda-online/
+├── fase1/proyecto_etapa1_html/
+├── fase2/proyecto_etapa2_react/
+├── fase3/proyecto_etapa3_fullstack/
+│   ├── backend/
+│   ├── frontend/
+│   ├── .env.example
+│   └── docker-compose.yml
+├── docs/
+│   ├── ev1/
+│   ├── ev2/
+│   └── ev3/
+└── README.md
+```
 
----
+## 🚀 Ejecutar el proyecto
 
-## 🚀 Ejecutar la aplicación React
-
-### Requisitos
-
-- Node.js 24.
-- npm.
-- Git.
-- Un navegador web actualizado.
-
-### Instalación
+Clona el repositorio y abre la fase que quieras ejecutar.
 
 ```bash
 git clone https://github.com/soofigonb/nutrivida-tienda-online.git
-cd nutrivida-tienda-online/fase2/proyecto_etapa2_react
-npm ci
+cd nutrivida-tienda-online
 ```
 
-### Iniciar el servidor
+### Fase 1 · Sitio estático
+
+Abre `fase1/proyecto_etapa1_html/index.html` con un servidor estático, como **Live Server** en VS Code. Consulta las instrucciones del [README de la fase 1](./fase1/proyecto_etapa1_html/README.md).
+
+### Fase 2 · React y Vite
+
+Con Node.js y npm instalados, ejecuta desde la raíz del repositorio:
 
 ```bash
+cd fase2/proyecto_etapa2_react
+npm ci
 npm run dev
 ```
 
-Abre la dirección indicada en la terminal, normalmente [http://localhost:5173/](http://localhost:5173/).
+Abre la dirección que indique Vite, normalmente [http://localhost:5173/](http://localhost:5173/). Los datos de demostración de esta fase se guardan en el navegador. Consulta el [README de la fase 2](./fase2/proyecto_etapa2_react/README.md).
 
-Si el puerto está ocupado, Vite puede utilizar otro. Para detener el servidor, presiona **Ctrl + C**.
+### Fase 3 · Aplicación full stack
 
-> Los comandos de npm se ejecutan dentro de `fase2/proyecto_etapa2_react`, donde se encuentra `package.json`.
-
----
-
-## 🖥️ Ejecutar la primera etapa
-
-Abre `fase1/proyecto_etapa1_html/index.html` mediante un servidor estático, como la extensión **Live Server** de Visual Studio Code.
-
-Esta etapa no requiere instalar dependencias con npm.
-
-Consulta el [README de fase 1](./fase1/proyecto_etapa1_html/README.md).
-
----
-
-## 🧪 Pruebas y cobertura
-
-Desde la carpeta React:
+Desde la raíz del repositorio, entra a la carpeta de la fase 3 y copia la plantilla de variables.
 
 ```bash
-npm run test -- --run
+cd fase3/proyecto_etapa3_fullstack
+cp .env.example .env
 ```
 
-Para ejecutar las pruebas y generar la cobertura:
+En PowerShell, el comando equivalente es `Copy-Item .env.example .env`. Configura en `.env` las conexiones a PostgreSQL y las rutas de las claves RSA. Guarda las credenciales y las claves privadas fuera del control de versiones.
+
+Para una instalación nueva, puedes generar las claves con `node backend/scripts/generar-claves.mjs ./secrets`. Con Docker iniciado y la configuración completa, ejecuta:
 
 ```bash
-npm run test:coverage
+docker compose config --quiet
+docker compose up --build -d
+docker compose ps
 ```
 
-La ejecución de referencia del **16 de octubre de 2026 a las 02:20:55, hora de Chile**, aprobó **151 pruebas en 15 archivos**, sin pruebas fallidas. La duración registrada fue de **34,07 segundos**.
+El frontend se abre en [http://localhost:5173/](http://localhost:5173/) y el Gateway escucha en `localhost:8080`. Las variables por servicio, la ejecución sin Docker y los enlaces de Swagger UI se detallan en el [README de la fase 3](./fase3/proyecto_etapa3_fullstack/README.md).
 
-| Métrica | Cobertura | Elementos ejecutados |
-|---|---:|---:|
-| Sentencias | 90,29 % | 791 de 876 |
-| Ramas | 81,89 % | 638 de 779 |
-| Funciones | 93,44 % | 228 de 244 |
-| Líneas | 90,20 % | 764 de 847 |
+## 🧪 Pruebas y evidencias
 
-Las pruebas verifican formularios, navegación, acceso por rol, categorías, ofertas, administración, reservas, persistencia y manejo de errores.
+| Fase | Resultado documentado | Evidencia |
+| --- | --- | --- |
+| **2 · React** | La ejecución de referencia registró **151 pruebas aprobadas en 15 archivos** y **90,20 % de cobertura de líneas**. | [Pruebas unitarias y cobertura de la EV2](./docs/ev2/pruebas_unitarias/) |
+| **3 · Frontend** | El registro de cierre consigna **155 pruebas aprobadas en 18 archivos** y una compilación exitosa con Vite. | [Verificación local de la EV3](./docs/ev3/pruebas/cierre-integracion-local.md) |
+| **3 · Backend** | Se conservan los resultados locales y los informes JaCoCo del Gateway y los seis microservicios. | [Pruebas locales](./docs/ev3/pruebas/backend-local.json) · [Reportes de cobertura](./docs/ev3/cobertura/) |
+| **3 · Integración REST** | La verificación con PostgreSQL local documenta el guardado de la ficha, los permisos sobre registros propios, la validación de precios, los conflictos de horario y la recuperación de una orden con una cita pendiente. | [Cierre del flujo de orden y cita](./docs/ev3/pruebas/cierre-integracion-local.md) |
 
-El reporte local se genera en `coverage/index.html`. La cobertura indica qué código se ejecutó; su alcance y limitaciones se analizan en el informe.
+Para ejecutar las pruebas del frontend de la fase 2 o 3, entra a la carpeta correspondiente y usa `npm run test -- --run`. Para verificar un módulo Java de la fase 3, ejecuta `./mvnw verify` desde su carpeta o `.\mvnw.cmd verify` en PowerShell.
 
-### Informe y evidencias
+## 📘 Documentación de las tres fases
 
-- [Informe de pruebas y análisis de cobertura](./docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf).
-- [Reporte HTML y recursos](./docs/ev2/pruebas_unitarias/cobertura/).
-- [Resumen de cobertura en JSON](./docs/ev2/pruebas_unitarias/cobertura/coverage-summary.json).
-- [Captura de cobertura](./docs/ev2/pruebas_unitarias/evidencias/cobertura-final.png).
-- [Resultado de las pruebas](./docs/ev2/pruebas_unitarias/evidencias/resultado-pruebas.png).
+### Fase 1 · Requerimientos y sitio inicial
 
-GitHub muestra el HTML como código. Para navegar por el reporte, abre `docs/ev2/pruebas_unitarias/cobertura/index.html` desde la copia local del repositorio.
+| Entregable | Archivo |
+| --- | --- |
+| Planilla de requerimientos | [Anexo 2 · Planilla de Requerimientos](./docs/ev1/DSY1104%20Evaluaci%C3%B3n%20Parcial%201%20-%20Anexo%202%20Planilla%20de%20Requerimientos.xlsx) |
+| Especificación de Requisitos de Software | [Anexo 4 · ERS de la fase 1](./docs/ev1/DSY1104%20Evaluaci%C3%B3n%20Parcial%201%20-%20Anexo%204%20ERS-Especificacion%20de%20Requisitos%20del%20software.docx) |
 
----
+### Fase 2 · Aplicación React, pruebas y despliegue
 
-## 📦 Análisis y compilación
+| Entregable | Archivo |
+| --- | --- |
+| Especificación de Requisitos de Software | [Anexo 4 · ERS de la fase 2](./docs/ev2/DSY1104%20Evaluaci%C3%B3n%20Parcial%202%20-%20Anexo%204%20ERS-Especificacion%20de%20Requisitos%20del%20software.docx.pdf) |
+| Informe de pruebas | [Informe de Pruebas de NutriVida](./docs/ev2/pruebas_unitarias/Informe%20Pruebas%20NutriVida.pdf) |
+| Cobertura y evidencias | [Reporte de cobertura](./docs/ev2/pruebas_unitarias/cobertura/) · [Capturas de las pruebas](./docs/ev2/pruebas_unitarias/evidencias/) |
+| Despliegue en AWS EC2 | [Procedimiento de despliegue](./docs/ev2/despliegue_aws/README.md) · [Evidencias del despliegue](./docs/ev2/despliegue_aws/evidencias/) |
 
-Desde la carpeta React:
+### Fase 3 · Integración full stack
 
-```bash
-npm run lint
-npm run build
-npm run preview
-```
+| Entregable | Archivo |
+| --- | --- |
+| Especificación de Requisitos de Software | [ERS de la fase 3](./docs/ev3/DSY1104%20Evaluaci%C3%B3n%20Parcial%203%20-%20Anexo%204%20ERS-Especificacion%20de%20Requisitos%20del%20software.docx) |
+| APIs e Integración | [Anexo 2 · Informe y evidencias de integración](./docs/ev3/DSY1104%20Evaluaci%C3%B3n%20Parcial%203%20-%20Anexo%202%20Documentaci%C3%B3n%20APIs%20e%20Integraci%C3%B3n.docx) |
+| Documentación de APIs | [Anexo 3 · Planilla de endpoints](./docs/ev3/DSY1104%20Evaluaci%C3%B3n%20Parcial%203%20-%20Anexo%203%20Documentaci%C3%B3n%20APIs.xlsm) |
+| Manual de usuario | [Anexo 4 · Manual de NutriVida](./docs/ev3/DSY1104%20Evaluaci%C3%B3n%20Parcial%203%20-%20Anexo%204%20Manual%20de%20usuario.docx) |
+| Pruebas y cobertura | [Resultados de pruebas](./docs/ev3/pruebas/) · [Reportes JaCoCo](./docs/ev3/cobertura/) |
 
-- `lint` analiza el código con Oxlint.
-- `build` genera la compilación en `dist/`.
-- `preview` permite revisar esa compilación localmente.
-
-Las carpetas `node_modules/`, `dist/` y `coverage/` de la aplicación se generan localmente y están excluidas del control de versiones.
-
-La copia de cobertura ubicada en `docs/ev2/pruebas_unitarias/cobertura/` se conserva como documentación.
-
----
-
-## ☁️ Despliegue en AWS
-
-La aplicación se publicó en una instancia **AWS EC2**, con **Ubuntu Server 24.04 LTS** y **Nginx**.
-
-**URL registrada del despliegue:** [http://54.160.216.249](http://54.160.216.249)
-
-Nginx utiliza una configuración compatible con React Router para servir las rutas de la aplicación.
-
-El entorno pertenece a AWS Academy. Su disponibilidad depende de que la instancia y el laboratorio permanezcan activos. La IP pública puede cambiar al detener e iniciar la instancia.
-
-Consulta el [procedimiento de despliegue y actualización](./docs/ev2/despliegue_aws/README.md).
-
----
-
-## 💾 Persistencia local
-
-La aplicación conserva pacientes, profesionales, sesión, reservas y citas mediante `localStorage`.
-
-Los datos pertenecen al navegador y al origen utilizado. No se comparten automáticamente entre dispositivos, navegadores o entre localhost y AWS.
-
-En las demostraciones se utilizan datos ficticios.
-
----
+El código de la fase 3 está disponible en las carpetas de [frontend](./fase3/proyecto_etapa3_fullstack/frontend/) y [backend](./fase3/proyecto_etapa3_fullstack/backend/).
 
 ## 🤝 Trabajo colaborativo
 
-Los cambios se desarrollan mediante ramas y se integran a `main` utilizando Pull Requests.
-
-### Crear una rama
-
-Con el directorio de trabajo limpio:
-
-```bash
-git switch main
-git pull --ff-only origin main
-git switch -c nombre/descripcion-tarea
-```
-
-### Guardar cambios
-
-Desde la raíz del repositorio:
-
-```bash
-git status
-git add .
-git commit -m "nombre: describir el cambio"
-```
-
-### Actualizar la rama antes de publicar
-
-```bash
-git fetch origin
-git merge origin/main
-```
-
-Si la integración modifica la aplicación, se comprueban las pruebas y la compilación antes de publicar.
-
-### Publicar
-
-```bash
-git push -u origin nombre/descripcion-tarea
-```
-
-Después se crea un Pull Request con `main` como destino, describiendo los cambios y las verificaciones realizadas.
-
----
+El equipo organiza los cambios en ramas y los integra a `main` mediante Pull Requests. Cada Pull Request describe el cambio y las verificaciones realizadas.
 
 ## 👥 Equipo de desarrollo
 
@@ -304,9 +212,7 @@ Después se crea un Pull Request con `main` como destino, describiendo los cambi
 - **Nitsi Sepúlveda**
 - **Sofía González**
 
-Proyecto académico desarrollado para la asignatura **Desarrollo Full Stack II — Duoc UC**.
-
----
+Proyecto académico de **Desarrollo Full Stack II · Duoc UC**.
 
 <p align="center">
   🌿 <strong>NutriVida · Un cambio de hábitos cambia tu vida</strong>
